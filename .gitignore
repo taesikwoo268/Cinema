@@ -1,0 +1,60 @@
+# Build output
+/target/
+/build/
+/out/
+*.class
+
+# Logs and temporary files
+*.log
+*.tmp
+*.bak
+*.swp
+*.swo
+*~
+hs_err_pid*
+replay_pid*
+
+# Local environment and secrets
+.env
+.env.*
+!.env.example
+!.env.sample
+/src/main/resources/application-local.properties
+/src/main/resources/application-local.yml
+/src/main/resources/application-local.yaml
+
+# IDE configuration
+/.vscode/
+/.idea/
+*.iws
+*.iml
+*.ipr
+.apt_generated/
+.classpath
+.factorypath
+.project
+.settings/
+.springBeans
+.sts4-cache/
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+# Generated tool reports; keep GitHub workflows
+/.github/modernize/
+
+# Local documentation; keep README.md and source resources
+/docs/
+/HELP.md
+*.doc
+*.docx
+*.pdf
+
+# Operating system files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Keep Maven Wrapper scripts and .mvn/wrapper configuration in Git.

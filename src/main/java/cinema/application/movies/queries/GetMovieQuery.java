@@ -1,0 +1,6 @@
+package cinema.application.movies.queries;
+
+import java.time.Instant;
+import java.math.BigDecimal;
+/** Input contract only. Validation is pending. */
+public record GetMovieQuery(String movieId) { }
