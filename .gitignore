@@ -45,12 +45,8 @@ replay_pid*
 # Generated tool reports; keep GitHub workflows
 /.github/modernize/
 
-# Local documentation; keep README.md and source resources
-/docs/
+# Generated Maven help; team documentation is versioned
 /HELP.md
-*.doc
-*.docx
-*.pdf
 
 # Operating system files
 .DS_Store

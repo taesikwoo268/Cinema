@@ -1,10 +1,10 @@
-Với **giai đoạn đầu**, làm hệ thống theo nguyên tắc:
+# Kế hoạch xây dựng Cinema V1
+
+## Nguyên tắc triển khai
 
 > **Nghiệp vụ tương đối đầy đủ, công nghệ triển khai cố tình đơn giản.**
 
-Tức là vẫn thiết kế đúng `Domain → Application → Infrastructure → Web`, vẫn có booking, payment, ticket, ownership, seat hold..., nhưng chưa cần JWT thật, Redis, RabbitMQ, cổng thanh toán thật hay thuật toán concurrency phức tạp. Những thứ đó để thành **điểm nâng cấp Phase 2**. Đây cũng là hướng hợp lý vì các hệ thống booking hoàn chỉnh thường phải giải quyết seat locking/concurrency và payment integration; ta giữ abstraction ngay từ đầu nhưng chưa cần implementation phức tạp. ([GitHub][1])
-
-# Kế hoạch xây dựng Cinema V1
+Hệ thống gồm bốn tầng Domain, Application, Infrastructure và Web. Web phụ thuộc Application; Application phụ thuộc Domain; Infrastructure triển khai các port của Application. V1 bao gồm booking, payment, ticket, ownership và seat hold. JWT, Redis, RabbitMQ, cổng thanh toán thật và cơ chế concurrency nâng cao thuộc Phase 2. Các abstraction được xác định từ V1 để hỗ trợ thay thế implementation.
 
 ## 1. Mục tiêu V1
 
@@ -50,7 +50,7 @@ V1 **không cần giống hệ thống rạp phim production**. Điều quan tr�
 
 # 2. Nguyên tắc đơn giản hóa
 
-Ta phân biệt rất rõ:
+Phân biệt yêu cầu nghiệp vụ và implementation V1:
 
 ```text
 Cái phải làm đúng                 Implementation có thể giả
@@ -121,13 +121,13 @@ mà không sửa use case.
                          TICKET
 ```
 
-Đây cũng chính là thứ tự nên implement.
+Thứ tự triển khai chi tiết được quy định trong roadmap M0–M12.
 
 ---
 
 # 4. Giai đoạn 0 — Hoàn thiện nền kiến trúc
 
-Scaffold đã build thành công nên không thay kiến trúc lớn nữa.
+Giữ cấu trúc bốn tầng của scaffold hiện có.
 
 Giữ:
 
@@ -441,7 +441,7 @@ save
 
 # 8. Giai đoạn 4 — Identity / Customer
 
-Bây giờ mới cần người dùng.
+Giai đoạn này bổ sung danh tính đăng nhập và hồ sơ khách hàng.
 
 Tách:
 
@@ -525,7 +525,7 @@ Vì Application không được biết đang fake authentication.
 
 # 9. Giai đoạn 5 — Cart + Seat Hold
 
-Đây là phần đầu tiên thực sự thú vị.
+Cart quản lý ghế được chọn; SeatHold quản lý quyền giữ ghế theo suất chiếu.
 
 Customer chọn:
 
@@ -534,7 +534,7 @@ Screening #15
 Seat A5
 ```
 
-Ta tạo:
+Cấu trúc dữ liệu:
 
 ```text
 Cart
@@ -557,7 +557,7 @@ unitPrice >= 0
 
 ## AddSeatToCart
 
-Đây nên là use case chuẩn để cả nhóm học Clean Architecture:
+Use case AddSeatToCart thể hiện cách Application điều phối các port:
 
 ```text
 AddSeatToCartCommand
@@ -612,7 +612,7 @@ SimpleSeatHoldService     V1
         └────────→ RedisSeatHoldService     tương lai
 ```
 
-Đây là điểm nâng cấp Phase 2 rất đẹp.
+Phase 2 có thể thay SimpleSeatHoldService bằng RedisSeatHoldService.
 
 ---
 
@@ -836,7 +836,7 @@ Chưa cần QR code.
 
 # 13. Giai đoạn 9 — Ownership
 
-Bây giờ hoàn thiện authorization ở Application.
+Hoàn thiện kiểm tra quyền sở hữu tài nguyên tại Application.
 
 Ví dụ:
 
@@ -1060,7 +1060,7 @@ Ticket VALID
 
 # 17. Những công nghệ cố tình CHƯA làm
 
-Đây là phần rất quan trọng cho đồ án.
+Phạm vi công nghệ được phân chia giữa V1 và Phase 2 như sau.
 
 V1:
 
@@ -1092,13 +1092,13 @@ Basic queries         → query optimization/indexes
 Basic monitoring      → metrics/logging
 ```
 
-Đặc biệt seat booking là nơi rất phù hợp để đo concurrency: các hệ thống booking thực tế thường phải xử lý race condition, locking và transaction để tránh hai người cùng đặt một ghế. ([GitHub][1])
+Benchmark đặt ghế tập trung vào race condition, locking và transaction để đánh giá khả năng ngăn hai khách hàng đặt cùng một ghế trong một suất chiếu. ([GitHub][1])
 
 ---
 
 # 18. Roadmap code cụ thể
 
-Tôi sẽ chia công việc thành **12 milestone**, mỗi milestone phải chạy được trước khi sang bước sau:
+Kế hoạch gồm **13 milestone (M0–M12)**. Mỗi milestone phải đạt tiêu chí hoàn thành trước khi chuyển sang bước tiếp theo:
 
 ```text
 M0  Architecture foundation
@@ -1164,7 +1164,7 @@ Tests
 Commit
 ```
 
-Và **mỗi milestone nên là một commit hoặc một nhóm commit nhỏ**, thay vì giao Codex “implement toàn bộ Cinema”. Như vậy bạn vẫn kiểm soát và thực sự hiểu kiến trúc.
+Mỗi milestone được triển khai thành một commit hoặc một nhóm commit nhỏ để thuận tiện review, kiểm thử và theo dõi thay đổi.
 
 ## Mục tiêu cuối Phase 1
 
@@ -1209,10 +1209,10 @@ Và **mỗi milestone nên là một commit hoặc một nhóm commit nhỏ**, t
 └─────────────────────────────────────────────┘
 ```
 
-Như vậy **V1 đơn giản ở công nghệ nhưng không đơn giản hóa sai kiến trúc**. Sau này khi học/đưa vào Redis, JWT, RabbitMQ, payment thật hay concurrency control, ta chủ yếu thay **Infrastructure adapter**, hoặc bổ sung Application mechanism khi thực sự cần, thay vì đập đi xây lại Domain.
+V1 giữ các quy tắc nghiệp vụ trong Domain và sử dụng implementation đơn giản ở Infrastructure. Khi bổ sung Redis, JWT, RabbitMQ, thanh toán thật hoặc concurrency control, thay đổi tập trung ở Infrastructure adapter và cơ chế điều phối của Application.
 
-[Cinema repository – refactor/clean-architecture](https://github.com/taesikwoo268/Cinema/tree/refactor/clean-architecture?utm_source=chatgpt.com)
+[Cinema repository – refactor/clean-architecture](https://github.com/taesikwoo268/Cinema/tree/refactor/clean-architecture)
 
-Bước tiếp theo hợp lý nhất là **M0 → M1**, chưa cho Codex làm cả 12 milestone. Với mỗi milestone, ta có thể viết một specification đủ chi tiết để Codex implement đúng các file hiện có.
+Thứ tự triển khai bắt đầu từ **M0 → M1** và tiếp tục theo roadmap. Mỗi milestone cần có đặc tả phạm vi, quy tắc nghiệp vụ, file liên quan và tiêu chí nghiệm thu. Trạng thái hiện tại được cập nhật trong [Tiến độ Cinema V1](cinema-v1-progress.md).
 
-[1]: https://github.com/T-Lak/movie-booking-backend?utm_source=chatgpt.com "GitHub - T-Lak/movie-booking-backend: Scalable Movie Booking System API handling real-time seat reservations, concurrency control, and atomic transactions. · GitHub"
+[1]: https://github.com/T-Lak/movie-booking-backend "GitHub - T-Lak/movie-booking-backend: Scalable Movie Booking System API handling real-time seat reservations, concurrency control, and atomic transactions. · GitHub"

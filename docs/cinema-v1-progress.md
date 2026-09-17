@@ -2,7 +2,7 @@
 
 Ngày lưu kế hoạch: 2026-09-17.
 
-Kế hoạch chi tiết: [Cinema V1](cinema-v1-plan.md). Giữ nguyên nội dung bản kế hoạch đã thống nhất; bảng dưới đây dùng để theo dõi thực hiện.
+Kế hoạch chi tiết: [Cinema V1](cinema-v1-plan.md). Tài liệu này ghi nhận trạng thái milestone, kết quả kiểm thử và công việc còn lại của nhóm.
 
 ## Nguyên tắc thực hiện
 
@@ -15,7 +15,7 @@ Kế hoạch chi tiết: [Cinema V1](cinema-v1-plan.md). Giữ nguyên nội dun
 
 ## Checklist
 
-Bản kế hoạch gọi là “12 milestone” nhưng liệt kê M0–M12, tức **13 milestone**. Giữ nguyên mã milestone để tiện đối chiếu.
+Kế hoạch gồm **13 milestone**, từ M0 đến M12.
 
 - [x] **M0 — Architecture foundation:** hoàn thiện thành phần chung và port; 13 DomainRulesTest và 6 architecture tests đạt, không bỏ qua.
 - [ ] **M1 — Cinema / Hall / Seat:** tạo và truy vấn dữ liệu rạp, phòng, ghế; kiểm tra luật và tính duy nhất của ghế trong phòng.
@@ -33,7 +33,7 @@ Bản kế hoạch gọi là “12 milestone” nhưng liệt kê M0–M12, tứ
 
 ## Bước tiếp theo
 
-Chuẩn bị specification M1 — Cinema / Hall / Seat, gồm CinemaRepository, HallRepository và các use case tương ứng. Chưa triển khai M1 trong lần hoàn thiện M0 này.
+Chuẩn bị specification M1 — Cinema / Hall / Seat, gồm CinemaRepository, HallRepository và các use case tương ứng. M1 chưa triển khai.
 
 ## Hoàn thành M0 — 2026-09-17
 
@@ -42,7 +42,6 @@ Chuẩn bị specification M1 — Cinema / Hall / Seat, gồm CinemaRepository, 
 - Rà soát các port nền tảng, bổ sung `package-info.java` mô tả ranh giới và phân biệt user ID/customer ID; giữ nguyên chữ ký hiện có.
 - `DomainRulesTest` được thay bằng 13 trường hợp kiểm tra nền tảng thực tế; không còn `@Disabled` hoặc test rỗng trong lớp này.
 - Chạy `mvnw.cmd '-Dmaven.repo.local=C:\Users\admin\.m2\repository' -o verify` sau khi clean: build thành công; 29 trường hợp được báo cáo, 21 đạt, 8 workflow skeleton bị bỏ qua, không có failure/error. Trong đó architecture tests đạt 6/6.
-- Lần compile trong sandbox gặp lỗi truy cập dependency cache; chạy lại với quyền truy cập phù hợp đã biên dịch, kiểm thử và đóng gói thành công.
 - `BookingWorkflowTest` vẫn là backlog cho các milestone sau, không được tính là kiểm thử đã đạt của M0.
 
 ### Phân bổ acceptance test nghiệp vụ từ DomainRulesTest cũ
