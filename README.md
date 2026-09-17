@@ -1,6 +1,6 @@
 # Cinema — Architecture Contract v0.1
 
-Cinema được xây lại theo Clean Architecture. Ở bước này, tôi chỉ dựng **cấu trúc, interface và skeleton**, chưa implement hệ thống bán vé hoàn chỉnh.
+Cinema được xây lại theo Clean Architecture. Đã hoàn thiện **M0 — nền kiến trúc**, gồm kiểm tra dữ liệu của `Money`, `BaseEntity` và kiểm thử nền tảng; các chức năng bán vé vẫn ở mức skeleton.
 
 ## 1. Cấu trúc
 
@@ -54,10 +54,12 @@ Nếu Maven trỏ cache vào `C:\.m2` và không ghi được, truyền `-Dmaven
 
 Ứng dụng khởi động được mà chưa cần database, Redis hay RabbitMQ. Controller chưa có endpoint nghiệp vụ; Security đang chặn toàn bộ request. JWT filter chưa đăng ký, chưa có tài khoản mặc định hay thanh toán hoạt động.
 
-Handler chưa implement sẽ ném `FeatureNotImplementedException`. Domain method và adapter chưa implement sẽ ném `UnsupportedOperationException`. Constructor domain hiện chỉ giữ dữ liệu, chưa kiểm tra invariant. JPA entity mới có ID, phần mapping còn phải làm tiếp.
+Handler chưa implement sẽ ném `FeatureNotImplementedException`. Domain method và adapter chưa implement sẽ ném `UnsupportedOperationException`. `BaseEntity` từ chối ID null/blank; `Money` từ chối amount/currency null và số tiền âm. Các invariant nghiệp vụ khác còn phải triển khai theo milestone. JPA entity mới có ID, phần mapping còn phải làm tiếp.
 
-Test đang chạy kiểm tra dependency, khởi động/security và việc handler báo chưa implement. Test nghiệp vụ đang để `@Disabled` vì mới có skeleton.
+Test đang chạy kiểm tra luật nền tảng, dependency, khởi động/security và việc handler báo chưa implement. M0 có 13 domain test và 6 architecture test đạt, không bỏ qua. `BookingWorkflowTest` còn 8 test skeleton bị `@Disabled`, thuộc các bước triển khai sau.
 
 Chi tiết: [Architecture Contract](docs/architecture-contract.md).
 
 Model và các luồng nghiệp vụ: [Thiết kế chi tiết](docs/architecture-contract-source.txt).
+
+Kế hoạch và tiến độ: [Cinema V1](docs/cinema-v1-plan.md) · [Checklist M0–M12](docs/cinema-v1-progress.md).
