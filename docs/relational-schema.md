@@ -147,22 +147,217 @@ Quan hệ `Booking → BookingItem` là `1..N` theo nghiệp vụ; FK đơn thu�
 
 Ký hiệu `?` chỉ cột cho phép `NULL`. Độ dài chuỗi ngoài ID là đề xuất triển khai.
 
-| Bảng | Thuộc tính và kiểu dữ liệu | Khóa chính / duy nhất |
-|---|---|---|
-| `application_users` | `id VARCHAR(64)`, `email VARCHAR(254)`, `password_hash VARCHAR(255)` | PK `id`; UK `email` sau chuẩn hóa |
-| `customer_records` | `id VARCHAR(64)`, `user_id VARCHAR(64)`, `display_name VARCHAR(255)` | PK `id`; UK `user_id` |
-| `cinema_records` | `id VARCHAR(64)`, `name VARCHAR(255)`, `address TEXT` | PK `id` |
-| `hall_records` | `id VARCHAR(64)`, `cinema_id VARCHAR(64)`, `name VARCHAR(255)` | PK `id`; UK `(cinema_id, name)` đề xuất |
-| `seat_records` | `id VARCHAR(64)`, `hall_id VARCHAR(64)`, `row_label VARCHAR(20)`, `seat_number INTEGER`, `type VARCHAR(20)` | PK `id`; UK `(hall_id, row_label, seat_number)`; UK `(id, hall_id)` phục vụ FK ghép |
-| `movie_records` | `id VARCHAR(64)`, `title VARCHAR(255)`, `description TEXT?`, `duration_minutes INTEGER`, `age_rating VARCHAR(20)?`, `status VARCHAR(20)` | PK `id` |
-| `screening_records` | `id VARCHAR(64)`, `movie_id VARCHAR(64)`, `hall_id VARCHAR(64)`, `start_time TIMESTAMP_TZ`, `end_time TIMESTAMP_TZ`, `base_price_amount DECIMAL(19,4)`, `base_price_currency CHAR(3)`, `status VARCHAR(20)` | PK `id`; UK `(id, hall_id)` phục vụ FK ghép |
-| `screening_seat_records` | `screening_id VARCHAR(64)`, `seat_id VARCHAR(64)`, `hall_id VARCHAR(64)`, `state VARCHAR(20)`, `held_by_customer_id VARCHAR(64)?`, `hold_expires_at TIMESTAMP_TZ?`, `booked_booking_id VARCHAR(64)?` | PK `(screening_id, seat_id)` |
-| `cart_records` | `id VARCHAR(64)`, `customer_id VARCHAR(64)` | PK `id`; UK `customer_id` |
-| `cart_item_records` | `cart_id VARCHAR(64)`, `screening_id VARCHAR(64)`, `seat_id VARCHAR(64)`, `unit_price_amount DECIMAL(19,4)`, `unit_price_currency CHAR(3)` | PK `(cart_id, screening_id, seat_id)` |
-| `booking_records` | `id VARCHAR(64)`, `customer_id VARCHAR(64)`, `screening_id VARCHAR(64)`, `total_amount DECIMAL(19,4)`, `currency CHAR(3)`, `status VARCHAR(20)`, `created_at TIMESTAMP_TZ` | PK `id`; UK `(id, screening_id)` phục vụ FK ghép |
-| `booking_item_records` | `booking_id VARCHAR(64)`, `seat_id VARCHAR(64)`, `screening_id VARCHAR(64)`, `price_amount DECIMAL(19,4)`, `price_currency CHAR(3)`, `seat_row_snapshot VARCHAR(20)`, `seat_number_snapshot INTEGER`, `seat_type_snapshot VARCHAR(20)` | PK `(booking_id, seat_id)`; UK `(booking_id, screening_id, seat_id)` phục vụ FK ghép |
-| `payment_records` | `id VARCHAR(64)`, `booking_id VARCHAR(64)`, `amount DECIMAL(19,4)`, `currency CHAR(3)`, `status VARCHAR(20)`, `provider_reference VARCHAR(255)?`, `idempotency_key VARCHAR(128)` | PK `id`; UK `idempotency_key`; tối đa một lần `SUCCESS` mỗi booking |
-| `ticket_records` | `id VARCHAR(64)`, `booking_id VARCHAR(64)`, `screening_id VARCHAR(64)`, `seat_id VARCHAR(64)`, `ticket_code VARCHAR(128)`, `status VARCHAR(20)` | PK `id`; UK `ticket_code`; UK `(booking_id, seat_id)` |
+### `application_users`
+
+Thuộc tính:
+
+- `id VARCHAR(64)`
+- `email VARCHAR(254)`
+- `password_hash VARCHAR(255)`
+
+Khóa và ràng buộc:
+
+- PK `id`
+- UK `email` sau chuẩn hóa
+
+### `customer_records`
+
+Thuộc tính:
+
+- `id VARCHAR(64)`
+- `user_id VARCHAR(64)`
+- `display_name VARCHAR(255)`
+
+Khóa và ràng buộc:
+
+- PK `id`
+- UK `user_id`
+
+### `cinema_records`
+
+Thuộc tính:
+
+- `id VARCHAR(64)`
+- `name VARCHAR(255)`
+- `address TEXT`
+
+Khóa và ràng buộc:
+
+- PK `id`
+
+### `hall_records`
+
+Thuộc tính:
+
+- `id VARCHAR(64)`
+- `cinema_id VARCHAR(64)`
+- `name VARCHAR(255)`
+
+Khóa và ràng buộc:
+
+- PK `id`
+- UK `(cinema_id, name)` đề xuất
+
+### `seat_records`
+
+Thuộc tính:
+
+- `id VARCHAR(64)`
+- `hall_id VARCHAR(64)`
+- `row_label VARCHAR(20)`
+- `seat_number INTEGER`
+- `type VARCHAR(20)`
+
+Khóa và ràng buộc:
+
+- PK `id`
+- UK `(hall_id, row_label, seat_number)`
+- UK `(id, hall_id)` phục vụ FK ghép
+
+### `movie_records`
+
+Thuộc tính:
+
+- `id VARCHAR(64)`
+- `title VARCHAR(255)`
+- `description TEXT?`
+- `duration_minutes INTEGER`
+- `age_rating VARCHAR(20)?`
+- `status VARCHAR(20)`
+
+Khóa và ràng buộc:
+
+- PK `id`
+
+### `screening_records`
+
+Thuộc tính:
+
+- `id VARCHAR(64)`
+- `movie_id VARCHAR(64)`
+- `hall_id VARCHAR(64)`
+- `start_time TIMESTAMP_TZ`
+- `end_time TIMESTAMP_TZ`
+- `base_price_amount DECIMAL(19,4)`
+- `base_price_currency CHAR(3)`
+- `status VARCHAR(20)`
+
+Khóa và ràng buộc:
+
+- PK `id`
+- UK `(id, hall_id)` phục vụ FK ghép
+
+### `screening_seat_records`
+
+Thuộc tính:
+
+- `screening_id VARCHAR(64)`
+- `seat_id VARCHAR(64)`
+- `hall_id VARCHAR(64)`
+- `state VARCHAR(20)`
+- `held_by_customer_id VARCHAR(64)?`
+- `hold_expires_at TIMESTAMP_TZ?`
+- `booked_booking_id VARCHAR(64)?`
+
+Khóa và ràng buộc:
+
+- PK `(screening_id, seat_id)`
+
+### `cart_records`
+
+Thuộc tính:
+
+- `id VARCHAR(64)`
+- `customer_id VARCHAR(64)`
+
+Khóa và ràng buộc:
+
+- PK `id`
+- UK `customer_id`
+
+### `cart_item_records`
+
+Thuộc tính:
+
+- `cart_id VARCHAR(64)`
+- `screening_id VARCHAR(64)`
+- `seat_id VARCHAR(64)`
+- `unit_price_amount DECIMAL(19,4)`
+- `unit_price_currency CHAR(3)`
+
+Khóa và ràng buộc:
+
+- PK `(cart_id, screening_id, seat_id)`
+
+### `booking_records`
+
+Thuộc tính:
+
+- `id VARCHAR(64)`
+- `customer_id VARCHAR(64)`
+- `screening_id VARCHAR(64)`
+- `total_amount DECIMAL(19,4)`
+- `currency CHAR(3)`
+- `status VARCHAR(20)`
+- `created_at TIMESTAMP_TZ`
+
+Khóa và ràng buộc:
+
+- PK `id`
+- UK `(id, screening_id)` phục vụ FK ghép
+
+### `booking_item_records`
+
+Thuộc tính:
+
+- `booking_id VARCHAR(64)`
+- `seat_id VARCHAR(64)`
+- `screening_id VARCHAR(64)`
+- `price_amount DECIMAL(19,4)`
+- `price_currency CHAR(3)`
+- `seat_row_snapshot VARCHAR(20)`
+- `seat_number_snapshot INTEGER`
+- `seat_type_snapshot VARCHAR(20)`
+
+Khóa và ràng buộc:
+
+- PK `(booking_id, seat_id)`
+- UK `(booking_id, screening_id, seat_id)` phục vụ FK ghép
+
+### `payment_records`
+
+Thuộc tính:
+
+- `id VARCHAR(64)`
+- `booking_id VARCHAR(64)`
+- `amount DECIMAL(19,4)`
+- `currency CHAR(3)`
+- `status VARCHAR(20)`
+- `provider_reference VARCHAR(255)?`
+- `idempotency_key VARCHAR(128)`
+
+Khóa và ràng buộc:
+
+- PK `id`
+- UK `idempotency_key`
+- tối đa một lần `SUCCESS` mỗi booking
+
+### `ticket_records`
+
+Thuộc tính:
+
+- `id VARCHAR(64)`
+- `booking_id VARCHAR(64)`
+- `screening_id VARCHAR(64)`
+- `seat_id VARCHAR(64)`
+- `ticket_code VARCHAR(128)`
+- `status VARCHAR(20)`
+
+Khóa và ràng buộc:
+
+- PK `id`
+- UK `ticket_code`
+- UK `(booking_id, seat_id)`
 
 `TIMESTAMP_TZ` là ký hiệu kiểu logic, không phải SQL chạy trực tiếp. Chọn kiểu tương ứng khi chốt hệ quản trị database.
 
@@ -172,26 +367,59 @@ Không tạo bảng riêng cho `Money`, enum hoặc `BaseEntity`: `Money` đư�
 
 ## 4. Danh sách khóa ngoại đầy đủ
 
-| Bảng con / cột | Tham chiếu bảng cha / cột |
-|---|---|
-| `customer_records(user_id)` | `application_users(id)` |
-| `hall_records(cinema_id)` | `cinema_records(id)` |
-| `seat_records(hall_id)` | `hall_records(id)` |
-| `screening_records(movie_id)` | `movie_records(id)` |
-| `screening_records(hall_id)` | `hall_records(id)` |
-| `screening_seat_records(screening_id, hall_id)` | `screening_records(id, hall_id)` |
-| `screening_seat_records(seat_id, hall_id)` | `seat_records(id, hall_id)` |
-| `screening_seat_records(held_by_customer_id)` | `customer_records(id)` |
-| `screening_seat_records(booked_booking_id, screening_id, seat_id)` | `booking_item_records(booking_id, screening_id, seat_id)` |
-| `cart_records(customer_id)` | `customer_records(id)` |
-| `cart_item_records(cart_id)` | `cart_records(id)` |
-| `cart_item_records(screening_id, seat_id)` | `screening_seat_records(screening_id, seat_id)` |
-| `booking_records(customer_id)` | `customer_records(id)` |
-| `booking_records(screening_id)` | `screening_records(id)` |
-| `booking_item_records(booking_id, screening_id)` | `booking_records(id, screening_id)` |
-| `booking_item_records(screening_id, seat_id)` | `screening_seat_records(screening_id, seat_id)` |
-| `payment_records(booking_id)` | `booking_records(id)` |
-| `ticket_records(booking_id, screening_id, seat_id)` | `booking_item_records(booking_id, screening_id, seat_id)` |
+- Cột nguồn: `customer_records(user_id)`
+  Tham chiếu: `application_users(id)`
+
+- Cột nguồn: `hall_records(cinema_id)`
+  Tham chiếu: `cinema_records(id)`
+
+- Cột nguồn: `seat_records(hall_id)`
+  Tham chiếu: `hall_records(id)`
+
+- Cột nguồn: `screening_records(movie_id)`
+  Tham chiếu: `movie_records(id)`
+
+- Cột nguồn: `screening_records(hall_id)`
+  Tham chiếu: `hall_records(id)`
+
+- Cột nguồn: `screening_seat_records(screening_id, hall_id)`
+  Tham chiếu: `screening_records(id, hall_id)`
+
+- Cột nguồn: `screening_seat_records(seat_id, hall_id)`
+  Tham chiếu: `seat_records(id, hall_id)`
+
+- Cột nguồn: `screening_seat_records(held_by_customer_id)`
+  Tham chiếu: `customer_records(id)`
+
+- Cột nguồn: `screening_seat_records(booked_booking_id, screening_id, seat_id)`
+  Tham chiếu: `booking_item_records(booking_id, screening_id, seat_id)`
+
+- Cột nguồn: `cart_records(customer_id)`
+  Tham chiếu: `customer_records(id)`
+
+- Cột nguồn: `cart_item_records(cart_id)`
+  Tham chiếu: `cart_records(id)`
+
+- Cột nguồn: `cart_item_records(screening_id, seat_id)`
+  Tham chiếu: `screening_seat_records(screening_id, seat_id)`
+
+- Cột nguồn: `booking_records(customer_id)`
+  Tham chiếu: `customer_records(id)`
+
+- Cột nguồn: `booking_records(screening_id)`
+  Tham chiếu: `screening_records(id)`
+
+- Cột nguồn: `booking_item_records(booking_id, screening_id)`
+  Tham chiếu: `booking_records(id, screening_id)`
+
+- Cột nguồn: `booking_item_records(screening_id, seat_id)`
+  Tham chiếu: `screening_seat_records(screening_id, seat_id)`
+
+- Cột nguồn: `payment_records(booking_id)`
+  Tham chiếu: `booking_records(id)`
+
+- Cột nguồn: `ticket_records(booking_id, screening_id, seat_id)`
+  Tham chiếu: `booking_item_records(booking_id, screening_id, seat_id)`
 
 Hai FK ghép qua `hall_id` bảo đảm ghế và suất chiếu cùng phòng. FK ghép booking item bảo đảm mọi item cùng suất với booking. FK của ticket bảo đảm vé tham chiếu đúng một item, đúng ghế và đúng suất.
 
@@ -203,29 +431,71 @@ Chính sách xóa đề xuất: chỉ `cart_records → cart_item_records` dùng
 
 ## 5. Miền giá trị và ràng buộc
 
-| Cột | Giá trị / điều kiện |
-|---|---|
-| `movie_records.status` | `COMING_SOON`, `SHOWING`, `ARCHIVED` |
-| `screening_records.status` | `SCHEDULED`, `CANCELLED`, `COMPLETED` |
-| `seat_records.type`, `seat_type_snapshot` | `NORMAL`, `VIP`, `COUPLE` |
-| `booking_records.status` | `PENDING`, `CONFIRMED`, `CANCELLED` |
-| `payment_records.status` | `PENDING`, `SUCCESS`, `FAILED`, `REFUNDED` |
-| `ticket_records.status` | `VALID`, `USED`, `CANCELLED` |
-| `screening_seat_records.state` | `AVAILABLE`, `HELD`, `BOOKED` — enum persistence đề xuất |
-| Các cột tiền | `>= 0`; currency gồm ba chữ cái viết hoa, được application kiểm tra là mã tiền tệ hợp lệ |
-| `duration_minutes`, `seat_number`, `seat_number_snapshot` | `> 0` |
-| `start_time`, `end_time` | `start_time < end_time` |
-| ID, tên, title, row label, ticket code, idempotency key | Không rỗng sau khi bỏ khoảng trắng |
+### `movie_records.status`
+
+`COMING_SOON`, `SHOWING`, `ARCHIVED`
+
+### `screening_records.status`
+
+`SCHEDULED`, `CANCELLED`, `COMPLETED`
+
+### `seat_records.type`, `seat_type_snapshot`
+
+`NORMAL`, `VIP`, `COUPLE`
+
+### `booking_records.status`
+
+`PENDING`, `CONFIRMED`, `CANCELLED`
+
+### `payment_records.status`
+
+`PENDING`, `SUCCESS`, `FAILED`, `REFUNDED`
+
+### `ticket_records.status`
+
+`VALID`, `USED`, `CANCELLED`
+
+### `screening_seat_records.state`
+
+`AVAILABLE`, `HELD`, `BOOKED` — enum persistence đề xuất
+
+### Các cột tiền
+
+`>= 0`; currency gồm ba chữ cái viết hoa, được application kiểm tra là mã tiền tệ hợp lệ
+
+### `duration_minutes`, `seat_number`, `seat_number_snapshot`
+
+`> 0`
+
+### `start_time`, `end_time`
+
+`start_time < end_time`
+
+### ID, tên, title, row label, ticket code, idempotency key
+
+Không rỗng sau khi bỏ khoảng trắng
 
 Email được chuẩn hóa theo một policy thống nhất trước khi lưu/tra cứu để uniqueness không bị khác biệt chữ hoa/thường. Chỉ lưu hash mật khẩu; không lưu mật khẩu gốc.
 
 Ràng buộc `CHECK` cho tồn ghế phải dùng kiểm tra `IS NULL`/`IS NOT NULL` tường minh:
 
-| State | `held_by_customer_id` | `hold_expires_at` | `booked_booking_id` |
-|---|---|---|---|
-| `AVAILABLE` | NULL | NULL | NULL |
-| `HELD` | Có giá trị | Có giá trị | NULL |
-| `BOOKED` | NULL | NULL | Có giá trị |
+### Trạng thái `AVAILABLE`
+
+- `held_by_customer_id`: NULL
+- `hold_expires_at`: NULL
+- `booked_booking_id`: NULL
+
+### Trạng thái `HELD`
+
+- `held_by_customer_id`: Có giá trị
+- `hold_expires_at`: Có giá trị
+- `booked_booking_id`: NULL
+
+### Trạng thái `BOOKED`
+
+- `held_by_customer_id`: NULL
+- `hold_expires_at`: NULL
+- `booked_booking_id`: Có giá trị
 
 Không dùng `CHECK(hold_expires_at > now())`: hold hợp lệ hôm nay sẽ hết hạn theo thời gian. Application kiểm tra hạn bằng `Clock` và cập nhật bản ghi trong transaction.
 
@@ -253,28 +523,98 @@ Các yêu cầu sau cần application kết hợp transaction/locking hoặc tri
 
 PK/UK thường đã có index đi kèm; không tạo lại các index đó. Bổ sung theo truy vấn và kế hoạch thực thi thực tế:
 
-| Bảng | Index | Mục đích |
-|---|---|---|
-| `screening_records` | `(movie_id, start_time)`, `(hall_id, start_time)` | Tìm suất theo phim; kiểm tra lịch phòng |
-| `screening_seat_records` | `(held_by_customer_id, state)`, `(state, hold_expires_at)`, `(booked_booking_id)`, `(seat_id, hall_id)` | Tìm hold, thu hồi hold hết hạn, tra booking và tham chiếu ghế |
-| `cart_item_records` | `(screening_id, seat_id)` | Tra item theo ghế của suất |
-| `booking_records` | `(customer_id, created_at)`, `(screening_id, status)` | Lịch sử khách và booking của suất |
-| `booking_item_records` | `(screening_id, seat_id)` | Tra lịch sử đặt ghế |
-| `payment_records` | `(booking_id)`, `(provider_reference)` | Các lần thanh toán và đối soát |
-| `ticket_records` | `(screening_id, seat_id)` | Tra vé theo suất–ghế |
+### `screening_records`
+
+Chỉ mục:
+
+- `(movie_id, start_time)`
+- `(hall_id, start_time)`
+
+Mục đích: Tìm suất theo phim; kiểm tra lịch phòng.
+
+### `screening_seat_records`
+
+Chỉ mục:
+
+- `(held_by_customer_id, state)`
+- `(state, hold_expires_at)`
+- `(booked_booking_id)`
+- `(seat_id, hall_id)`
+
+Mục đích: Tìm hold, thu hồi hold hết hạn, tra booking và tham chiếu ghế.
+
+### `cart_item_records`
+
+Chỉ mục:
+
+- `(screening_id, seat_id)`
+
+Mục đích: Tra item theo ghế của suất.
+
+### `booking_records`
+
+Chỉ mục:
+
+- `(customer_id, created_at)`
+- `(screening_id, status)`
+
+Mục đích: Lịch sử khách và booking của suất.
+
+### `booking_item_records`
+
+Chỉ mục:
+
+- `(screening_id, seat_id)`
+
+Mục đích: Tra lịch sử đặt ghế.
+
+### `payment_records`
+
+Chỉ mục:
+
+- `(booking_id)`
+- `(provider_reference)`
+
+Mục đích: Các lần thanh toán và đối soát.
+
+### `ticket_records`
+
+Chỉ mục:
+
+- `(screening_id, seat_id)`
+
+Mục đích: Tra vé theo suất–ghế.
 
 Index UNIQUE `(cinema_id, name)` của phòng và `(hall_id, row_label, seat_number)` của ghế đã hỗ trợ tra theo rạp/phòng. Không mặc định `provider_reference` duy nhất toàn hệ thống khi chưa có quy ước từ gateway; nếu tích hợp nhiều nhà cung cấp, bổ sung `provider` và cân nhắc UK `(provider, provider_reference)`.
 
 ## 8. Đối chiếu với mã nguồn và bước triển khai
 
-| Model / port hiện tại | Bảng đích |
-|---|---|
-| `ApplicationUser` | `application_users` |
-| `Customer`, `Movie`, `Screening`, `Seat` | Các bảng `customer_records`, `movie_records`, `screening_records`, `seat_records` |
-| `Cinema`, `Hall` | `cinema_records`, `hall_records` |
-| `Cart`, `CartItem` | `cart_records`, `cart_item_records` |
-| `Booking`, `BookingItem` | `booking_records`, `booking_item_records` |
-| `Payment`, `Ticket` | `payment_records`, `ticket_records` |
-| `SeatHoldService`, `SeatReservationRepository` | Cùng thao tác `screening_seat_records` để tuần tự hóa việc giữ và đặt trên một dòng |
+### `ApplicationUser`
+
+Bảng đích: `application_users`.
+
+### `Customer`, `Movie`, `Screening`, `Seat`
+
+Bảng đích: Các bảng `customer_records`, `movie_records`, `screening_records`, `seat_records`.
+
+### `Cinema`, `Hall`
+
+Bảng đích: `cinema_records`, `hall_records`.
+
+### `Cart`, `CartItem`
+
+Bảng đích: `cart_records`, `cart_item_records`.
+
+### `Booking`, `BookingItem`
+
+Bảng đích: `booking_records`, `booking_item_records`.
+
+### `Payment`, `Ticket`
+
+Bảng đích: `payment_records`, `ticket_records`.
+
+### `SeatHoldService`, `SeatReservationRepository`
+
+Bảng đích: Cùng thao tác `screening_seat_records` để tuần tự hóa việc giữ và đặt trên một dòng.
 
 Trước khi triển khai: chọn hệ quản trị; chốt thời hạn hold/booking, refund, quyền quản trị và quy tắc currency; tạo migration cùng các FK/UK/CHECK; hoàn thiện JPA mapping, mapper và transaction; kiểm tra cạnh tranh đặt cùng ghế, retry payment và hủy vé bằng integration test rồi mới bật JPA. Identity hiện chưa mô hình hóa role/permission, nên các bảng phân quyền cần thiết kế riêng khi chốt chức năng quản trị.
