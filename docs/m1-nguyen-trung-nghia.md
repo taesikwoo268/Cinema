@@ -6,7 +6,8 @@ Nguồn thống nhất: [đặc tả M1](m1-specification.md).
 
 ## 1. Chốt đầu vào và điều phối
 
-- Xác nhận các lựa chọn trong mục 3 đặc tả trước PR implementation.
+- Đã xác nhận toàn bộ quy tắc mục 3 đặc tả ngày 2026-09-18.
+  Bước tiếp theo: review PR hợp đồng của Long khi được bàn giao.
 - Review PR hợp đồng của Long trước khi Khánh/Anh nối implementation.
 - Chốt danh sách file của bốn người; mỗi file chỉ một chủ sửa.
 - Xác nhận nền M0 đã có trên main.

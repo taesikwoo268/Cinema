@@ -3,6 +3,7 @@
 Vai trò: repository in-memory, tính duy nhất nguyên tử và dữ liệu nghiệm thu.
 Trạng thái: kế hoạch giao việc, chưa triển khai.
 Hợp đồng: [đặc tả M1](m1-specification.md), mục 3–5.
+Quy tắc mục 3 đã được Nghĩa xác nhận ngày 2026-09-18.
 
 ## 1. Phạm vi file
 

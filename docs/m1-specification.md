@@ -1,7 +1,7 @@
 # Đặc tả M1 — Cinema / Hall / Seat
 
 Ngày lập: 2026-09-18. Mốc 5 trong kế hoạch 18 mốc; mã kỹ thuật M1.
-Trạng thái: đặc tả và phân công dự kiến, chưa triển khai code M1.
+Trạng thái: quy tắc M1 đã được Nguyễn Trung Nghĩa duyệt ngày 2026-09-18; chưa triển khai code M1.
 
 ## 1. Mục tiêu và hiện trạng
 
@@ -39,16 +39,17 @@ Yêu cầu đã có trong kế hoạch:
 - Domain kiểm tra dữ liệu của entity; Application phối hợp tra cứu và kiểm tra trùng.
 - Repository phải bảo đảm kiểm tra và ghi unique nguyên tử.
 
-## 3. Quyết định cần Nghĩa chốt trước khi mở PR triển khai
+## 3. Quy tắc đã duyệt — 2026-09-18
 
-Các lựa chọn dưới đây là phương án dự kiến, chưa được ghi nhận là quy tắc đã duyệt.
-Bốn bản giao việc dùng cùng phương án để xác định phạm vi.
-Nếu thay đổi, cập nhật đặc tả và test expectation trước khi code phụ thuộc.
+Nguyễn Trung Nghĩa đã xác nhận toàn bộ các quy tắc dưới đây.
+Bốn bản giao việc và các kiểm thử sử dụng thống nhất các quy tắc này.
+Nếu cần thay đổi, trưởng nhóm xác nhận và cập nhật đặc tả cùng test expectation
+trước khi sửa code phụ thuộc.
 
 - Address: bắt buộc không null/blank; trim khi lưu.
 - Tên Cinema/Hall: trim khi lưu; chưa chuẩn hóa chữ hoa/thường.
 - Tên Hall: unique trong cùng Cinema sau trim, phân biệt hoa/thường.
-  Đây là lựa chọn được đề xuất trong schema, chưa là luật bắt buộc của kế hoạch gốc.
+  Ràng buộc này được xác nhận áp dụng trong M1.
 - Seat.row: trim rồi uppercase bằng Locale.ROOT; a, A và " A " cùng một hàng.
   Không tự giới hạn hàng ghế chỉ còn A–Z.
 - COUPLE: một Seat với loại COUPLE; chưa suy ra hai chỗ hoặc tự tạo hai Seat.
@@ -107,7 +108,7 @@ Dữ liệu được tạo qua Application; adapter không tự gọi repository
 Đặt command/query/handler trong application/venues/commands và application/venues/queries.
 Đặt DTO trong application/venues/models.
 Mỗi record và mỗi handler là một file riêng.
-Các kiểu dưới đây là chữ ký dự kiến phải thống nhất trước khi triển khai.
+Các kiểu dưới đây là hợp đồng dùng chung cho triển khai M1.
 
 Commands:
 
@@ -232,7 +233,7 @@ Profile mặc định giữ nguyên hành vi kiểm thử scaffold.
 - [Duy Anh — kiểm thử Domain/Application](m1-duy-anh.md).
 - [Duy Khánh — adapter in-memory và test persistence tạm](m1-duy-khanh.md).
 
-Bước 1: Nghĩa xác nhận các quyết định mục 3.
+Bước 1: đã hoàn thành — Nghĩa xác nhận các quyết định mục 3 ngày 2026-09-18.
 Bước 2: Bảo Long bàn giao PR hợp đồng: port, record command/query/DTO,
 ConflictException và bổ sung chữ ký cho JpaSeatRepositoryAdapter để code compile.
 Bước 3: sau khi PR hợp đồng ghép main, chia bốn nhánh theo bản giao việc.

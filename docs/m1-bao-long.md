@@ -3,7 +3,7 @@
 Vai trò: phụ trách chính Domain và Application của Cinema/Hall/Seat.
 Trạng thái: kế hoạch giao việc, chưa triển khai.
 Đọc [đặc tả M1](m1-specification.md) trước khi code.
-Các quy tắc dự kiến ở mục 3 cần Nghĩa xác nhận trước.
+Các quy tắc mục 3 đã được Nghĩa xác nhận ngày 2026-09-18; triển khai theo đặc tả.
 
 ## 1. File hiện có được sửa
 

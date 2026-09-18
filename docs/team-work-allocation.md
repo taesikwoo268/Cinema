@@ -64,8 +64,8 @@ ngay tại mốc đó; mốc 13 rà soát và hoàn thiện nhất quán toàn h
 - [Duy Anh: kiểm thử Domain/Application](m1-duy-anh.md).
 - [Duy Khánh: adapter in-memory và kiểm thử](m1-duy-khanh.md).
 
-Các bản giao việc này quy định file và chữ ký hàm cho M1. Các quyết định
-nghiệp vụ còn mở phải được Nghĩa chốt trong đặc tả trước khi triển khai.
+Các bản giao việc này quy định file và chữ ký hàm cho M1. Nghĩa đã xác nhận
+các quy tắc mục 3 đặc tả ngày 2026-09-18; triển khai và kiểm thử theo hợp đồng này.
 
 Phụ trách chính: **Bảo Long**. Trạng thái: **Chưa bắt đầu**.
 

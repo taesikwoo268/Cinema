@@ -2,8 +2,8 @@
 
 Vai trò: kiểm thử độc lập Domain và Application của M1.
 Trạng thái: kế hoạch giao việc, chưa triển khai.
-Đọc [đặc tả M1](m1-specification.md); chỉ chốt expectation cho các quy tắc
-mục 3 sau khi Nghĩa xác nhận.
+Đọc [đặc tả M1](m1-specification.md); dùng quy tắc mục 3 đã được Nghĩa
+xác nhận ngày 2026-09-18 để viết test expectation.
 
 ## 1. Phạm vi sở hữu
 
@@ -39,7 +39,7 @@ SeatTest.java:
 - rejectsNonPositiveNumber: 0, số âm.
 - rejectsNullType.
 - acceptsEachSeatType: NORMAL, VIP, COUPLE.
-- normalizesRow: a và " A " cho cùng giá trị A khi lựa chọn này được chốt.
+- normalizesRow: a và " A " cho cùng giá trị A theo quy tắc đã duyệt.
 - preservesNumberAndHallId.
 - Không kiểm tra uniqueness bằng cách tạo hai object Domain:
   uniqueness phụ thuộc repository, không nằm trong constructor Seat.
