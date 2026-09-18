@@ -20,6 +20,9 @@ flowchart LR
 
 ## Chạy và kiểm tra
 
+Đặc tả bước tiếp theo: [M1 — Cinema / Hall / Seat](docs/m1-specification.md),
+kèm bốn bản giao việc theo thành viên. Đây là kế hoạch triển khai, chưa phải chức năng đã hoàn thành.
+
 Dùng JDK 25. Dự án đã có Maven Wrapper:
 
 ```powershell

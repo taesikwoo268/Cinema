@@ -8,7 +8,7 @@ Số mốc 1–18 khác với mã roadmap kỹ thuật M0–M12.
 
 **Nguyễn Trung Nghĩa — trưởng nhóm** đã hoàn thành mốc 1–4,
 bao gồm V0 tại mốc 4 (giai đoạn 0 / M0).
-A, B, C là tên tạm của ba thành viên còn lại.
+A: Bảo Long; B: Duy Anh; C: Duy Khánh.
 
 **Cả nhóm chỉ triển khai một mốc tại một thời điểm, theo thứ tự 5 → 18.**
 Không gom nhiều mốc thành một đợt làm song song.
@@ -56,56 +56,67 @@ ngay tại mốc đó; mốc 13 rà soát và hoàn thiện nhất quán toàn h
 
 ### Mốc 5 — Cinema / Hall / Seat
 
-Phụ trách chính: **A**. Trạng thái: **Chưa bắt đầu**.
+Đặc tả và giao việc chi tiết:
+
+- [Đặc tả M1 và hợp đồng dùng chung](m1-specification.md).
+- [Nguyễn Trung Nghĩa: Web, cấu hình và tích hợp](m1-nguyen-trung-nghia.md).
+- [Bảo Long: Domain và Application](m1-bao-long.md).
+- [Duy Anh: kiểm thử Domain/Application](m1-duy-anh.md).
+- [Duy Khánh: adapter in-memory và kiểm thử](m1-duy-khanh.md).
+
+Các bản giao việc này quy định file và chữ ký hàm cho M1. Các quyết định
+nghiệp vụ còn mở phải được Nghĩa chốt trong đặc tả trước khi triển khai.
+
+Phụ trách chính: **Bảo Long**. Trạng thái: **Chưa bắt đầu**.
 
 - **Nghĩa:** Chốt port, cấu hình ghép nối; review và tích hợp.
-- **A:** Triển khai Domain, repository port và use case Cinema/Hall/Seat.
-- **B:** Viết test quy tắc tên, số ghế và ghế trùng trong phòng.
-- **C:** Chuẩn bị dữ liệu mẫu, adapter in-memory và kịch bản tạo/truy vấn theo hợp đồng đã chốt.
+- **Bảo Long:** Triển khai Domain, repository port và use case Cinema/Hall/Seat.
+- **Duy Anh:** Viết test quy tắc tên, số ghế và ghế trùng trong phòng.
+- **Duy Khánh:** Chuẩn bị dữ liệu mẫu, adapter in-memory và kịch bản tạo/truy vấn theo hợp đồng đã chốt.
 
 **Điều kiện nghiệm thu:** Tạo/truy vấn rạp, phòng, ghế hoạt động; từ chối dữ liệu sai và ghế trùng trong phòng.
 
 ### Mốc 6 — Movie
 
-Phụ trách chính: **B**. Trạng thái: **Chưa bắt đầu**.
+Phụ trách chính: **Duy Anh**. Trạng thái: **Chưa bắt đầu**.
 
 - **Nghĩa:** Review hợp đồng Movie, ghép cấu hình và nghiệm thu.
-- **A:** Viết test tiêu đề, thời lượng và các trường hợp không tìm thấy phim.
-- **B:** Triển khai Domain, port, use case và adapter Movie.
-- **C:** Chuẩn bị dữ liệu phim và kịch bản kiểm thử tạo/truy vấn/xóa.
+- **Bảo Long:** Viết test tiêu đề, thời lượng và các trường hợp không tìm thấy phim.
+- **Duy Anh:** Triển khai Domain, port, use case và adapter Movie.
+- **Duy Khánh:** Chuẩn bị dữ liệu phim và kịch bản kiểm thử tạo/truy vấn/xóa.
 
 **Điều kiện nghiệm thu:** Luồng quản lý phim chạy được; tiêu đề và thời lượng được kiểm tra.
 
 ### Mốc 7 — Screening
 
-Phụ trách chính: **B**. Trạng thái: **Chưa bắt đầu**.
+Phụ trách chính: **Duy Anh**. Trạng thái: **Chưa bắt đầu**.
 
 - **Nghĩa:** Chốt quy tắc lịch chiếu; tích hợp và nghiệm thu.
-- **A:** Nối tra cứu Hall/Seat đã hoàn thành; kiểm tra ghế thuộc phòng của suất.
-- **B:** Triển khai Screening, truy vấn và kiểm tra lịch trùng qua repository.
-- **C:** Viết test giờ bắt đầu/kết thúc, lịch trùng và trạng thái không cho đặt.
+- **Bảo Long:** Nối tra cứu Hall/Seat đã hoàn thành; kiểm tra ghế thuộc phòng của suất.
+- **Duy Anh:** Triển khai Screening, truy vấn và kiểm tra lịch trùng qua repository.
+- **Duy Khánh:** Viết test giờ bắt đầu/kết thúc, lịch trùng và trạng thái không cho đặt.
 
 **Điều kiện nghiệm thu:** Tạo/truy vấn suất chiếu hoạt động; lịch cùng phòng không trùng; trạng thái bookable đúng.
 
 ### Mốc 8 — Identity / Customer
 
-Phụ trách chính: **C**. Trạng thái: **Chưa bắt đầu**.
+Phụ trách chính: **Duy Khánh**. Trạng thái: **Chưa bắt đầu**.
 
 - **Nghĩa:** Chốt phân biệt user ID/customer ID, hợp đồng CurrentUser; ghép cấu hình.
-- **A:** Viết test hồ sơ Customer và ánh xạ user–customer.
-- **B:** Chuẩn bị kịch bản đăng ký/đăng nhập, dữ liệu mẫu và tài liệu sử dụng.
-- **C:** Triển khai IdentityService, Customer, CurrentUser và identity adapter đơn giản.
+- **Bảo Long:** Viết test hồ sơ Customer và ánh xạ user–customer.
+- **Duy Anh:** Chuẩn bị kịch bản đăng ký/đăng nhập, dữ liệu mẫu và tài liệu sử dụng.
+- **Duy Khánh:** Triển khai IdentityService, Customer, CurrentUser và identity adapter đơn giản.
 
 **Điều kiện nghiệm thu:** Đăng ký/đăng nhập đơn giản hoạt động; Application xác định đúng customer hiện tại.
 
 ### Mốc 9 — Cart + Seat Hold
 
-Phụ trách chính: **A**. Trạng thái: **Chưa bắt đầu**.
+Phụ trách chính: **Bảo Long**. Trạng thái: **Chưa bắt đầu**.
 
 - **Nghĩa:** Chốt vòng đời giữ/nhả ghế, review và tích hợp.
-- **A:** Triển khai Cart, use case thêm/xóa ghế và SeatHold/SeatReservation adapter đơn giản.
-- **B:** Viết test ghế sai phòng, suất không bookable, ghế đã đặt và giỏ trùng.
-- **C:** Nối danh tính hiện tại và viết test giữ ghế của khách khác; sửa identity adapter nếu cần.
+- **Bảo Long:** Triển khai Cart, use case thêm/xóa ghế và SeatHold/SeatReservation adapter đơn giản.
+- **Duy Anh:** Viết test ghế sai phòng, suất không bookable, ghế đã đặt và giỏ trùng.
+- **Duy Khánh:** Nối danh tính hiện tại và viết test giữ ghế của khách khác; sửa identity adapter nếu cần.
 
 **Điều kiện nghiệm thu:** Thêm/xóa giỏ và giữ/nhả ghế hoạt động; kiểm tra trạng thái ghế và chủ giỏ đúng.
 
@@ -114,53 +125,53 @@ Phụ trách chính: **A**. Trạng thái: **Chưa bắt đầu**.
 Phụ trách chính: **Nguyễn Trung Nghĩa**. Trạng thái: **Chưa bắt đầu**.
 
 - **Nghĩa:** Triển khai Booking, Checkout và hủy booking; sở hữu handler điều phối và trạng thái Domain.
-- **A:** Nối Cart/SeatHold với Checkout qua port; xử lý giữ/nhả ghế phục vụ booking.
-- **B:** Viết test nhóm theo suất, snapshot giá, tổng tiền và giỏ rỗng.
-- **C:** Viết test ownership, hủy booking và chuyển trạng thái không hợp lệ.
+- **Bảo Long:** Nối Cart/SeatHold với Checkout qua port; xử lý giữ/nhả ghế phục vụ booking.
+- **Duy Anh:** Viết test nhóm theo suất, snapshot giá, tổng tiền và giỏ rỗng.
+- **Duy Khánh:** Viết test ownership, hủy booking và chuyển trạng thái không hợp lệ.
 
 **Điều kiện nghiệm thu:** Checkout tạo Booking PENDING, mỗi booking thuộc một suất; tổng tiền và hủy đúng. Chỉ kiểm thử confirm ở Domain; chưa triển khai Payment hoặc Ticket.
 
 ### Mốc 11 — Payment
 
-Phụ trách chính: **C**. Trạng thái: **Chưa bắt đầu**.
+Phụ trách chính: **Duy Khánh**. Trạng thái: **Chưa bắt đầu**.
 
 - **Nghĩa:** Nối kết quả thanh toán với Booking.confirm(); review hợp đồng và tích hợp.
-- **A:** Nối cập nhật SeatReservation sau thanh toán; kiểm thử giữ/đặt ghế.
-- **B:** Viết test luồng thanh toán, lỗi và yêu cầu lặp theo hợp đồng V1.
-- **C:** Triển khai Payment, FakePaymentGateway và PayBooking handler; kiểm tra ownership và PENDING.
+- **Bảo Long:** Nối cập nhật SeatReservation sau thanh toán; kiểm thử giữ/đặt ghế.
+- **Duy Anh:** Viết test luồng thanh toán, lỗi và yêu cầu lặp theo hợp đồng V1.
+- **Duy Khánh:** Triển khai Payment, FakePaymentGateway và PayBooking handler; kiểm tra ownership và PENDING.
 
 **Điều kiện nghiệm thu:** Thanh toán thành công lưu Payment SUCCESS và xác nhận Booking; trạng thái ghế nhất quán; từ chối sai chủ/trạng thái. Chưa triển khai Ticket.
 
 ### Mốc 12 — Ticket
 
-Phụ trách chính: **B**. Trạng thái: **Chưa bắt đầu**.
+Phụ trách chính: **Duy Anh**. Trạng thái: **Chưa bắt đầu**.
 
 - **Nghĩa:** Review việc tích hợp phát vé với Booking và nghiệm thu.
-- **A:** Viết test vé đúng ghế, đúng suất và đủ số lượng booking item.
-- **B:** Triển khai Ticket, phát hành và truy vấn vé, mã vé và trạng thái.
-- **C:** Nối gọi phát hành vé sau thanh toán trong handler Payment; kiểm thử đường đi không thành công.
+- **Bảo Long:** Viết test vé đúng ghế, đúng suất và đủ số lượng booking item.
+- **Duy Anh:** Triển khai Ticket, phát hành và truy vấn vé, mã vé và trạng thái.
+- **Duy Khánh:** Nối gọi phát hành vé sau thanh toán trong handler Payment; kiểm thử đường đi không thành công.
 
 **Điều kiện nghiệm thu:** Mỗi booking item có một vé sau thanh toán thành công; không phát vé khi chưa đủ điều kiện hoặc phát trùng.
 
 ### Mốc 13 — Ownership / Authorization
 
-Phụ trách chính: **C**. Trạng thái: **Chưa bắt đầu**.
+Phụ trách chính: **Duy Khánh**. Trạng thái: **Chưa bắt đầu**.
 
 - **Nghĩa:** Rà soát và hoàn thiện quyền xem/hủy Booking; kiểm thử tích hợp.
-- **A:** Rà soát quyền Cart và giữ/nhả ghế; bổ sung trường hợp truy cập chéo.
-- **B:** Rà soát quyền truy vấn Ticket qua chủ Booking; bổ sung test truy cập chéo.
-- **C:** Điều phối quy tắc CurrentUser/Customer; hoàn thiện quyền Payment và bộ kịch bản hai khách hàng.
+- **Bảo Long:** Rà soát quyền Cart và giữ/nhả ghế; bổ sung trường hợp truy cập chéo.
+- **Duy Anh:** Rà soát quyền truy vấn Ticket qua chủ Booking; bổ sung test truy cập chéo.
+- **Duy Khánh:** Điều phối quy tắc CurrentUser/Customer; hoàn thiện quyền Payment và bộ kịch bản hai khách hàng.
 
-**Điều kiện nghiệm thu:** GetBooking, CancelBooking, PayBooking, GetTicket kiểm tra ownership tại Application; khách A không thao tác tài nguyên của B.
+**Điều kiện nghiệm thu:** GetBooking, CancelBooking, PayBooking, GetTicket kiểm tra ownership tại Application; khách thứ nhất không thao tác tài nguyên của khách thứ hai.
 
 ### Mốc 14 — REST API hoàn chỉnh
 
 Phụ trách chính: **Nguyễn Trung Nghĩa**. Trạng thái: **Chưa bắt đầu**.
 
 - **Nghĩa:** Chốt quy ước HTTP/DTO/lỗi; hoàn thiện BookingController, exception chung và cấu hình.
-- **A:** Hoàn thiện controller/DTO Cinema/Hall/Seat và Cart.
-- **B:** Hoàn thiện controller/DTO Movie, Screening và Ticket.
-- **C:** Hoàn thiện controller/DTO Identity và Payment, nối security adapter.
+- **Bảo Long:** Hoàn thiện controller/DTO Cinema/Hall/Seat và Cart.
+- **Duy Anh:** Hoàn thiện controller/DTO Movie, Screening và Ticket.
+- **Duy Khánh:** Hoàn thiện controller/DTO Identity và Payment, nối security adapter.
 
 **Điều kiện nghiệm thu:** API V1 đầy đủ và nhất quán; controller gọi use case; HTTP tests đạt với adapter hiện có.
 
@@ -169,9 +180,9 @@ Phụ trách chính: **Nguyễn Trung Nghĩa**. Trạng thái: **Chưa bắt đ�
 Phụ trách chính: **Nguyễn Trung Nghĩa**. Trạng thái: **Chưa bắt đầu**.
 
 - **Nghĩa:** Chốt DB/schema/transaction, migration tổng và cấu hình; triển khai adapter Booking.
-- **A:** Triển khai mapping/adapter Cinema/Hall/Seat, Cart và SeatHold/SeatReservation.
-- **B:** Triển khai mapping/adapter Movie, Screening và Ticket.
-- **C:** Triển khai persistence Identity/Customer và Payment.
+- **Bảo Long:** Triển khai mapping/adapter Cinema/Hall/Seat, Cart và SeatHold/SeatReservation.
+- **Duy Anh:** Triển khai mapping/adapter Movie, Screening và Ticket.
+- **Duy Khánh:** Triển khai persistence Identity/Customer và Payment.
 
 **Điều kiện nghiệm thu:** Adapter JPA thay adapter tạm; migration, khóa và transaction đúng; dữ liệu đọc lại được sau khởi động lại; test persistence đạt.
 
@@ -180,9 +191,9 @@ Phụ trách chính: **Nguyễn Trung Nghĩa**. Trạng thái: **Chưa bắt đ�
 Phụ trách chính: **Nguyễn Trung Nghĩa**. Trạng thái: **Chưa bắt đầu**.
 
 - **Nghĩa:** Điều phối kiểm thử hồi quy và toàn luồng; sửa lỗi Booking/tích hợp.
-- **A:** Hoàn thiện bộ test rạp/ghế/giỏ/hold và sửa lỗi thuộc phạm vi.
-- **B:** Hoàn thiện bộ test Movie/Screening/Ticket và sửa lỗi thuộc phạm vi.
-- **C:** Hoàn thiện bộ test Identity/Payment/Ownership và sửa lỗi thuộc phạm vi.
+- **Bảo Long:** Hoàn thiện bộ test rạp/ghế/giỏ/hold và sửa lỗi thuộc phạm vi.
+- **Duy Anh:** Hoàn thiện bộ test Movie/Screening/Ticket và sửa lỗi thuộc phạm vi.
+- **Duy Khánh:** Hoàn thiện bộ test Identity/Payment/Ownership và sửa lỗi thuộc phạm vi.
 
 **Điều kiện nghiệm thu:** Toàn bộ test bắt buộc đạt, không để rỗng hoặc bỏ qua; luồng đăng nhập → chọn ghế → checkout → payment → ticket đạt.
 
@@ -191,9 +202,9 @@ Phụ trách chính: **Nguyễn Trung Nghĩa**. Trạng thái: **Chưa bắt đ�
 Phụ trách chính: **Nguyễn Trung Nghĩa**. Trạng thái: **Chưa bắt đầu**.
 
 - **Nghĩa:** Chốt báo cáo giới hạn V1 và danh sách nâng cấp Phase 2.
-- **A:** Ghi nhận giới hạn SeatHold, thời hạn và concurrency; nêu hướng nâng cấp.
-- **B:** Ghi nhận giới hạn truy vấn, lịch chiếu và phát vé; nêu hướng nâng cấp.
-- **C:** Ghi nhận identity/payment giả và giới hạn quyền truy cập; nêu hướng nâng cấp.
+- **Bảo Long:** Ghi nhận giới hạn SeatHold, thời hạn và concurrency; nêu hướng nâng cấp.
+- **Duy Anh:** Ghi nhận giới hạn truy vấn, lịch chiếu và phát vé; nêu hướng nâng cấp.
+- **Duy Khánh:** Ghi nhận identity/payment giả và giới hạn quyền truy cập; nêu hướng nâng cấp.
 
 **Điều kiện nghiệm thu:** Tài liệu phân biệt rõ chức năng V1 đã có và công việc Phase 2 chưa triển khai; không bắt đầu code Phase 2.
 
@@ -202,9 +213,9 @@ Phụ trách chính: **Nguyễn Trung Nghĩa**. Trạng thái: **Chưa bắt đ�
 Phụ trách chính: **Nguyễn Trung Nghĩa**. Trạng thái: **Chưa bắt đầu**.
 
 - **Nghĩa:** Đối chiếu roadmap M0–M12; hoàn thiện Docker, hướng dẫn chạy và nghiệm thu V1.
-- **A:** Chuẩn bị dữ liệu demo, chạy benchmark đặt ghế và ghi điều kiện/kết quả đo.
-- **B:** Tổng hợp OpenAPI và ví dụ request/response từ API đã hoàn thành.
-- **C:** Kiểm tra demo đăng nhập/thanh toán/quyền truy cập, cấu hình và hướng dẫn trên môi trường mới.
+- **Bảo Long:** Chuẩn bị dữ liệu demo, chạy benchmark đặt ghế và ghi điều kiện/kết quả đo.
+- **Duy Anh:** Tổng hợp OpenAPI và ví dụ request/response từ API đã hoàn thành.
+- **Duy Khánh:** Kiểm tra demo đăng nhập/thanh toán/quyền truy cập, cấu hình và hướng dẫn trên môi trường mới.
 
 **Điều kiện nghiệm thu:** Roadmap và tài liệu bàn giao đầy đủ; chạy được Docker và demo toàn luồng; có OpenAPI và baseline benchmark. Các mục Docker/OpenAPI/benchmark đối chiếu M12 trong roadmap.
 
@@ -213,12 +224,12 @@ Phụ trách chính: **Nguyễn Trung Nghĩa**. Trạng thái: **Chưa bắt đ�
 Các nhóm chức năng được duy trì để thành viên tích lũy hiểu biết xuyên suốt:
 
 - **Nghĩa:** kiến trúc chung, Booking và cấu hình tích hợp.
-- **A:** Cinema/Hall/Seat, Cart, SeatHold và SeatReservation.
-- **B:** Movie, Screening và Ticket.
-- **C:** Identity/Customer, Payment và security adapter.
+- **Bảo Long:** Cinema/Hall/Seat, Cart, SeatHold và SeatReservation.
+- **Duy Anh:** Movie, Screening và Ticket.
+- **Duy Khánh:** Identity/Customer, Payment và security adapter.
 
 Đây là phạm vi duy trì mã nguồn, không cho phép triển khai trước mốc.
-Ví dụ, khi cả nhóm ở mốc 10, B viết test Booking theo phân công;
+Ví dụ, khi cả nhóm ở mốc 10, Duy Anh viết test Booking theo phân công;
 chưa triển khai Ticket của mốc 12.
 
 Trước mỗi mốc, Nghĩa ghi rõ file/package sản phẩm và file test của từng người.
@@ -238,11 +249,11 @@ thay đổi ảnh hưởng người khác phải được thống nhất trướ
 
 Ví dụ phân chia mốc 11:
 
-- C sửa Payment và PayBooking handler.
-- Nghĩa sửa Booking khi cần; cung cấp hành vi confirm cho C gọi.
-- A sửa adapter SeatHold/SeatReservation; cung cấp thao tác cập nhật ghế.
-- B viết lớp test thanh toán riêng.
-- C thực hiện lời gọi Booking và SeatReservation trong handler do C sở hữu.
+- Duy Khánh sửa Payment và PayBooking handler.
+- Nghĩa sửa Booking khi cần; cung cấp hành vi confirm cho Duy Khánh gọi.
+- Bảo Long sửa adapter SeatHold/SeatReservation; cung cấp thao tác cập nhật ghế.
+- Duy Anh viết lớp test thanh toán riêng.
+- Duy Khánh thực hiện lời gọi Booking và SeatReservation trong handler do Duy Khánh sở hữu.
   Các thành viên khác không đồng thời chỉnh sửa handler này.
 
 Ở mốc 15, mỗi người bàn giao schema/mapping của nhóm chức năng mình.
@@ -268,9 +279,9 @@ Nghĩa quản lý thứ tự migration và các khóa ngoại liên phân hệ.
 Ví dụ cả nhóm cùng làm mốc 10:
 
 - `feature/nghia/moc-10-booking`
-- `feature/a/moc-10-cart-hold-integration`
-- `feature/b/moc-10-checkout-tests`
-- `feature/c/moc-10-ownership-tests`
+- `feature/bao-long/moc-10-cart-hold-integration`
+- `feature/duy-anh/moc-10-checkout-tests`
+- `feature/duy-khanh/moc-10-ownership-tests`
 
 Nếu còn lỗi tích hợp, cả nhóm tiếp tục xử lý trong mốc hiện tại.
 Thành viên đã xong hỗ trợ review, test hoặc tài liệu; không chuyển trước
@@ -283,9 +294,9 @@ Quy trình này chưa tạo nhánh, PR hoặc cấu hình bảo vệ nhánh trê
 Mỗi mốc chỉ được đánh dấu hoàn thành khi tất cả điều kiện sau đạt:
 
 - [ ] Nghĩa hoàn thành phần việc.
-- [ ] A hoàn thành phần việc.
-- [ ] B hoàn thành phần việc.
-- [ ] C hoàn thành phần việc.
+- [ ] Bảo Long hoàn thành phần việc.
+- [ ] Duy Anh hoàn thành phần việc.
+- [ ] Duy Khánh hoàn thành phần việc.
 - [ ] Tất cả PR của mốc đã review và ghép vào `main`.
 - [ ] Build, architecture tests và các test liên quan đạt trên `main`.
 - [ ] Kiểm thử tích hợp đạt tiêu chí nghiệm thu của mốc.
@@ -300,7 +311,7 @@ Các kết quả kiểm thử V1 đã được nghiệm thu phải được gi�
 ## 6. Trạng thái và bước tiếp theo
 
 - **Đã hoàn thành:** mốc 1–4, do Nguyễn Trung Nghĩa thực hiện.
-- **Mốc tiếp theo:** mốc 5 — Cinema / Hall / Seat, A phụ trách chính.
+- **Mốc tiếp theo:** mốc 5 — Cinema / Hall / Seat, Bảo Long phụ trách chính.
 - **Chưa bắt đầu:** mốc 5–18.
 - Hạn bàn giao được chốt tại đầu mỗi mốc theo thời gian của các thành viên.
 - Lưu kết quả nghiệm thu và liên kết PR/commit tại
