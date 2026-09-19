@@ -1,0 +1,51 @@
+### Run with: .\mvnw.cmd spring-boot:run '-Dspring-boot.run.profiles=venue-dev'
+
+### Create a cinema, copy the returned id into {{cinemaId}}
+POST http://localhost:8080/cinemas
+Content-Type: application/json
+
+{"name":"Aurora Cinema","address":"1 Main Street"}
+
+### Set this from the previous response
+@cinemaId = replace-with-returned-cinema-id
+
+### Create a hall, copy the returned id into {{hallId}}
+POST http://localhost:8080/halls
+Content-Type: application/json
+
+{"cinemaId":"{{cinemaId}}","name":"Hall A"}
+
+@hallId = replace-with-returned-hall-id
+
+### Create physical seats
+POST http://localhost:8080/seats
+Content-Type: application/json
+
+{"hallId":"{{hallId}}","row":"A","number":1,"type":"NORMAL"}
+
+POST http://localhost:8080/seats
+Content-Type: application/json
+
+{"hallId":"{{hallId}}","row":"A","number":2,"type":"VIP"}
+
+POST http://localhost:8080/seats
+Content-Type: application/json
+
+{"hallId":"{{hallId}}","row":"B","number":1,"type":"COUPLE"}
+
+### Read the hierarchy
+GET http://localhost:8080/cinemas
+GET http://localhost:8080/cinemas/{{cinemaId}}
+GET http://localhost:8080/cinemas/{{cinemaId}}/halls
+GET http://localhost:8080/halls/{{hallId}}
+GET http://localhost:8080/halls/{{hallId}}/seats
+
+### Expected errors: duplicate seat is 409; missing hall is 404
+POST http://localhost:8080/seats
+Content-Type: application/json
+
+{"hallId":"{{hallId}}","row":"a","number":1,"type":"NORMAL"}
+
+GET http://localhost:8080/halls/missing-hall/seats
+
+### In-memory data is lost when the application restarts.
