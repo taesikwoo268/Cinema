@@ -2,6 +2,7 @@ package cinema.application.common.interfaces;
 
 import java.util.List;
 import java.util.Optional;
+
 import cinema.domain.cinema.Seat;
 /**
  * Output port for physical seats.
@@ -14,7 +15,9 @@ import cinema.domain.cinema.Seat;
  * row, then number, then ID.
  */
 public interface SeatRepository {
+
     Optional<Seat> findById(String id);
+
     List<Seat> findByHallId(String hallId);
     boolean existsByHallIdAndRowAndNumber(String hallId, String row, int number);
     void save(Seat seat);

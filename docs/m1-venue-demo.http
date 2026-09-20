@@ -1,0 +1,126 @@
+### Run with: .\mvnw.cmd spring-boot:run '-Dspring-boot.run.profiles=venue-dev'
+
+
+### ------------------------------------------------------------
+### Đăng ký tài khoản (chỉ chạy lần đầu)
+### ------------------------------------------------------------
+POST http://localhost:8080/api/auth/register
+Content-Type: application/json
+
+{
+  "email": "admin@cinema.local",
+  "password": "Admin123!",
+  "fullName": "Admin"
+}
+
+
+### ------------------------------------------------------------
+### Đăng nhập — lấy token
+### Response có "token". Copy giá trị đó → gán vào @token bên dưới.
+### ------------------------------------------------------------
+POST http://localhost:8080/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@cinema.local",
+  "password": "Admin123!"
+}
+
+
+### ------------------------------------------------------------
+### GÁN BIẾN TOKEN — Dán token thật từ response login vào đây
+### ------------------------------------------------------------
+@token = replace-with-returned-jwt-token
+
+
+### Create a cinema, copy the returned id into {{cinemaId}}
+POST http://localhost:8080/cinemas
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{"name":"Aurora Cinema","address":"1 Main Street"}
+
+
+### Set this from the previous response
+@cinemaId = replace-with-returned-cinema-id
+
+
+### Create a hall, copy the returned id into {{hallId}}
+POST http://localhost:8080/halls
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{"cinemaId":"{{cinemaId}}","name":"Hall A"}
+
+
+### Set this from the previous response
+@hallId = replace-with-returned-hall-id
+
+
+### Create physical seats
+POST http://localhost:8080/seats
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{"hallId":"{{hallId}}","row":"A","number":1,"type":"NORMAL"}
+
+
+### ------------------------------------------------------------
+POST http://localhost:8080/seats
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{"hallId":"{{hallId}}","row":"A","number":2,"type":"VIP"}
+
+
+### ------------------------------------------------------------
+POST http://localhost:8080/seats
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{"hallId":"{{hallId}}","row":"B","number":1,"type":"COUPLE"}
+
+
+### Read the hierarchy
+### GET danh sách cinema
+GET http://localhost:8080/cinemas
+Authorization: Bearer {{token}}
+
+
+### GET chi tiết cinema
+GET http://localhost:8080/cinemas/{{cinemaId}}
+Authorization: Bearer {{token}}
+
+
+### GET halls theo cinema
+GET http://localhost:8080/cinemas/{{cinemaId}}/halls
+Authorization: Bearer {{token}}
+
+
+### GET chi tiết hall
+GET http://localhost:8080/halls/{{hallId}}
+Authorization: Bearer {{token}}
+
+
+### GET seats theo hall
+GET http://localhost:8080/halls/{{hallId}}/seats
+Authorization: Bearer {{token}}
+
+
+### Expected errors: duplicate seat is 409; missing hall is 404
+### Duplicate seat → mong đợi 409 Conflict
+### Dùng đúng "A"/1 (giá trị đã lưu) để chắc chắn trùng.
+POST http://localhost:8080/seats
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{"hallId":"{{hallId}}","row":"A","number":1,"type":"NORMAL"}
+
+
+### Missing hall → mong đợi 404 Not Found
+### "missing-hall" là ID cố ý sai để test lỗi, không phải ID thật.
+GET http://localhost:8080/halls/missing-hall/seats
+Authorization: Bearer {{token}}
+
+
+### In-memory data is lost when the application restarts.
