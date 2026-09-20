@@ -33,7 +33,19 @@ Kế hoạch gồm **13 milestone**, từ M0 đến M12.
 
 ## Bước tiếp theo
 
-Chuẩn bị specification M1 — Cinema / Hall / Seat, gồm CinemaRepository, HallRepository và các use case tương ứng. M1 chưa triển khai.
+M1 đang triển khai phần Web độc lập trên nhánh feature/nghia/moc-5-web-integration.
+Quy tắc đã chốt; bước tiếp theo là nhận PR hợp đồng/handler của Bảo Long và
+adapter in-memory của Duy Khánh để nối controller, cấu hình và kiểm thử toàn luồng.
+
+## Tiến độ M1 — 2026-09-18
+
+- Đã thêm ba request DTO, response ID, profile security venue-dev và lỗi JSON 400.
+- 40 trường hợp kiểm thử Web/security mới đạt; gồm test ứng dụng thật với profile
+  venue-dev và test riêng có controller thử nghiệm để kiểm tra JSON/security.
+- Toàn bộ verify: 61 đạt, 8 workflow skeleton ngoài M1 skipped, không lỗi.
+- Chưa có controller nghiệp vụ, VenueConfiguration hoặc mapping lỗi 409;
+  chờ lớp Application và adapter đúng phân công.
+- Chưa nghiệm thu M1, chưa ghép main hoặc chuyển mốc 6.
 
 ## Hoàn thành M0 — 2026-09-17
 

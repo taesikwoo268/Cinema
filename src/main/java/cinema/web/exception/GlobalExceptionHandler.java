@@ -4,10 +4,16 @@ import cinema.application.common.exceptions.*;
 import cinema.web.responses.ErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ErrorResponse> malformedRequest(HttpMessageNotReadableException ex) {
+        return ResponseEntity.badRequest().body(
+            new ErrorResponse("VALIDATION", "Request body must be valid JSON with the expected field types"));
+    }
     @ExceptionHandler(FeatureNotImplementedException.class)
     public ResponseEntity<ErrorResponse> notImplemented(FeatureNotImplementedException ex) { return error(HttpStatus.NOT_IMPLEMENTED, "NOT_IMPLEMENTED", ex); }
     @ExceptionHandler(NotFoundException.class)

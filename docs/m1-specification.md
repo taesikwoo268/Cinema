@@ -1,7 +1,8 @@
 # Đặc tả M1 — Cinema / Hall / Seat
 
 Ngày lập: 2026-09-18. Mốc 5 trong kế hoạch 18 mốc; mã kỹ thuật M1.
-Trạng thái: quy tắc M1 đã được Nguyễn Trung Nghĩa duyệt ngày 2026-09-18; chưa triển khai code M1.
+Trạng thái: quy tắc M1 đã được Nguyễn Trung Nghĩa duyệt ngày 2026-09-18;
+đang triển khai phần Web độc lập, chưa hoàn thành M1.
 
 ## 1. Mục tiêu và hiện trạng
 
@@ -12,7 +13,9 @@ sau đó truy vấn lại qua Application và HTTP.
 Code hiện tại đã có Cinema, Hall, Seat, SeatType và kiểm tra ID trong BaseEntity.
 Các entity chưa kiểm tra luật riêng. SeatRepository chỉ có findById/findByHallId.
 Chưa có CinemaRepository, HallRepository hoặc use case quản lý địa điểm.
-JpaSeatRepositoryAdapter còn là skeleton; SecurityConfig chặn toàn bộ request.
+JpaSeatRepositoryAdapter còn là skeleton. Profile mặc định vẫn chặn toàn bộ request;
+profile venue-dev đã có allowlist method/path M1, nhưng controller nghiệp vụ và
+cấu hình nối handler/repository chưa được tích hợp.
 
 M1 dùng repository in-memory. Dữ liệu mất khi khởi động lại.
 Chưa triển khai JPA/migration, sửa/xóa địa điểm, tạo ghế hàng loạt,

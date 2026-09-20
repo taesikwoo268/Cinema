@@ -67,7 +67,11 @@ ngay tại mốc đó; mốc 13 rà soát và hoàn thiện nhất quán toàn h
 Các bản giao việc này quy định file và chữ ký hàm cho M1. Nghĩa đã xác nhận
 các quy tắc mục 3 đặc tả ngày 2026-09-18; triển khai và kiểm thử theo hợp đồng này.
 
-Phụ trách chính: **Bảo Long**. Trạng thái: **Chưa bắt đầu**.
+Phụ trách chính: **Bảo Long**. Trạng thái: **Đang triển khai phần Web độc lập của Nghĩa**.
+
+Ngày 2026-09-18: request/response, security theo profile và xử lý JSON lỗi đã có
+kiểm thử đạt trên nhánh Nghĩa. Phần nối controller/handler/repository còn chờ
+bàn giao; mốc 5 chưa được nghiệm thu. Chi tiết tại bản giao việc của Nghĩa.
 
 - **Nghĩa:** Chốt port, cấu hình ghép nối; review và tích hợp.
 - **Bảo Long:** Triển khai Domain, repository port và use case Cinema/Hall/Seat.
@@ -312,7 +316,8 @@ Các kết quả kiểm thử V1 đã được nghiệm thu phải được gi�
 
 - **Đã hoàn thành:** mốc 1–4, do Nguyễn Trung Nghĩa thực hiện.
 - **Mốc tiếp theo:** mốc 5 — Cinema / Hall / Seat, Bảo Long phụ trách chính.
-- **Chưa bắt đầu:** mốc 5–18.
+- **Đang triển khai:** mốc 5, phần Web độc lập của Nghĩa.
+- **Chưa bắt đầu:** mốc 6–18.
 - Hạn bàn giao được chốt tại đầu mỗi mốc theo thời gian của các thành viên.
 - Lưu kết quả nghiệm thu và liên kết PR/commit tại
   [Tiến độ Cinema V1](cinema-v1-progress.md).

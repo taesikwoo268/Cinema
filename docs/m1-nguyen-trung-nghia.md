@@ -1,8 +1,33 @@
 # M1 — Bản giao việc Nguyễn Trung Nghĩa
 
 Vai trò: trưởng nhóm, chốt hợp đồng, Web, cấu hình và nghiệm thu.
-Trạng thái: kế hoạch giao việc, chưa triển khai.
+Trạng thái: đang triển khai trên nhánh feature/nghia/moc-5-web-integration.
 Nguồn thống nhất: [đặc tả M1](m1-specification.md).
+
+## Tiến độ thực hiện — 2026-09-18
+
+- [x] Chốt quy tắc M1.
+- [x] Thêm CreateCinemaRequest, CreateHallRequest, CreateSeatRequest và CreatedResourceResponse.
+- [x] Tách SecurityConfig mặc định và VenueDevSecurityConfig theo profile.
+- [x] Giới hạn route theo method/path; chỉ bỏ qua CSRF cho ba POST M1.
+- [x] Thêm xử lý JSON không hợp lệ thành 400 VALIDATION.
+- [x] Kiểm thử phần độc lập: VenueWebBoundaryTest (31), DefaultVenueSecurityTest (8),
+  VenueDevelopmentContextTest (1) đều đạt.
+- [ ] Nhận/review port, DTO, ConflictException và handler của Bảo Long.
+- [ ] Nhận/review ba adapter in-memory của Duy Khánh.
+- [ ] Thêm VenueConfiguration và ba controller nghiệp vụ.
+- [ ] Thêm mapping ConflictException thành 409 khi lớp lỗi được bàn giao.
+- [ ] Viết VenueApiIntegrationTest kiểm thử luồng nghiệp vụ thật và nghiệm thu M1.
+
+Kết quả verify: 69 trường hợp, 61 đạt, 8 BookingWorkflowTest skeleton ngoài M1
+bị bỏ qua; không failure/error. 13 test nền tảng và 6 architecture tests vẫn đạt.
+VenueWebBoundaryTest dùng controller thử nghiệm chỉ trong test để xác minh
+security/JSON; không thay thế handler, repository hoặc chứng minh M1 hoàn thành.
+VenueDevelopmentContextTest xác minh ứng dụng thật chọn đúng một security chain
+khi bật venue-dev. Hiện chưa có endpoint nghiệp vụ M1 hoạt động.
+
+Các file test bổ sung thuộc phạm vi Web của Nghĩa; các phần của Long/Anh/Khánh
+chưa được sửa trong nhánh này. Chưa commit, push hoặc ghép main tại thời điểm ghi nhận.
 
 ## 1. Chốt đầu vào và điều phối
 
