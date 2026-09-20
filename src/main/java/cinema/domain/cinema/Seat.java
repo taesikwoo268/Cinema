@@ -1,9 +1,8 @@
 package cinema.domain.cinema;
 
-import java.util.Locale;
-
 import cinema.domain.common.BaseEntity;
 import cinema.domain.common.DomainException;
+import java.util.Locale;
 
 public final class Seat extends BaseEntity {
     private final String hallId;
