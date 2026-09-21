@@ -16,12 +16,13 @@ flowchart LR
 - [Lược đồ quan hệ](docs/relational-schema.md): ERD, bảng, khóa, constraint, chỉ mục và transaction.
 - [Kế hoạch Cinema V1](docs/cinema-v1-plan.md): kế hoạch đã thống nhất, phạm vi V1 và các nâng cấp Phase 2.
 - [Tiến độ Cinema V1](docs/cinema-v1-progress.md): checklist M0–M12, bước tiếp theo và nhật ký thực hiện.
-- [Phân công công việc](docs/team-work-allocation.md): phần việc của từng thành viên trong 18 mốc, điều kiện chuyển mốc và quy trình review/ghép vào main.
+- Các bản phân công nhóm cũ chỉ dùng tham khảo lịch sử; dự án hiện áp dụng quy trình cá nhân.
 
 ## Chạy và kiểm tra
 
-Đặc tả bước tiếp theo: [M1 — Cinema / Hall / Seat](docs/m1-specification.md),
-kèm bốn bản giao việc theo thành viên. Đây là kế hoạch triển khai, chưa phải chức năng đã hoàn thành.
+Đặc tả M1: [Cinema / Hall / Seat](docs/m1-specification.md).
+M1 đã hoàn thành theo quy trình dự án cá nhân; luồng tạo/đọc đã được kiểm chứng qua HTTP thật.
+Xem [bằng chứng nghiệm thu](docs/m1-acceptance.md).
 
 Dùng JDK 25. Dự án đã có Maven Wrapper:
 
@@ -34,7 +35,18 @@ Nếu Maven trỏ cache vào `C:\.m2` và không ghi được, truyền `-Dmaven
 
 ## Trạng thái triển khai
 
-Ứng dụng khởi động được mà chưa cần database, Redis hay RabbitMQ. Controller chưa có endpoint nghiệp vụ; Security đang chặn toàn bộ request. JWT filter chưa đăng ký, chưa có tài khoản mặc định hay thanh toán hoạt động.
+Ứng dụng khởi động không cần database, Redis hay RabbitMQ. Profile mặc định
+vẫn deny-all. Profile venue-dev đã có controller, handler và repository in-memory
+thật cho Cinema/Hall/Seat, cùng xử lý lỗi 400/404/409.
+
+Chạy cấu hình phát triển M1 khi cần kiểm tra profile:
+
+```powershell
+.\mvnw.cmd spring-boot:run '-Dspring-boot.run.profiles=venue-dev'
+```
+
+M1 dùng in-memory, mất dữ liệu khi khởi động lại. clean verify: 165 test,
+157 đạt, 8 workflow skeleton ngoài M1 skipped; không failure/error.
 
 Handler chưa implement sẽ ném `FeatureNotImplementedException`. Domain method và adapter chưa implement sẽ ném `UnsupportedOperationException`. `BaseEntity` từ chối ID null/blank; `Money` từ chối amount/currency null và số tiền âm. Các invariant nghiệp vụ khác còn phải triển khai theo milestone. JPA entity mới có ID, phần mapping còn phải làm tiếp.
 

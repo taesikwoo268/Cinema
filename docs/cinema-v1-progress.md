@@ -2,7 +2,7 @@
 
 Ngày lưu kế hoạch: 2026-09-17.
 
-Kế hoạch chi tiết: [Cinema V1](cinema-v1-plan.md). Tài liệu này ghi nhận trạng thái milestone, kết quả kiểm thử và công việc còn lại của nhóm.
+Kế hoạch chi tiết: [Cinema V1](cinema-v1-plan.md). Tài liệu này ghi nhận trạng thái milestone, kết quả kiểm thử và công việc còn lại của dự án cá nhân.
 
 ## Nguyên tắc thực hiện
 
@@ -18,7 +18,7 @@ Kế hoạch chi tiết: [Cinema V1](cinema-v1-plan.md). Tài liệu này ghi nh
 Kế hoạch gồm **13 milestone**, từ M0 đến M12.
 
 - [x] **M0 — Architecture foundation:** hoàn thiện thành phần chung và port; 13 DomainRulesTest và 6 architecture tests đạt, không bỏ qua.
-- [ ] **M1 — Cinema / Hall / Seat:** tạo và truy vấn dữ liệu rạp, phòng, ghế; kiểm tra luật và tính duy nhất của ghế trong phòng.
+- [x] **M1 — Cinema / Hall / Seat:** hoàn thành ngày 2026-09-21; đã kiểm chứng luồng HTTP và các điều kiện kỹ thuật.
 - [ ] **M2 — Movie:** tạo, xóa và truy vấn phim; kiểm tra tiêu đề và thời lượng.
 - [ ] **M3 — Screening:** tạo và truy vấn suất chiếu; kiểm tra lịch trùng trong cùng phòng và trạng thái cho phép đặt vé.
 - [ ] **M4 — Identity + Customer:** đăng ký, đăng nhập đơn giản; nối ApplicationUser với Customer qua IdentityService và CurrentUser.
@@ -31,9 +31,50 @@ Kế hoạch gồm **13 milestone**, từ M0 đến M12.
 - [ ] **M11 — Persistence + integration tests:** adapter JPA và mapping ở Infrastructure; kiểm thử luồng tích hợp từ đăng nhập đến nhận vé.
 - [ ] **M12 — Docker + OpenAPI + Benchmark:** đóng gói, tài liệu API và đo baseline trước Phase 2.
 
+## Trạng thái thực tế M1 — 2026-09-21
+
+**M1 hoàn thành ngày 2026-09-21 trên D:\Cinema.**
+Dự án cá nhân: không áp dụng điều kiện chờ review/merge nhóm.
+Căn cứ nghiệm thu gồm luồng HTTP thật, integration, validation, uniqueness, security và hồi quy đã kiểm chứng ở lần chạy trước.
+
+- [x] Domain và Application bảo vệ invariant, validate đầu vào trước lookup.
+- [x] Ba adapter in-memory khớp port; kiểm tra duplicate và cạnh tranh đã chạy.
+- [x] Thêm CinemaController, HallController, SeatController và VenueConfiguration.
+- [x] GlobalExceptionHandler trả 409 CONFLICT cho ConflictException.
+- [x] VenueApiIntegrationTest: 13 trường hợp với controller/handler/repository thật.
+- [x] VenueHttpAcceptanceTest: server cổng ngẫu nhiên, HTTP thật tạo Cinema → Hall → Seat → đọc lại; xác minh 400/404/409/403.
+- [x] VenueSnapshotTest: danh sách bất biến và không đổi sau các lần ghi tiếp theo.
+- [x] clean verify: 165 trường hợp, 157 đạt, 0 failure/error, 8 workflow ngoài M1 skipped.
+- [x] Rà soát code và bằng chứng kỹ thuật theo quy trình cá nhân.
+- [x] Checklist M1 đã đóng.
+
+## Yếu tố bắt buộc để M1 được đánh dấu hoàn thành
+
+- [x] Handler và repository contract được đối chiếu với đặc tả và kiểm thử.
+- [x] Tạo Cinema → Hall → Seat → đọc lại bằng Application và HTTP.
+- [x] Integration test M1 đạt: tạo/đọc, null/blank, 400, 404 và 409.
+- [x] Hall unique trong Cinema, Seat unique theo (hallId, row, number).
+- [x] Profile venue-dev đúng allowlist; route ngoài M1 bị chặn.
+- [x] Test M1 có assertion thực, không @Disabled; các test cạnh tranh đạt.
+- [x] Đối chiếu implementation với bằng chứng nghiệm thu; không yêu cầu review nhóm.
+- [x] Cập nhật trạng thái hoàn thành trong tài liệu.
+
+Không coi một báo cáo test từ D:\MyCinema là bằng chứng cho D:\Cinema.
+[Bằng chứng nghiệm thu kỹ thuật](m1-acceptance.md) ghi lớp test và lệnh chạy.
+
 ## Bước tiếp theo
 
-Chuẩn bị specification M1 — Cinema / Hall / Seat, gồm CinemaRepository, HallRepository và các use case tương ứng. M1 chưa triển khai.
+M2 — Movie. Các lần chạy test tiếp theo do chủ dự án thực hiện; trợ lý cung cấp lệnh, không tự chạy test.
+
+## Lịch sử M1 — 2026-09-18 (không phải trạng thái hiện tại)
+
+- Đã thêm ba request DTO, response ID, profile security venue-dev và lỗi JSON 400.
+- 40 trường hợp kiểm thử Web/security mới đạt; gồm test ứng dụng thật với profile
+  venue-dev và test riêng có controller thử nghiệm để kiểm tra JSON/security.
+- Toàn bộ verify: 61 đạt, 8 workflow skeleton ngoài M1 skipped, không lỗi.
+- Chưa có controller nghiệp vụ, VenueConfiguration hoặc mapping lỗi 409;
+  chờ lớp Application và adapter đúng phân công.
+- Chưa nghiệm thu M1, chưa ghép main hoặc chuyển mốc 6.
 
 ## Hoàn thành M0 — 2026-09-17
 
