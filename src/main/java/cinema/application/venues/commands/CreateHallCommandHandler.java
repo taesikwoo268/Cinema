@@ -31,6 +31,9 @@ public final class CreateHallCommandHandler implements UseCase<CreateHallCommand
         if (cinemaId == null || cinemaId.isBlank()) {
             throw new ValidationException("Hall cinemaId must not be blank");
         }
+        if (input.name() == null || input.name().isBlank()) {
+            throw new ValidationException("Hall name must not be blank");
+        }
         if (cinemas.findById(cinemaId).isEmpty()) {
             throw new NotFoundException("Cinema not found: " + cinemaId);
         }

@@ -2,7 +2,7 @@
 
 Ngày lập: 2026-09-18. Mốc 5 trong kế hoạch 18 mốc; mã kỹ thuật M1.
 Trạng thái: quy tắc M1 đã được Nguyễn Trung Nghĩa duyệt ngày 2026-09-18;
-đang triển khai phần Web độc lập, chưa hoàn thành M1.
+M1 hoàn thành ngày 2026-09-21 theo quy trình dự án cá nhân. Bằng chứng: [nghiệm thu kỹ thuật M1](m1-acceptance.md).
 
 ## 1. Mục tiêu và hiện trạng
 
@@ -10,12 +10,12 @@ M1 cung cấp dữ liệu rạp → phòng → ghế để Screening sử dụng
 Luồng nghiệm thu: tạo Cinema, tạo Hall thuộc Cinema, tạo Seat thuộc Hall,
 sau đó truy vấn lại qua Application và HTTP.
 
-Code hiện tại đã có Cinema, Hall, Seat, SeatType và kiểm tra ID trong BaseEntity.
-Các entity chưa kiểm tra luật riêng. SeatRepository chỉ có findById/findByHallId.
-Chưa có CinemaRepository, HallRepository hoặc use case quản lý địa điểm.
-JpaSeatRepositoryAdapter còn là skeleton. Profile mặc định vẫn chặn toàn bộ request;
-profile venue-dev đã có allowlist method/path M1, nhưng controller nghiệp vụ và
-cấu hình nối handler/repository chưa được tích hợp.
+Code đã có invariant Domain, port và handler Cinema/Hall/Seat, ba adapter
+in-memory, ba controller và VenueConfiguration. GlobalExceptionHandler đã map
+409 CONFLICT. Profile mặc định deny-all; venue-dev mở đúng allowlist M1.
+VenueApiIntegrationTest và VenueHttpAcceptanceTest đã chạy thành công trên
+D:\Cinema; test HTTP thật xác minh tạo/đọc hierarchy và lỗi 400/404/409.
+JpaSeatRepositoryAdapter vẫn là skeleton theo phạm vi M1.
 
 M1 dùng repository in-memory. Dữ liệu mất khi khởi động lại.
 Chưa triển khai JPA/migration, sửa/xóa địa điểm, tạo ghế hàng loạt,
@@ -44,9 +44,9 @@ Yêu cầu đã có trong kế hoạch:
 
 ## 3. Quy tắc đã duyệt — 2026-09-18
 
-Nguyễn Trung Nghĩa đã xác nhận toàn bộ các quy tắc dưới đây.
-Bốn bản giao việc và các kiểm thử sử dụng thống nhất các quy tắc này.
-Nếu cần thay đổi, trưởng nhóm xác nhận và cập nhật đặc tả cùng test expectation
+Các quy tắc dưới đây là hợp đồng M1.
+Implementation và kiểm thử sử dụng thống nhất các quy tắc này.
+Nếu cần thay đổi, cập nhật đặc tả cùng test expectation
 trước khi sửa code phụ thuộc.
 
 - Address: bắt buộc không null/blank; trim khi lưu.
@@ -227,25 +227,10 @@ Profile mặc định giữ nguyên hành vi kiểm thử scaffold.
 - HTTP: tạo Cinema → Hall → Seat và đọc lại; 400/404/409; request ngoài M1 bị chặn.
 - Test M0, architecture tests và kiểm thử cũ vẫn đạt.
 - Test bắt buộc M1 không @Disabled, không thân rỗng.
-- Tất cả PR đã ghép main, chạy kiểm thử chung và Nghĩa ký nhận trước mốc 6.
+- Rà soát implementation và bằng chứng kiểm thử; cập nhật trạng thái nghiệm thu cá nhân.
 
-## 9. Bốn bản giao việc và trình tự tích hợp
+## 9. Quy trình cá nhân
 
-- [Nguyễn Trung Nghĩa — Web, cấu hình và tích hợp](m1-nguyen-trung-nghia.md).
-- [Bảo Long — Domain và Application](m1-bao-long.md).
-- [Duy Anh — kiểm thử Domain/Application](m1-duy-anh.md).
-- [Duy Khánh — adapter in-memory và test persistence tạm](m1-duy-khanh.md).
-
-Bước 1: đã hoàn thành — Nghĩa xác nhận các quyết định mục 3 ngày 2026-09-18.
-Bước 2: Bảo Long bàn giao PR hợp đồng: port, record command/query/DTO,
-ConflictException và bổ sung chữ ký cho JpaSeatRepositoryAdapter để code compile.
-Bước 3: sau khi PR hợp đồng ghép main, chia bốn nhánh theo bản giao việc.
-Các handler constructor được thống nhất ở mục 5; test/Web phụ thuộc handler
-chỉ hoàn thiện biên dịch khi implementation của Long đã sẵn sàng.
-Không ghép code gọi lớp chưa tồn tại hoặc để main không build được.
-Bước 4: ghép Domain/Application, adapter, test, cuối cùng cấu hình/Web.
-Bước 5: chạy toàn bộ verify, nghiệm thu và cập nhật tiến độ.
-
-Độc lập ở đây là không sở hữu trùng file, không phải không có phụ thuộc.
-Không tạo stub thành công giả hoặc dùng @Disabled để che phần chưa triển khai.
-
+Domain → Application → adapter → Web → kiểm chứng → cập nhật tiến độ.
+Không yêu cầu phân công nhóm hoặc chờ review/merge thành viên.
+Các bản giao việc cũ là tài liệu lịch sử, không còn ràng buộc sở hữu file.

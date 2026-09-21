@@ -16,6 +16,8 @@ public class GlobalExceptionHandler {
     }
     @ExceptionHandler(FeatureNotImplementedException.class)
     public ResponseEntity<ErrorResponse> notImplemented(FeatureNotImplementedException ex) { return error(HttpStatus.NOT_IMPLEMENTED, "NOT_IMPLEMENTED", ex); }
+    @ExceptionHandler(ConflictException.class)
+    public ResponseEntity<ErrorResponse> conflict(ConflictException ex) { return error(HttpStatus.CONFLICT, "CONFLICT", ex); }
     @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<ErrorResponse> notFound(NotFoundException ex) { return error(HttpStatus.NOT_FOUND, "NOT_FOUND", ex); }
     @ExceptionHandler(ForbiddenException.class)

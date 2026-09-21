@@ -31,6 +31,12 @@ public final class CreateSeatCommandHandler implements UseCase<CreateSeatCommand
         if (hallId == null || hallId.isBlank()) {
             throw new ValidationException("Seat hallId must not be blank");
         }
+        if (input.number() == null || input.number() <= 0) {
+            throw new ValidationException("Seat number must be positive");
+        }
+        if (input.row() == null || input.row().isBlank()) {
+            throw new ValidationException("Seat row must not be blank");
+        }
         SeatType type = parseType(input.type());
         if (halls.findById(hallId).isEmpty()) {
             throw new NotFoundException("Hall not found: " + hallId);
