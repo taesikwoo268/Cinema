@@ -95,7 +95,12 @@ Chi tiết: [M2 implementation](m2/m2-implementation.md), [M2 acceptance](m2/m2-
 
 ### Mốc 7 — Screening
 
-Phụ trách chính: **Duy Anh**. Trạng thái: **Chưa bắt đầu**.
+Phụ trách chính: **Duy Anh**. Trạng thái: **Hoàn thành**.
+
+M3 Screening core đã hoàn thành trong phạm vi Domain, Application, in-memory
+adapter, venue-dev composition, HTTP API và acceptance/security verification.
+Các phần deferred của roadmap vẫn giữ nguyên, gồm GetAvailableSeats, Booking,
+Checkout, Payment và JPA persistence.
 
 - **Nghĩa:** Chốt quy tắc lịch chiếu; tích hợp và nghiệm thu.
 - **Bảo Long:** Nối tra cứu Hall/Seat đã hoàn thành; kiểm tra ghế thuộc phòng của suất.

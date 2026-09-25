@@ -1,10 +1,38 @@
 package cinema.application.screenings.commands;
 
+import cinema.application.common.exceptions.ConflictException;
+import cinema.application.common.exceptions.NotFoundException;
+import cinema.application.common.exceptions.ValidationException;
+import cinema.application.common.interfaces.ScreeningRepository;
 import cinema.application.common.interfaces.UseCase;
-import cinema.application.common.models.*;
-import cinema.application.common.exceptions.FeatureNotImplementedException;
-import java.util.List;
-/** TODO: implement orchestration through application ports; see docs/architecture-contract.md. */
+import cinema.domain.common.DomainException;
+import cinema.domain.screening.Screening;
+
 public final class CancelScreeningCommandHandler implements UseCase<CancelScreeningCommand, Void> {
-    @Override public Void handle(CancelScreeningCommand input) { throw new FeatureNotImplementedException("CancelScreeningCommand"); }
+
+    private final ScreeningRepository screenings;
+
+    public CancelScreeningCommandHandler(ScreeningRepository screenings) {
+        this.screenings = screenings;
+    }
+
+    @Override
+    public Void handle(CancelScreeningCommand input) {
+        if (input == null) {
+            throw new ValidationException("CancelScreeningCommand must not be null");
+        }
+        if (input.screeningId() == null || input.screeningId().isBlank()) {
+            throw new ValidationException("Screening ID must not be blank");
+        }
+
+        Screening screening = screenings.findById(input.screeningId())
+                .orElseThrow(() -> new NotFoundException("Screening not found: " + input.screeningId()));
+        try {
+            screening.cancel();
+        } catch (DomainException ex) {
+            throw new ConflictException(ex.getMessage());
+        }
+        screenings.save(screening);
+        return null;
+    }
 }

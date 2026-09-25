@@ -1,6 +1,6 @@
 # Cinema
 
-Cinema được xây lại theo Clean Architecture. Đã hoàn thiện **M0 — nền kiến trúc**, **M1 — Venue** và **M2 — Movie**. **M3 — Screening** là bước tiếp theo, chưa bắt đầu; luồng bán vé còn ở mức skeleton.
+Cinema được xây lại theo Clean Architecture. Đã hoàn thiện **M0 — nền kiến trúc**, **M1 — Venue**, **M2 — Movie** và **M3 — Screening core**. **M4 — Identity + Customer** là bước tiếp theo; luồng bán vé sau Screening còn ở mức skeleton.
 
 ## Kiến trúc và tài liệu
 
@@ -20,6 +20,7 @@ flowchart LR
 
 Tài liệu tổng thể nằm ở docs/; historical artifacts M1 ở [docs/m1/](docs/m1/), tài liệu M2 ở [docs/m2/](docs/m2/).
 M2: [đặc tả](docs/m2/m2-specification.md), [triển khai](docs/m2/m2-implementation.md), [nghiệm thu](docs/m2/m2-acceptance.md).
+M3: [đặc tả](docs/m3/m3-specification.md), [triển khai](docs/m3/m3-implementation.md), [nghiệm thu](docs/m3/m3-acceptance.md).
 
 ## Chạy và kiểm tra
 
@@ -40,7 +41,7 @@ Nếu Maven trỏ cache vào `C:\.m2` và không ghi được, truyền `-Dmaven
 
 Ứng dụng khởi động không cần database, Redis hay RabbitMQ. Profile mặc định
 vẫn deny-all. Profile venue-dev đã có controller, handler và repository in-memory
-thật cho Cinema/Hall/Seat và Movie, cùng xử lý lỗi 400/404/409.
+thật cho Cinema/Hall/Seat, Movie và Screening, cùng xử lý lỗi 400/404/409.
 
 Chạy cấu hình phát triển M1/M2:
 
@@ -48,16 +49,34 @@ Chạy cấu hình phát triển M1/M2:
 .\mvnw.cmd spring-boot:run '-Dspring-boot.run.profiles=venue-dev'
 ```
 
-M1/M2 dùng in-memory, mất dữ liệu khi khởi động lại. Movie dùng InMemoryMovieRepository; Movie JPA persistence chưa được triển khai trong M2.
+M1/M2/M3 dùng in-memory, mất dữ liệu khi khởi động lại. Movie dùng InMemoryMovieRepository; Screening dùng InMemoryScreeningRepository. Movie và Screening JPA persistence chưa được triển khai.
 MovieController, bốn handler beans và repository chỉ active trong venue-dev; default context vẫn khởi động và deny-all.
 
-Checkpoint M2 ngày 2026-09-25: clean test — 230 tests, 0 failures, 0 errors, 8 skipped (workflow skeleton hiện có). Không chạy lại test trong đợt cập nhật tài liệu.
+Checkpoint M2 ngày 2026-09-25: clean test — 230 tests, 0 failures, 0 errors, 8 skipped (workflow skeleton hiện có).
+Checkpoint M3 ngày 2026-09-25: clean test — 299 tests, 0 failures, 0 errors, 8 skipped; 8 skipped thuộc BookingWorkflowTest. M3 không bao gồm GetAvailableSeats, SeatHold, Booking/Checkout hoặc Payment.
 
 Handler chưa implement sẽ ném `FeatureNotImplementedException`. Domain method và adapter chưa implement sẽ ném `UnsupportedOperationException`. `BaseEntity` từ chối ID null/blank; `Money` từ chối amount/currency null và số tiền âm. Các invariant nghiệp vụ khác còn phải triển khai theo milestone. JPA entity mới có ID, phần mapping còn phải làm tiếp.
 
 Test kiểm tra luật nền tảng, dependency, khởi động/security, Venue và Movie qua Domain/Application/repository/HTTP; các handler skeleton còn lại được kiểm tra theo contract chưa implement. M0 có 13 domain test và 6 architecture test đạt, không bỏ qua. `BookingWorkflowTest` còn 8 test skeleton bị `@Disabled`, thuộc các bước triển khai sau.
 
 Source cũ và SQL migration cũ đã được thay bằng skeleton; database bên ngoài không bị thay đổi trong bước dựng lại đó.
+
+### Screening API trong venue-dev
+
+M3 Screening core đã hoàn thành: tạo, đọc, liệt kê theo Movie, hủy Screening,
+bảo vệ overlap trong cùng Hall, lifecycle `SCHEDULED -> CANCELLED`, in-memory
+persistence, HTTP API và security boundary.
+
+| Method | Path | Success |
+| --- | --- | --- |
+| POST | /screenings | 201 + {"id":"..."} |
+| GET | /screenings/{id} | 200 + ScreeningView |
+| GET | /screenings?movieId={movieId} | 200 + List<ScreeningView> |
+| POST | /screenings/{id}/cancel | 204, không body |
+
+Cancel không xóa resource; sau khi cancel, GET vẫn trả Screening với status `CANCELLED`.
+GetAvailableSeats, SeatHold, Booking/Checkout, Payment và Screening JPA persistence
+vẫn deferred.
 
 ### Movie API trong venue-dev
 

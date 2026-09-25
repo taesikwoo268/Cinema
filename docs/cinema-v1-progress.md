@@ -20,7 +20,7 @@ Kế hoạch gồm **13 milestone**, từ M0 đến M12.
 - [x] **M0 — Architecture foundation:** hoàn thiện thành phần chung và port; 13 DomainRulesTest và 6 architecture tests đạt, không bỏ qua.
 - [x] **M1 — Cinema / Hall / Seat:** hoàn thành ngày 2026-09-21; đã kiểm chứng luồng HTTP và các điều kiện kỹ thuật.
 - [x] **M2 — Movie:** tạo, xóa và truy vấn phim; kiểm tra tiêu đề và thời lượng.
-- [ ] **M3 — Screening:** tạo và truy vấn suất chiếu; kiểm tra lịch trùng trong cùng phòng và trạng thái cho phép đặt vé.
+- [x] **M3 — Screening:** hoàn thành Screening core: tạo, truy vấn, liệt kê theo Movie, hủy, kiểm tra lịch trùng cùng Hall, HTTP API và security trong venue-dev. GetAvailableSeats, booking và trạng thái bookable vẫn deferred.
 - [ ] **M4 — Identity + Customer:** đăng ký, đăng nhập đơn giản; nối ApplicationUser với Customer qua IdentityService và CurrentUser.
 - [ ] **M5 — Cart + simple SeatHold:** thêm/xóa ghế, kiểm tra phòng, trạng thái ghế và chủ giỏ; giữ ghế qua SeatHoldService.
 - [ ] **M6 — Checkout + Booking:** nhóm giỏ theo suất chiếu; một Booking thuộc một Screening; quản lý PENDING / CONFIRMED / CANCELLED.
@@ -67,6 +67,23 @@ Bằng chứng kỹ thuật gồm domain, application, repository in-memory và 
 Movie JPA persistence chưa triển khai trong M2.
 Tài liệu: [đặc tả](m2/m2-specification.md), [triển khai](m2/m2-implementation.md), [nghiệm thu](m2/m2-acceptance.md).
 
+## Trạng thái thực tế M3 — 2026-09-25
+
+**M3 hoàn thành trên D:\Cinema. Phạm vi hoàn thành là Screening core.**
+Bằng chứng gồm Domain/Application, port, adapter in-memory, venue-dev composition,
+HTTP API, security boundary, architecture test và full clean regression.
+
+- [x] Screening bảo vệ invariant thời gian, Hall/Movie ID, giá và lifecycle cancel.
+- [x] Create, Cancel, Get one và Get list theo Movie đã triển khai qua Application.
+- [x] InMemoryScreeningRepository hỗ trợ overlap half-open, thứ tự ổn định và cập nhật state cancel.
+- [x] Screening Web API và venue-dev security boundary đã hoàn thiện.
+- [x] Final clean test: 299 tests, 0 failures, 0 errors, 8 skipped thuộc BookingWorkflowTest.
+- [x] Architecture tests: 6/6 đạt; Screening regression: 69/69 đạt.
+
+GetAvailableSeats, SeatHold, Booking/Checkout, Payment thật, JPA Screening persistence
+và complete Screening transition chưa triển khai.
+Tài liệu: [đặc tả M3](m3/m3-specification.md), [triển khai M3](m3/m3-implementation.md), [nghiệm thu M3](m3/m3-acceptance.md).
+
 ## Yếu tố bắt buộc để M1 được đánh dấu hoàn thành
 
 - [x] Handler và repository contract được đối chiếu với đặc tả và kiểm thử.
@@ -83,7 +100,7 @@ Không coi một báo cáo test từ D:\MyCinema là bằng chứng cho D:\Cinem
 
 ## Bước tiếp theo
 
-M3 — Screening: NEXT / NOT STARTED, chưa phân công triển khai. Các lần chạy test tiếp theo do chủ dự án thực hiện; trợ lý cung cấp lệnh, không tự chạy test.
+M4 — Identity + Customer: NEXT / NOT STARTED. Các lần chạy test tiếp theo do chủ dự án thực hiện; trợ lý cung cấp lệnh, không tự chạy test.
 
 ## Lịch sử M1 — 2026-09-18 (không phải trạng thái hiện tại)
 

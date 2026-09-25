@@ -8,10 +8,14 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
 
-/** Development-only access to the M1 venue and M2 movie routes; other routes remain denied. */
+/**
+ * Development-only access to the M1 venue and M2 movie routes; other routes
+ * remain denied.
+ */
 @Configuration
 @Profile("venue-dev")
 public class VenueDevSecurityConfig {
+
     @Bean
     SecurityFilterChain venueDevSecurityFilterChain(HttpSecurity http) throws Exception {
         var paths = PathPatternRequestMatcher.withDefaults();
@@ -21,22 +25,29 @@ public class VenueDevSecurityConfig {
 
         var createMovie = paths.matcher(HttpMethod.POST, "/movies");
         var deleteMovie = paths.matcher(HttpMethod.DELETE, "/movies/{id}");
+        var createScreening = paths.matcher(HttpMethod.POST, "/screenings");
+        var getScreenings = paths.matcher(HttpMethod.GET, "/screenings");
+        var getScreening = paths.matcher(HttpMethod.GET, "/screenings/{id}");
+        var cancelScreening = paths.matcher(HttpMethod.POST, "/screenings/{id}/cancel");
 
         return http
-            .csrf(csrf -> csrf.ignoringRequestMatchers(createCinema, createHall, createSeat, createMovie, deleteMovie))
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers(createCinema, createHall, createSeat, createMovie, deleteMovie).permitAll()
+                .csrf(csrf -> csrf.ignoringRequestMatchers(createCinema, createHall, createSeat, createMovie, deleteMovie,
+                createScreening, cancelScreening))
+                .authorizeHttpRequests(auth -> auth
+                .requestMatchers(createCinema, createHall, createSeat, createMovie, deleteMovie,
+                        createScreening, cancelScreening).permitAll()
                 .requestMatchers(
-                    paths.matcher(HttpMethod.GET, "/cinemas"),
-                    paths.matcher(HttpMethod.GET, "/cinemas/{id}"),
-                    paths.matcher(HttpMethod.GET, "/cinemas/{id}/halls"),
-                    paths.matcher(HttpMethod.GET, "/halls/{id}"),
-                    paths.matcher(HttpMethod.GET, "/halls/{id}/seats"),
-                    paths.matcher(HttpMethod.GET, "/movies"),
-                    paths.matcher(HttpMethod.GET, "/movies/{id}")
+                        paths.matcher(HttpMethod.GET, "/cinemas"),
+                        paths.matcher(HttpMethod.GET, "/cinemas/{id}"),
+                        paths.matcher(HttpMethod.GET, "/cinemas/{id}/halls"),
+                        paths.matcher(HttpMethod.GET, "/halls/{id}"),
+                        paths.matcher(HttpMethod.GET, "/halls/{id}/seats"),
+                        paths.matcher(HttpMethod.GET, "/movies"),
+                        paths.matcher(HttpMethod.GET, "/movies/{id}"),
+                        getScreenings,
+                        getScreening
                 ).permitAll()
                 .anyRequest().denyAll())
-            .build();
+                .build();
     }
 }
-
