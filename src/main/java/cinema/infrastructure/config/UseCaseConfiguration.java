@@ -1,12 +1,16 @@
 package cinema.infrastructure.config;
 
+import cinema.application.common.interfaces.MovieRepository;
+import java.util.UUID;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 /** Composition root. Replace stub wiring when each feature is implemented. */
 @Configuration
 public class UseCaseConfiguration {
-    @Bean public cinema.application.movies.commands.CreateMovieCommandHandler createMovieCommandHandler() { return new cinema.application.movies.commands.CreateMovieCommandHandler(); }
-    @Bean public cinema.application.movies.commands.DeleteMovieCommandHandler deleteMovieCommandHandler() { return new cinema.application.movies.commands.DeleteMovieCommandHandler(); }
+    @Bean @Profile("venue-dev") public cinema.application.movies.commands.CreateMovieCommandHandler createMovieCommandHandler(MovieRepository movieRepository) { return new cinema.application.movies.commands.CreateMovieCommandHandler(movieRepository, () -> UUID.randomUUID().toString()); }
+    @Bean @Profile("venue-dev") public cinema.application.movies.commands.DeleteMovieCommandHandler deleteMovieCommandHandler(MovieRepository movieRepository) { return new cinema.application.movies.commands.DeleteMovieCommandHandler(movieRepository); }
     @Bean public cinema.application.screenings.commands.CreateScreeningCommandHandler createScreeningCommandHandler() { return new cinema.application.screenings.commands.CreateScreeningCommandHandler(); }
     @Bean public cinema.application.screenings.commands.CancelScreeningCommandHandler cancelScreeningCommandHandler() { return new cinema.application.screenings.commands.CancelScreeningCommandHandler(); }
     @Bean public cinema.application.carts.commands.AddSeatToCartCommandHandler addSeatToCartCommandHandler() { return new cinema.application.carts.commands.AddSeatToCartCommandHandler(); }
@@ -17,8 +21,8 @@ public class UseCaseConfiguration {
     @Bean public cinema.application.payments.commands.PayBookingCommandHandler payBookingCommandHandler() { return new cinema.application.payments.commands.PayBookingCommandHandler(); }
     @Bean public cinema.application.identity.commands.RegisterCommandHandler registerCommandHandler() { return new cinema.application.identity.commands.RegisterCommandHandler(); }
     @Bean public cinema.application.identity.commands.LoginCommandHandler loginCommandHandler() { return new cinema.application.identity.commands.LoginCommandHandler(); }
-    @Bean public cinema.application.movies.queries.GetMoviesQueryHandler getMoviesQueryHandler() { return new cinema.application.movies.queries.GetMoviesQueryHandler(); }
-    @Bean public cinema.application.movies.queries.GetMovieQueryHandler getMovieQueryHandler() { return new cinema.application.movies.queries.GetMovieQueryHandler(); }
+    @Bean @Profile("venue-dev") public cinema.application.movies.queries.GetMoviesQueryHandler getMoviesQueryHandler(MovieRepository movieRepository) { return new cinema.application.movies.queries.GetMoviesQueryHandler(movieRepository); }
+    @Bean @Profile("venue-dev") public cinema.application.movies.queries.GetMovieQueryHandler getMovieQueryHandler(MovieRepository movieRepository) { return new cinema.application.movies.queries.GetMovieQueryHandler(movieRepository); }
     @Bean public cinema.application.screenings.queries.GetScreeningsQueryHandler getScreeningsQueryHandler() { return new cinema.application.screenings.queries.GetScreeningsQueryHandler(); }
     @Bean public cinema.application.screenings.queries.GetScreeningQueryHandler getScreeningQueryHandler() { return new cinema.application.screenings.queries.GetScreeningQueryHandler(); }
     @Bean public cinema.application.screenings.queries.GetAvailableSeatsQueryHandler getAvailableSeatsQueryHandler() { return new cinema.application.screenings.queries.GetAvailableSeatsQueryHandler(); }

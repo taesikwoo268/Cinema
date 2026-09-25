@@ -1,10 +1,42 @@
 package cinema.application.movies.commands;
 
+import cinema.application.common.exceptions.ValidationException;
+import cinema.application.common.interfaces.MovieRepository;
 import cinema.application.common.interfaces.UseCase;
-import cinema.application.common.models.*;
-import cinema.application.common.exceptions.FeatureNotImplementedException;
-import java.util.List;
-/** TODO: implement orchestration through application ports; see docs/architecture-contract.md. */
+import cinema.domain.common.DomainException;
+import cinema.domain.movie.Movie;
+import cinema.domain.movie.MovieStatus;
+import java.util.function.Supplier;
+
 public final class CreateMovieCommandHandler implements UseCase<CreateMovieCommand, String> {
-    @Override public String handle(CreateMovieCommand input) { throw new FeatureNotImplementedException("CreateMovieCommand"); }
+    private final MovieRepository movies;
+    private final Supplier<String> idGenerator;
+
+    public CreateMovieCommandHandler(MovieRepository movies, Supplier<String> idGenerator) {
+        this.movies = movies;
+        this.idGenerator = idGenerator;
+    }
+
+    @Override
+    public String handle(CreateMovieCommand input) {
+        if (input == null) {
+            throw new ValidationException("CreateMovieCommand must not be null");
+        }
+        if (input.title() == null || input.title().isBlank()) {
+            throw new ValidationException("Movie title must not be blank");
+        }
+        if (input.durationMinutes() <= 0) {
+            throw new ValidationException("Movie duration must be positive");
+        }
+        String id = idGenerator.get();
+        Movie movie;
+        try {
+            movie = new Movie(id, input.title(), input.description(), input.durationMinutes(),
+                    input.ageRating(), MovieStatus.COMING_SOON);
+        } catch (DomainException ex) {
+            throw new ValidationException(ex.getMessage());
+        }
+        movies.save(movie);
+        return movie.getId();
+    }
 }

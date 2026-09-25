@@ -39,7 +39,7 @@ class VenueWebBoundaryTest {
     @ParameterizedTest
     @ValueSource(strings = {
         "/cinemas", "/cinemas/c1", "/cinemas/c1/halls",
-        "/halls/h1", "/halls/h1/seats"
+        "/halls/h1", "/halls/h1/seats", "/movies", "/movies/m1"
     })
     void allowsOnlySpecifiedGetRoutes(String path) throws Exception {
         mvc.perform(get(path)).andExpect(status().isOk()).andExpect(content().string("probe"));
@@ -47,17 +47,24 @@ class VenueWebBoundaryTest {
 
     @ParameterizedTest
     @CsvSource({
-        "GET, /movies", "GET, /halls", "GET, /seats",
+        "GET, /unimplemented", "GET, /halls", "GET, /seats",
         "GET, /seats/s1", "GET, /cinemas/c1/halls/h1",
         "GET, /halls/h1/seats/s1", "GET, /cinemas/c1/internal",
         "POST, /cinemas/c1", "POST, /cinemas/c1/halls",
-        "POST, /halls/h1/seats", "POST, /movies",
-        "PUT, /cinemas", "PATCH, /halls", "DELETE, /seats",
+        "POST, /halls/h1/seats", "POST, /unimplemented",
+        "PUT, /movies", "PUT, /movies/m1", "PATCH, /movies", "PATCH, /movies/m1", "POST, /movies/m1", "DELETE, /movies", "GET, /movies/m1/internal", "DELETE, /movies/m1/internal", "HEAD, /movies", "OPTIONS, /movies", "PUT, /cinemas", "PATCH, /halls", "DELETE, /seats",
         "DELETE, /cinemas/c1", "HEAD, /cinemas", "OPTIONS, /cinemas"
     })
     void deniesOtherRoutesAndMethodsEvenWithValidCsrf(String method, String path) throws Exception {
         mvc.perform(request(HttpMethod.valueOf(method), path).with(csrf()))
             .andExpect(status().isForbidden());
+    }
+
+    @ParameterizedTest
+    @CsvSource({"POST, /movies", "DELETE, /movies/m1"})
+    void allowsMovieWritesWithoutCsrf(String method, String path) throws Exception {
+        mvc.perform(request(HttpMethod.valueOf(method), path))
+            .andExpect(status().isOk()).andExpect(content().string("probe"));
     }
 
     @Test

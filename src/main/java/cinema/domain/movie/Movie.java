@@ -1,11 +1,9 @@
 package cinema.domain.movie;
 
 import cinema.domain.common.BaseEntity;
-import cinema.domain.common.Money;
-import java.time.Instant;
-import java.util.List;
+import cinema.domain.common.DomainException;
 
-/** Domain state skeleton; invariants and transitions are intentionally pending. */
+/** Movie metadata with required title and positive duration. */
 public final class Movie extends BaseEntity {
     private final String title;
     private final String description;
@@ -14,6 +12,12 @@ public final class Movie extends BaseEntity {
     private final MovieStatus status;
     public Movie(String id, String title, String description, int durationMinutes, String ageRating, MovieStatus status) {
         super(id);
+        if (title == null || title.isBlank()) {
+            throw new DomainException("Movie title must not be blank");
+        }
+        if (durationMinutes <= 0) {
+            throw new DomainException("Movie duration must be positive");
+        }
         this.title = title;
         this.description = description;
         this.durationMinutes = durationMinutes;

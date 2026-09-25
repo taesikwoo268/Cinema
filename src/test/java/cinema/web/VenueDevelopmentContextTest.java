@@ -27,6 +27,6 @@ class VenueDevelopmentContextTest {
         assertTrue(context.containsBean("venueDevSecurityFilterChain"));
         assertFalse(context.containsBean("securityFilterChain"));
         assertEquals(1, context.getBeansOfType(SecurityFilterChain.class).size());
-        mvc.perform(get("/movies")).andExpect(status().isForbidden());
+        mvc.perform(get("/unimplemented")).andExpect(status().isForbidden());
     }
 }

@@ -129,6 +129,6 @@ class VenueApiIntegrationTest {
 
     @Test
     void keepsDefaultRoutesClosed() throws Exception {
-        mvc.perform(get("/movies")).andExpect(status().isForbidden());
+        mvc.perform(get("/unimplemented")).andExpect(status().isForbidden());
     }
 }

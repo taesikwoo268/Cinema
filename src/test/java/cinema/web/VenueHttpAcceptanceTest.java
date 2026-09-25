@@ -53,6 +53,6 @@ class VenueHttpAcceptanceTest {
         assertEquals(1, http.getForObject("/halls/" + hall + "/seats", JsonNode.class).size());
         String otherHall = create("/halls", Map.of("cinemaId", cinema, "name", "Other"));
         create("/seats", Map.of("hallId", otherHall, "row", "A", "number", 1, "type", "VIP"));
-        assertEquals(HttpStatus.FORBIDDEN, http.getForEntity("/movies", String.class).getStatusCode());
+        assertEquals(HttpStatus.FORBIDDEN, http.getForEntity("/unimplemented", String.class).getStatusCode());
     }
 }

@@ -1,10 +1,29 @@
 package cinema.application.movies.commands;
 
+import cinema.application.common.exceptions.NotFoundException;
+import cinema.application.common.exceptions.ValidationException;
+import cinema.application.common.interfaces.MovieRepository;
 import cinema.application.common.interfaces.UseCase;
-import cinema.application.common.models.*;
-import cinema.application.common.exceptions.FeatureNotImplementedException;
-import java.util.List;
-/** TODO: implement orchestration through application ports; see docs/architecture-contract.md. */
+
 public final class DeleteMovieCommandHandler implements UseCase<DeleteMovieCommand, Void> {
-    @Override public Void handle(DeleteMovieCommand input) { throw new FeatureNotImplementedException("DeleteMovieCommand"); }
+    private final MovieRepository movies;
+
+    public DeleteMovieCommandHandler(MovieRepository movies) {
+        this.movies = movies;
+    }
+
+    @Override
+    public Void handle(DeleteMovieCommand input) {
+        if (input == null) {
+            throw new ValidationException("DeleteMovieCommand must not be null");
+        }
+        String movieId = input.movieId();
+        if (movieId == null || movieId.isBlank()) {
+            throw new ValidationException("Movie id must not be blank");
+        }
+        movies.findById(movieId)
+                .orElseThrow(() -> new NotFoundException("Movie not found: " + movieId));
+        movies.deleteById(movieId);
+        return null;
+    }
 }
