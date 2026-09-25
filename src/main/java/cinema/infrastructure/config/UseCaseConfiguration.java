@@ -76,8 +76,14 @@ public class UseCaseConfiguration {
     }
 
     @Bean
-    public cinema.application.identity.commands.LoginCommandHandler loginCommandHandler() {
-        return new cinema.application.identity.commands.LoginCommandHandler();
+    public cinema.application.common.interfaces.IdentityService identityService() {
+        return new cinema.infrastructure.identity.IdentityServiceImpl();
+    }
+
+    @Bean
+    public cinema.application.identity.commands.LoginCommandHandler loginCommandHandler(
+            cinema.application.common.interfaces.IdentityService identityService) {
+        return new cinema.application.identity.commands.LoginCommandHandler(identityService);
     }
 
     @Bean
