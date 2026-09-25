@@ -19,7 +19,7 @@ Kế hoạch gồm **13 milestone**, từ M0 đến M12.
 
 - [x] **M0 — Architecture foundation:** hoàn thiện thành phần chung và port; 13 DomainRulesTest và 6 architecture tests đạt, không bỏ qua.
 - [x] **M1 — Cinema / Hall / Seat:** hoàn thành ngày 2026-09-21; đã kiểm chứng luồng HTTP và các điều kiện kỹ thuật.
-- [ ] **M2 — Movie:** tạo, xóa và truy vấn phim; kiểm tra tiêu đề và thời lượng.
+- [x] **M2 — Movie:** tạo, xóa và truy vấn phim; kiểm tra tiêu đề và thời lượng.
 - [ ] **M3 — Screening:** tạo và truy vấn suất chiếu; kiểm tra lịch trùng trong cùng phòng và trạng thái cho phép đặt vé.
 - [ ] **M4 — Identity + Customer:** đăng ký, đăng nhập đơn giản; nối ApplicationUser với Customer qua IdentityService và CurrentUser.
 - [ ] **M5 — Cart + simple SeatHold:** thêm/xóa ghế, kiểm tra phòng, trạng thái ghế và chủ giỏ; giữ ghế qua SeatHoldService.
@@ -48,6 +48,25 @@ Căn cứ nghiệm thu gồm luồng HTTP thật, integration, validation, uniqu
 - [x] Rà soát code và bằng chứng kỹ thuật theo quy trình cá nhân.
 - [x] Checklist M1 đã đóng.
 
+## Trạng thái thực tế M2 — 2026-09-25
+
+**M2 hoàn thành trên D:\Cinema. Owner: Nghia — triển khai toàn bộ M2 Movie.**
+Bằng chứng kỹ thuật gồm domain, application, repository in-memory và acceptance test HTTP đều đạt.
+
+- [x] `Movie` chặn title null/blank và duration <= 0 bằng invariant domain.
+- [x] Handler tạo phim kiểm tra validation input trước khi generate ID và lưu.
+- [x] Repository in-memory lưu, đọc và xóa phim đúng contract.
+- [x] HTTP thật kiểm tra lifecycle: tạo → đọc → list → xóa → 404.
+- [x] Test M2 có assertion thực, không `@Disabled`; 44 unit/application/repository tests và 7 Movie HTTP acceptance tests đạt (51 trường hợp trong nhóm Movie).
+
+- [x] Movie Domain, commands/queries và MovieRepository contract hoàn thiện.
+- [x] Spring composition/profile, MovieController và Movie security boundary hoàn thiện.
+- [x] MovieController, bốn handler beans và InMemoryMovieRepository active trong venue-dev; ngoài profile này không tạo Movie consumers/repository, default context khởi động được.
+- [x] Full clean test checkpoint 2026-09-25: 230 tests, 0 failures, 0 errors, 8 skipped thuộc workflow hiện có.
+
+Movie JPA persistence chưa triển khai trong M2.
+Tài liệu: [đặc tả](m2/m2-specification.md), [triển khai](m2/m2-implementation.md), [nghiệm thu](m2/m2-acceptance.md).
+
 ## Yếu tố bắt buộc để M1 được đánh dấu hoàn thành
 
 - [x] Handler và repository contract được đối chiếu với đặc tả và kiểm thử.
@@ -60,11 +79,11 @@ Căn cứ nghiệm thu gồm luồng HTTP thật, integration, validation, uniqu
 - [x] Cập nhật trạng thái hoàn thành trong tài liệu.
 
 Không coi một báo cáo test từ D:\MyCinema là bằng chứng cho D:\Cinema.
-[Bằng chứng nghiệm thu kỹ thuật](m1-acceptance.md) ghi lớp test và lệnh chạy.
+[Bằng chứng nghiệm thu kỹ thuật](m1/m1-acceptance.md) ghi lớp test và lệnh chạy.
 
 ## Bước tiếp theo
 
-M2 — Movie. Các lần chạy test tiếp theo do chủ dự án thực hiện; trợ lý cung cấp lệnh, không tự chạy test.
+M3 — Screening: NEXT / NOT STARTED, chưa phân công triển khai. Các lần chạy test tiếp theo do chủ dự án thực hiện; trợ lý cung cấp lệnh, không tự chạy test.
 
 ## Lịch sử M1 — 2026-09-18 (không phải trạng thái hiện tại)
 
@@ -89,7 +108,7 @@ M2 — Movie. Các lần chạy test tiếp theo do chủ dự án thực hiện
 
 Các test rỗng được chuyển thành checklist dưới đây để triển khai cùng tính năng; chúng chưa được tính là đã kiểm thử.
 
-- [ ] M2: Movie có tiêu đề và thời lượng dương.
+- [x] M2: Movie có tiêu đề và thời lượng dương; đã xác minh tại checkpoint M2.
 - [ ] M3: Screening có startTime < endTime.
 - [ ] M4: Customer có ID và userId hợp lệ (luật ID chung đã có ở M0).
 - [ ] M5: Cart từ chối cặp screening/seat trùng.
@@ -122,3 +141,4 @@ Kết quả: 14 test được báo cáo, 0 failure, 0 error, **8 skipped**. `BUI
 | 2026-09-17 | Lưu kế hoạch gốc và tạo checklist M0–M12. | Chỉ cập nhật tài liệu; chưa đánh giá mức hoàn thành implementation. |
 | 2026-09-17 | Kiểm tra M0: chưa hoàn thành. | Architecture: 6 đạt; DomainRulesTest: 8 skipped, thân test rỗng; Money chưa kiểm tra invariant. |
 | 2026-09-17 | Hoàn thiện M0 theo phạm vi được duyệt. | Domain: 13 đạt; architecture: 6 đạt; toàn bộ verify thành công (21 đạt, 8 workflow skipped). |
+| 2026-09-25 | Nghia hoàn thành toàn bộ M2 Movie; M3 là bước tiếp theo, chưa bắt đầu. | Full clean test: 230 tests, 0 failures, 0 errors, 8 workflow skipped; Movie HTTP acceptance: 7/7; architecture: 6/6. |

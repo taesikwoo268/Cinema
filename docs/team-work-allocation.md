@@ -1,5 +1,7 @@
 # Phân công công việc Cinema V1
 
+Ghi chú hiện tại: dự án thực hiện theo quy trình cá nhân. Phân công M1 và các kế hoạch nhóm dưới đây được giữ làm lịch sử; không phải phân công mới cho M3. M2 thực tế do Nghia triển khai toàn bộ. Trạng thái hiện tại xem mục 6 và [progress](cinema-v1-progress.md).
+
 ## 1. Phạm vi và nguyên tắc
 
 Tài liệu sử dụng **18 mốc trong [kế hoạch Cinema V1](cinema-v1-plan.md)**,
@@ -58,11 +60,11 @@ ngay tại mốc đó; mốc 13 rà soát và hoàn thiện nhất quán toàn h
 
 Đặc tả và giao việc chi tiết:
 
-- [Đặc tả M1 và hợp đồng dùng chung](m1-specification.md).
-- [Nguyễn Trung Nghĩa: Web, cấu hình và tích hợp](m1-nguyen-trung-nghia.md).
-- [Bảo Long: Domain và Application](m1-bao-long.md).
-- [Duy Anh: kiểm thử Domain/Application](m1-duy-anh.md).
-- [Duy Khánh: adapter in-memory và kiểm thử](m1-duy-khanh.md).
+- [Đặc tả M1 và hợp đồng dùng chung](m1/m1-specification.md).
+- [Nguyễn Trung Nghĩa: Web, cấu hình và tích hợp](m1/m1-nguyen-trung-nghia.md).
+- [Bảo Long: Domain và Application](m1/m1-bao-long.md).
+- [Duy Anh: kiểm thử Domain/Application](m1/m1-duy-anh.md).
+- [Duy Khánh: adapter in-memory và kiểm thử](m1/m1-duy-khanh.md).
 
 Các bản giao việc này quy định file và chữ ký hàm cho M1. Nghĩa đã xác nhận
 các quy tắc mục 3 đặc tả ngày 2026-09-18; triển khai và kiểm thử theo hợp đồng này.
@@ -80,16 +82,16 @@ bàn giao; mốc 5 chưa được nghiệm thu. Chi tiết tại bản giao vi�
 
 **Điều kiện nghiệm thu:** Tạo/truy vấn rạp, phòng, ghế hoạt động; từ chối dữ liệu sai và ghế trùng trong phòng.
 
-### Mốc 6 — Movie
+### Mốc 6 — Movie / M2
 
-Phụ trách chính: **Duy Anh**. Trạng thái: **Chưa bắt đầu**.
+Owner: **Nghia**. Status: **COMPLETED**.
+M2 Movie được triển khai toàn bộ bởi Nghia.
 
-- **Nghĩa:** Review hợp đồng Movie, ghép cấu hình và nghiệm thu.
-- **Bảo Long:** Viết test tiêu đề, thời lượng và các trường hợp không tìm thấy phim.
-- **Duy Anh:** Triển khai Domain, port, use case và adapter Movie.
-- **Duy Khánh:** Chuẩn bị dữ liệu phim và kịch bản kiểm thử tạo/truy vấn/xóa.
+Scope: Domain Movie; Application commands/queries; repository contract;
+InMemory adapter; configuration/profile; Movie Web API; security integration;
+unit/application/repository tests và HTTP acceptance.
 
-**Điều kiện nghiệm thu:** Luồng quản lý phim chạy được; tiêu đề và thời lượng được kiểm tra.
+Chi tiết: [M2 implementation](m2/m2-implementation.md), [M2 acceptance](m2/m2-acceptance.md).
 
 ### Mốc 7 — Screening
 
@@ -314,13 +316,9 @@ Các kết quả kiểm thử V1 đã được nghiệm thu phải được gi�
 
 ## 6. Trạng thái và bước tiếp theo
 
-- **Đã hoàn thành:** mốc 1–4, do Nguyễn Trung Nghĩa thực hiện.
-- **Mốc tiếp theo:** mốc 5 — Cinema / Hall / Seat, Bảo Long phụ trách chính.
-- **Đang triển khai:** mốc 5, phần Web độc lập của Nghĩa.
-- **Chưa bắt đầu:** mốc 6–18.
-- Hạn bàn giao được chốt tại đầu mỗi mốc theo thời gian của các thành viên.
-- Lưu kết quả nghiệm thu và liên kết PR/commit tại
-  [Tiến độ Cinema V1](cinema-v1-progress.md).
-
-Trình tự bắt buộc: **hoàn thành phần việc → review → ghép main →
-kiểm thử chung → nghiệm thu → chuyển mốc**.
+- **M1 — Venue:** COMPLETED; lịch sử ownership và phân công giữ nguyên tại [docs/m1/](m1/).
+- **M2 — Movie:** COMPLETED; Owner: Nghia, toàn bộ scope từ Domain đến HTTP acceptance.
+- **M3 — Screening:** NEXT / NOT STARTED; chưa quyết định phân công hiện tại. Phân công mốc 7 ở trên chỉ là kế hoạch nhóm lịch sử.
+- Các milestone sau vẫn là kế hoạch, không được coi là đã triển khai.
+- Checkpoint M2: 230 tests, 0 failures, 0 errors, 8 workflow skipped.
+- Trạng thái và bằng chứng hiện tại: [Tiến độ Cinema V1](cinema-v1-progress.md).
