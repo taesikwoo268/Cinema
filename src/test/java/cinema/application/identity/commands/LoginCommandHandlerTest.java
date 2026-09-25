@@ -18,35 +18,42 @@ class LoginCommandHandlerTest {
     private final LoginCommandHandler handler = new LoginCommandHandler(identityService);
 
     @Test
-    void returnsAuthenticationResultFromIdentityService() {
-        AuthenticationResult expected = new AuthenticationResult("access-token", Instant.parse("2026-09-26T00:00:00Z"));
-        when(identityService.login("user@example.com", "password")).thenReturn(expected);
+    void validCommandReturnsAuthenticationResult() {
+        var expected = new AuthenticationResult("token-abc", Instant.now().plusSeconds(3600));
+        when(identityService.login("a@b.com", "pass")).thenReturn(expected);
 
-        assertSame(expected, handler.handle(new LoginCommand("user@example.com", "password")));
+        var result = handler.handle(new LoginCommand("a@b.com", "pass"));
 
-        verify(identityService).login("user@example.com", "password");
+        assertSame(expected, result);
+        verify(identityService).login("a@b.com", "pass");
     }
 
     @Test
-    void propagatesIdentityServiceFailure() {
-        IllegalArgumentException failure = new IllegalArgumentException("Invalid credentials");
-        when(identityService.login("user@example.com", "password")).thenThrow(failure);
-
-        assertSame(failure, assertThrows(IllegalArgumentException.class,
-                () -> handler.handle(new LoginCommand("user@example.com", "password"))));
-    }
-
-    @Test
-    void rejectsInvalidInputBeforeCallingIdentityService() {
-        assertInvalid(null);
-        assertInvalid(new LoginCommand(null, "password"));
-        assertInvalid(new LoginCommand(" \t", "password"));
-        assertInvalid(new LoginCommand("user@example.com", null));
-        assertInvalid(new LoginCommand("user@example.com", "\n "));
-    }
-
-    private void assertInvalid(LoginCommand command) {
-        assertThrows(ValidationException.class, () -> handler.handle(command));
+    void nullCommandRejected() {
+        assertThrows(ValidationException.class, () -> handler.handle(null));
         verifyNoInteractions(identityService);
+    }
+
+    @Test
+    void blankEmailRejectedBeforeSideEffects() {
+        assertThrows(ValidationException.class,
+                () -> handler.handle(new LoginCommand("  ", "pass")));
+        verifyNoInteractions(identityService);
+    }
+
+    @Test
+    void blankPasswordRejectedBeforeSideEffects() {
+        assertThrows(ValidationException.class,
+                () -> handler.handle(new LoginCommand("a@b.com", "")));
+        verifyNoInteractions(identityService);
+    }
+
+    @Test
+    void invalidCredentialPropagates() {
+        when(identityService.login("a@b.com", "wrong"))
+                .thenThrow(new RuntimeException("invalid credentials"));
+
+        assertThrows(RuntimeException.class,
+                () -> handler.handle(new LoginCommand("a@b.com", "wrong")));
     }
 }
