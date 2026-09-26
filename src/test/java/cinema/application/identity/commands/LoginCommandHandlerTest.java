@@ -35,9 +35,23 @@ class LoginCommandHandlerTest {
     }
 
     @Test
+    void nullEmailRejectedBeforeSideEffects() {
+        assertThrows(ValidationException.class,
+                () -> handler.handle(new LoginCommand(null, "pass")));
+        verifyNoInteractions(identityService);
+    }
+
+    @Test
     void blankEmailRejectedBeforeSideEffects() {
         assertThrows(ValidationException.class,
                 () -> handler.handle(new LoginCommand("  ", "pass")));
+        verifyNoInteractions(identityService);
+    }
+
+    @Test
+    void nullPasswordRejectedBeforeSideEffects() {
+        assertThrows(ValidationException.class,
+                () -> handler.handle(new LoginCommand("a@b.com", null)));
         verifyNoInteractions(identityService);
     }
 

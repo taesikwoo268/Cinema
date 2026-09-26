@@ -40,6 +40,7 @@ class IdentityServiceImplTest {
 
         assertNotNull(result.accessToken());
         assertFalse(result.accessToken().isBlank());
+        assertNotNull(result.expiresAt());
         assertTrue(result.expiresAt().isAfter(NOW));
     }
 
