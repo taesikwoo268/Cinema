@@ -34,7 +34,8 @@ public final class RegisterCommandHandler implements UseCase<RegisterCommand, St
             throw new ConflictException("Customer already exists for user: " + userId);
         }
 
-        Customer customer = createCustomer(idGenerator.get(), userId, input.displayName());
+        String customerID = idGenerator.get();
+        Customer customer = createCustomer(customerID, userId, input.displayName());
         customers.save(customer);
 
         return customer.getId();

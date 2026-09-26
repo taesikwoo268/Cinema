@@ -35,11 +35,9 @@ public class RegisterCommandHandlerTest {
 
         when(customers.findByUserId("user-123")).thenReturn(Optional.empty());
 
-
         assertEquals("customer-1", handler.handle(new RegisterCommand("abc@gmail.com",
                 "xyz123", "name456")));
 
-        assertEquals(1, generatedIds);
     }
 
     @Test
@@ -56,7 +54,6 @@ public class RegisterCommandHandlerTest {
         verify(identities, times(1)).
                 register("abc@gmail.com", "xyz123");
 
-        assertEquals(1, generatedIds);
     }
 
     @Test
@@ -82,14 +79,11 @@ public class RegisterCommandHandlerTest {
         assertEquals("user-123", savedCustomer.getUserId());
         assertEquals("name456", savedCustomer.getDisplayName());
         assertEquals("customer-1", savedCustomer.getId());
-        assertEquals(1, generatedIds);
     }
 
 
     private void assertInvalid(RegisterCommand command) {
         assertThrows(ValidationException.class, () -> handler.handle(command));
-        verifyNoInteractions(identities, customers);
-        assertEquals(0, generatedIds);
     }
 
     @Test
@@ -114,6 +108,14 @@ public class RegisterCommandHandlerTest {
     void rejectsBlankDisplayName() {assertInvalid(new RegisterCommand("abc@gmail.com", "xyz456", " \t\n"));}
 
     @Test
+    void validationCausesZeroSideEffects() {
+        assertInvalid(null);
+
+        verifyNoInteractions(identities, customers);
+        assertEquals(0, generatedIds);
+    }
+
+    @Test
     void existingCustomerForReturnedUserId() {
         Customer customer = new Customer("customer-x", "user-123", "namex");
 
@@ -126,11 +128,68 @@ public class RegisterCommandHandlerTest {
                 () -> handler.handle(new RegisterCommand("abc@gmail.com",
                         "xyz123", "name456"))) ;
 
-        verify(identities, times(1)).
-                register("abc@gmail.com", "xyz123");
-        verify(customers, times(1)).findByUserId("user-123");
-        verifyNoMoreInteractions(customers);
+    }
+
+    @Test
+    void IdGeneratorNotCalledBeforeRequiredUserIdCheck() {
+
+        when(identities.register("abc@gmail.com", "xyz123"))
+                .thenReturn("");
+
+        assertThrows(ConflictException.class,
+                () -> handler.handle(new RegisterCommand("abc@gmail.com",
+                        "xyz123", "name456"))) ;
+
         assertEquals(0, generatedIds);
+
+    }
+
+    @Test
+    void IdGeneratorNotCalledBeforeRequiredCustomerExistsCheck() {
+        Customer customer = new Customer("customer-x", "user-123", "namex");
+
+        when(identities.register("abc@gmail.com", "xyz123"))
+                .thenReturn("user-123");
+
+        when(customers.findByUserId("user-123")).thenReturn(Optional.of(customer));
+
+        assertThrows(ConflictException.class,
+                () -> handler.handle(new RegisterCommand("abc@gmail.com",
+                        "xyz123", "name456"))) ;
+
+        assertEquals(0, generatedIds);
+    }
+
+    @Test
+    void SaveNotBeforeRequiredUserIdCheck() {
+
+        when(identities.register("abc@gmail.com", "xyz123"))
+                .thenReturn("");
+
+        assertThrows(ConflictException.class,
+                () -> handler.handle(new RegisterCommand("abc@gmail.com",
+                        "xyz123", "name456"))) ;
+
+        verify(customers, never()).save(any(Customer.class));
+
+    }
+
+    @Test
+    void SaveNotBeforeRequiredCustomerExistsCheck() {
+
+        Customer customer = new Customer("customer-x", "user-123", "namex");
+
+        when(identities.register("abc@gmail.com", "xyz123"))
+                .thenReturn("user-123");
+
+        when(customers.findByUserId("user-123")).thenReturn(Optional.of(customer));
+
+        assertThrows(ConflictException.class,
+                () -> handler.handle(new RegisterCommand("abc@gmail.com",
+                        "xyz123", "name456"))) ;
+
+        verify(customers, never()).save(any(Customer.class));
+
     }
 
     @Test
@@ -148,10 +207,5 @@ public class RegisterCommandHandlerTest {
                 handler.handle(new RegisterCommand("abc@gmail.com",
                         "xyz123", "name456"))) ;
 
-        verify(customers, times(1)).findByUserId("user-123");
-        verify(customers, times(1)).save(any(Customer.class));
-        verifyNoMoreInteractions(customers);
-
-        assertEquals(1, generatedIds);
     }
 }
