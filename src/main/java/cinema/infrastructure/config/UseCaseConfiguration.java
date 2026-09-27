@@ -63,8 +63,18 @@ public class UseCaseConfiguration {
     }
 
     @Bean
-    public cinema.application.carts.commands.RemoveSeatFromCartCommandHandler removeSeatFromCartCommandHandler() {
-        return new cinema.application.carts.commands.RemoveSeatFromCartCommandHandler();
+    @Profile("venue-dev")
+    public cinema.application.carts.commands.RemoveSeatFromCartCommandHandler removeSeatFromCartCommandHandler(
+            cinema.application.common.interfaces.CurrentUser currentUser,
+            cinema.application.common.interfaces.CustomerRepository customerRepository,
+            cinema.application.common.interfaces.CartRepository cartRepository,
+            cinema.application.common.interfaces.SeatHoldService seatHoldService) {
+
+        return new cinema.application.carts.commands.RemoveSeatFromCartCommandHandler(
+                currentUser,
+                customerRepository,
+                cartRepository,
+                seatHoldService);
     }
 
     @Bean
