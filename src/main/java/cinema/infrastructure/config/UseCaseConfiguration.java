@@ -159,8 +159,16 @@ public class UseCaseConfiguration {
     }
 
     @Bean
-    public cinema.application.carts.queries.GetMyCartQueryHandler getMyCartQueryHandler() {
-        return new cinema.application.carts.queries.GetMyCartQueryHandler();
+    @Profile("venue-dev")
+    public cinema.application.carts.queries.GetMyCartQueryHandler getMyCartQueryHandler(
+            cinema.application.common.interfaces.CurrentUser currentUser,
+            cinema.application.common.interfaces.CustomerRepository customerRepository,
+            cinema.application.common.interfaces.CartRepository cartRepository) {
+
+        return new cinema.application.carts.queries.GetMyCartQueryHandler(
+                currentUser,
+                customerRepository,
+                cartRepository);
     }
 
     @Bean
