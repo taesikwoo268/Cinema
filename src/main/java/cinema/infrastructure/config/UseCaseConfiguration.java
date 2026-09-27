@@ -71,8 +71,14 @@ public class UseCaseConfiguration {
     }
 
     @Bean
-    public cinema.application.identity.commands.RegisterCommandHandler registerCommandHandler() {
-        return new cinema.application.identity.commands.RegisterCommandHandler();
+    @Profile("venue-dev")
+    public cinema.application.identity.commands.RegisterCommandHandler registerCommandHandler(
+            cinema.application.common.interfaces.IdentityService identityService,
+            cinema.application.common.interfaces.CustomerRepository customerRepository) {
+        return new cinema.application.identity.commands.RegisterCommandHandler(
+                identityService,
+                customerRepository,
+                () -> UUID.randomUUID().toString());
     }
 
     @Bean
