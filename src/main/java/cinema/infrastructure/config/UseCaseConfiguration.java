@@ -141,11 +141,6 @@ public class UseCaseConfiguration {
     }
 
     @Bean
-    public cinema.application.common.interfaces.CurrentUser currentUser() {
-        return new cinema.web.security.SpringCurrentUser();
-    }
-
-    @Bean
     public cinema.application.identity.queries.GetCurrentUserQueryHandler getCurrentUserQueryHandler(
             cinema.application.common.interfaces.CurrentUser currentUser) {
         return new cinema.application.identity.queries.GetCurrentUserQueryHandler(currentUser);
