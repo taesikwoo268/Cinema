@@ -3,9 +3,6 @@ package cinema.domain.customer;
 import cinema.domain.common.BaseEntity;
 import cinema.domain.common.DomainException;
 
-/**
- * Domain state skeleton; invariants and transitions are intentionally pending.
- */
 public final class Customer extends BaseEntity {
 
     private final String userId;
