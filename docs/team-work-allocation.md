@@ -1,6 +1,6 @@
 # Phân công công việc Cinema V1
 
-Ghi chú hiện tại: dự án thực hiện theo quy trình cá nhân. Phân công M1 và các kế hoạch nhóm dưới đây được giữ làm lịch sử; không phải phân công mới cho M3. M2 thực tế do Nghia triển khai toàn bộ. Trạng thái hiện tại xem mục 6 và [progress](cinema-v1-progress.md).
+Ghi chú lịch sử: M1/M2 từng được nghiệm thu theo quy trình cá nhân. M4 đã tích hợp các slice theo phân công nhóm riêng tại [overview M4](m4/m4-overview.md). Phân công M1 và các kế hoạch nhóm dưới đây được giữ làm lịch sử; không phải phân công mới cho M3. M2 thực tế do Nghia triển khai toàn bộ. Trạng thái hiện tại xem mục 6 và [progress](cinema-v1-progress.md).
 
 ## 1. Phạm vi và nguyên tắc
 
@@ -111,7 +111,9 @@ Checkout, Payment và JPA persistence.
 
 ### Mốc 8 — Identity / Customer
 
-Phụ trách chính: **Duy Khánh**. Trạng thái: **Chưa bắt đầu**.
+Phụ trách chính: **Duy Khánh**. Trạng thái: **Hoàn thành M4 theo phạm vi đơn giản**.
+
+**Phân công ban đầu (lịch sử; phân công M4 chi tiết và bàn giao thực tế bên dưới):**
 
 - **Nghĩa:** Chốt phân biệt user ID/customer ID, hợp đồng CurrentUser; ghép cấu hình.
 - **Bảo Long:** Viết test hồ sơ Customer và ánh xạ user–customer.
@@ -119,6 +121,25 @@ Phụ trách chính: **Duy Khánh**. Trạng thái: **Chưa bắt đầu**.
 - **Duy Khánh:** Triển khai IdentityService, Customer, CurrentUser và identity adapter đơn giản.
 
 **Điều kiện nghiệm thu:** Đăng ký/đăng nhập đơn giản hoạt động; Application xác định đúng customer hiện tại.
+
+**Kết quả tích hợp M4 tại `bf6383e` trên `feature/nghia/moc-8`:**
+
+- **Nguyễn Trung Nghĩa — team lead/integrator:** freeze contracts/base (bao gồm Customer invariants), tích hợp worker slices; CustomerConfiguration, shared wiring, Identity HTTP API/security và HTTP acceptance.
+- **Bảo Long:** Customer slice owner; Customer domain tests, InMemoryCustomerRepository và repository tests.
+- **Duy Anh:** RegisterCommandHandler và unit tests.
+- **Duy Khanh:** Login, GetCurrentUser, IdentityService/ApplicationUser, SpringCurrentUser và tests.
+
+Phân công chi tiết tại [M4 overview](m4/m4-overview.md) là căn cứ attribution của M4;
+các dòng phân công ban đầu phía trên không thay thế lịch sử bàn giao thực tế.
+Các slice đã được Nghĩa tích hợp qua `115a307`, `705efe2`, `c63a020`,
+sau đó hoàn thiện shared integration tại `378cfe6` và HTTP tại `bf6383e`.
+Không khẳng định đã merge vào main.
+
+Nghiệm thu thực tế: Register/Customer, Login phát token và CurrentUser port hoạt động;
+HTTP me chưa xác thực trả 200 với userId null/authenticated false.
+Bearer/JWT verification, production authentication và production Identity/Customer persistence deferred.
+Focused/full regression đã được chủ dự án xác nhận BUILD SUCCESS.
+Xem [implementation](m4/m4-implementation.md), [acceptance](m4/m4-acceptance.md).
 
 ### Mốc 9 — Cart + Seat Hold
 
@@ -323,7 +344,9 @@ Các kết quả kiểm thử V1 đã được nghiệm thu phải được gi�
 
 - **M1 — Venue:** COMPLETED; lịch sử ownership và phân công giữ nguyên tại [docs/m1/](m1/).
 - **M2 — Movie:** COMPLETED; Owner: Nghia, toàn bộ scope từ Domain đến HTTP acceptance.
-- **M3 — Screening:** NEXT / NOT STARTED; chưa quyết định phân công hiện tại. Phân công mốc 7 ở trên chỉ là kế hoạch nhóm lịch sử.
+- **M3 — Screening:** COMPLETED cho Screening core; chi tiết tại [M3 acceptance](m3/m3-acceptance.md).
+- **M4 — Identity + Customer:** COMPLETED theo phạm vi M4; giữ attribution và lịch sử tích hợp ở mốc 8 phía trên. Bearer/JWT và production authentication/persistence deferred.
+- **M5 — Cart + simple SeatHold:** NEXT / NOT STARTED theo roadmap.
 - Các milestone sau vẫn là kế hoạch, không được coi là đã triển khai.
 - Checkpoint M2: 230 tests, 0 failures, 0 errors, 8 workflow skipped.
 - Trạng thái và bằng chứng hiện tại: [Tiến độ Cinema V1](cinema-v1-progress.md).

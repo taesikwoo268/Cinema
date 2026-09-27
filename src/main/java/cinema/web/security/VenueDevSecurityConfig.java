@@ -29,13 +29,34 @@ public class VenueDevSecurityConfig {
         var getScreenings = paths.matcher(HttpMethod.GET, "/screenings");
         var getScreening = paths.matcher(HttpMethod.GET, "/screenings/{id}");
         var cancelScreening = paths.matcher(HttpMethod.POST, "/screenings/{id}/cancel");
+        var register = paths.matcher(HttpMethod.POST, "/identity/register");
+        var login = paths.matcher(HttpMethod.POST, "/identity/login");
+        var currentUser = paths.matcher(HttpMethod.GET, "/identity/me");
 
         return http
-                .csrf(csrf -> csrf.ignoringRequestMatchers(createCinema, createHall, createSeat, createMovie, deleteMovie,
-                createScreening, cancelScreening))
+                .csrf(csrf -> csrf.ignoringRequestMatchers(
+                createCinema,
+                createHall,
+                createSeat,
+                createMovie,
+                deleteMovie,
+                createScreening,
+                cancelScreening,
+                register,
+                login))
                 .authorizeHttpRequests(auth -> auth
-                .requestMatchers(createCinema, createHall, createSeat, createMovie, deleteMovie,
-                        createScreening, cancelScreening).permitAll()
+                .requestMatchers(
+                        createCinema,
+                        createHall,
+                        createSeat,
+                        createMovie,
+                        deleteMovie,
+                        createScreening,
+                        cancelScreening,
+                        register,
+                        login,
+                        currentUser
+                ).permitAll()
                 .requestMatchers(
                         paths.matcher(HttpMethod.GET, "/cinemas"),
                         paths.matcher(HttpMethod.GET, "/cinemas/{id}"),

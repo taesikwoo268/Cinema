@@ -71,13 +71,25 @@ public class UseCaseConfiguration {
     }
 
     @Bean
-    public cinema.application.identity.commands.RegisterCommandHandler registerCommandHandler() {
-        return new cinema.application.identity.commands.RegisterCommandHandler();
+    @Profile("venue-dev")
+    public cinema.application.identity.commands.RegisterCommandHandler registerCommandHandler(
+            cinema.application.common.interfaces.IdentityService identityService,
+            cinema.application.common.interfaces.CustomerRepository customerRepository) {
+        return new cinema.application.identity.commands.RegisterCommandHandler(
+                identityService,
+                customerRepository,
+                () -> UUID.randomUUID().toString());
     }
 
     @Bean
-    public cinema.application.identity.commands.LoginCommandHandler loginCommandHandler() {
-        return new cinema.application.identity.commands.LoginCommandHandler();
+    public cinema.application.common.interfaces.IdentityService identityService() {
+        return new cinema.infrastructure.identity.IdentityServiceImpl();
+    }
+
+    @Bean
+    public cinema.application.identity.commands.LoginCommandHandler loginCommandHandler(
+            cinema.application.common.interfaces.IdentityService identityService) {
+        return new cinema.application.identity.commands.LoginCommandHandler(identityService);
     }
 
     @Bean
@@ -135,7 +147,8 @@ public class UseCaseConfiguration {
     }
 
     @Bean
-    public cinema.application.identity.queries.GetCurrentUserQueryHandler getCurrentUserQueryHandler() {
-        return new cinema.application.identity.queries.GetCurrentUserQueryHandler();
+    public cinema.application.identity.queries.GetCurrentUserQueryHandler getCurrentUserQueryHandler(
+            cinema.application.common.interfaces.CurrentUser currentUser) {
+        return new cinema.application.identity.queries.GetCurrentUserQueryHandler(currentUser);
     }
 }

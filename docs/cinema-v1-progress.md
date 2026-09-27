@@ -2,7 +2,7 @@
 
 Ngày lưu kế hoạch: 2026-09-17.
 
-Kế hoạch chi tiết: [Cinema V1](cinema-v1-plan.md). Tài liệu này ghi nhận trạng thái milestone, kết quả kiểm thử và công việc còn lại của dự án cá nhân.
+Kế hoạch chi tiết: [Cinema V1](cinema-v1-plan.md). Tài liệu này ghi nhận trạng thái milestone, kết quả kiểm thử và công việc còn lại của dự án; M4 giữ attribution theo lịch sử tích hợp nhóm.
 
 ## Nguyên tắc thực hiện
 
@@ -21,7 +21,7 @@ Kế hoạch gồm **13 milestone**, từ M0 đến M12.
 - [x] **M1 — Cinema / Hall / Seat:** hoàn thành ngày 2026-09-21; đã kiểm chứng luồng HTTP và các điều kiện kỹ thuật.
 - [x] **M2 — Movie:** tạo, xóa và truy vấn phim; kiểm tra tiêu đề và thời lượng.
 - [x] **M3 — Screening:** hoàn thành Screening core: tạo, truy vấn, liệt kê theo Movie, hủy, kiểm tra lịch trùng cùng Hall, HTTP API và security trong venue-dev. GetAvailableSeats, booking và trạng thái bookable vẫn deferred.
-- [ ] **M4 — Identity + Customer:** đăng ký, đăng nhập đơn giản; nối ApplicationUser với Customer qua IdentityService và CurrentUser.
+- [x] **M4 — Identity + Customer:** Customer, Register, Login phát token, Current User, in-memory adapters, venue-dev wiring và HTTP API đã hoàn thành. Bearer/JWT verification và production authentication còn deferred.
 - [ ] **M5 — Cart + simple SeatHold:** thêm/xóa ghế, kiểm tra phòng, trạng thái ghế và chủ giỏ; giữ ghế qua SeatHoldService.
 - [ ] **M6 — Checkout + Booking:** nhóm giỏ theo suất chiếu; một Booking thuộc một Screening; quản lý PENDING / CONFIRMED / CANCELLED.
 - [ ] **M7 — Fake Payment:** kiểm tra ownership và booking PENDING; thanh toán giả thành công, lưu Payment và xác nhận Booking.
@@ -84,6 +84,34 @@ GetAvailableSeats, SeatHold, Booking/Checkout, Payment thật, JPA Screening per
 và complete Screening transition chưa triển khai.
 Tài liệu: [đặc tả M3](m3/m3-specification.md), [triển khai M3](m3/m3-implementation.md), [nghiệm thu M3](m3/m3-acceptance.md).
 
+## Trạng thái thực tế M4 — 2026-09-27
+
+**M4 hoàn thành trong phạm vi Identity + Customer đơn giản**, tại `bf6383e`
+trên `feature/nghia/moc-8`, từ frozen base `3a44962`.
+
+- [x] Customer Domain bảo vệ id/userId/displayName và trim displayName.
+- [x] InMemoryCustomerRepository lookup/save, duplicate ID/userId và concurrency tests.
+- [x] Register tạo identity, tạo/lưu Customer liên kết userId, trả customer ID.
+- [x] Login validate credentials và trả accessToken + expiresAt.
+- [x] GetCurrentUser và SpringCurrentUser đọc authentication state qua port; chưa xác thực trả `(null,false)`.
+- [x] venue-dev composition và ba Identity HTTP endpoints.
+- [x] HTTP acceptance: register/login thành công, duplicate email 409, sai password 403, me chưa xác thực 200.
+- [x] Focused tests và full Maven regression được chủ dự án xác nhận BUILD SUCCESS; không chạy lại trong job docs.
+- [x] Cập nhật implementation, acceptance và trạng thái M4.
+
+Deferred: Bearer/JWT verification, production TokenVerifier/authentication filter,
+SecurityContext authentication từ token, production authentication, refresh token,
+OAuth/password reset và production Identity/Customer persistence.
+Bearer hiện chưa xác thực được `/identity/me`; đây là giới hạn hiện tại, không phải acceptance vĩnh viễn.
+
+Attribution: Bảo Long phụ trách Customer slice/repository/tests; Duy Anh phụ trách
+Register/tests; Duy Khanh phụ trách Identity/Login/CurrentUser/tests; Nguyễn Trung Nghĩa
+freeze contracts, tích hợp và hoàn thiện shared wiring/Web/security/HTTP acceptance.
+Các slice được tích hợp qua `115a307`, `705efe2`, `c63a020`, sau đó `378cfe6` và `bf6383e`.
+Không khẳng định đã merge vào main.
+
+Tài liệu: [overview](m4/m4-overview.md), [implementation](m4/m4-implementation.md), [acceptance](m4/m4-acceptance.md).
+
 ## Yếu tố bắt buộc để M1 được đánh dấu hoàn thành
 
 - [x] Handler và repository contract được đối chiếu với đặc tả và kiểm thử.
@@ -100,7 +128,7 @@ Không coi một báo cáo test từ D:\MyCinema là bằng chứng cho D:\Cinem
 
 ## Bước tiếp theo
 
-M4 — Identity + Customer: NEXT / NOT STARTED. Các lần chạy test tiếp theo do chủ dự án thực hiện; trợ lý cung cấp lệnh, không tự chạy test.
+M5 — Cart + simple SeatHold: NEXT / NOT STARTED theo roadmap hiện có. Các lần chạy test tiếp theo do chủ dự án thực hiện; trợ lý cung cấp lệnh, không tự chạy test.
 
 ## Lịch sử M1 — 2026-09-18 (không phải trạng thái hiện tại)
 
@@ -127,7 +155,7 @@ Các test rỗng được chuyển thành checklist dưới đây để triển 
 
 - [x] M2: Movie có tiêu đề và thời lượng dương; đã xác minh tại checkpoint M2.
 - [ ] M3: Screening có startTime < endTime.
-- [ ] M4: Customer có ID và userId hợp lệ (luật ID chung đã có ở M0).
+- [x] M4: Customer có ID/userId/displayName hợp lệ; đã được kiểm tra bằng CustomerTest.
 - [ ] M5: Cart từ chối cặp screening/seat trùng.
 - [ ] M6: Booking có ít nhất một snapshot item; booking đã hủy không thể confirm.
 - [ ] M8: Ticket USED/CANCELLED không thể trở lại VALID.
