@@ -1,5 +1,8 @@
 # M4 Identity + Customer --- Team Work Plan
 
+**Trạng thái: M4 COMPLETED** trong phạm vi Identity + Customer đơn giản tại `bf6383e`.
+Kế hoạch và phân công ban đầu được giữ bên dưới; kết quả cuối và giới hạn authentication xem cuối tài liệu.
+
 ## 1. Goal
 
 M4 hoàn thiện Identity + Customer ở mức đơn giản theo roadmap hiện tại:
@@ -16,7 +19,7 @@ Nguyên tắc bắt buộc: **implementation owner = unit/adapter test owner**.
 Không giao một người viết code rồi một người khác chờ code đó để viết
 test.
 
-## 2. Source facts đã kiểm tra
+## 2. Source facts đã kiểm tra tại baseline M3 (lịch sử)
 
 Baseline M3: `97e57f5`.
 
@@ -163,8 +166,7 @@ Không tự sửa shared contract.
 
 `M3_BASE = 97e57f5`.
 
-`M4_BASE = TBD`: commit do Nghĩa tạo sau khi thực hiện M4.0 contract
-changes + docs + tests.
+`M4_BASE = 3a44962`: docs(identity): freeze M4 contracts and team plan.
 
 **Không tạo worker branch trước M4_BASE.**
 
@@ -317,3 +319,53 @@ Thứ tự merge không có nghĩa worker 2/3 phải chờ worker 1.
 -   Architecture tests PASS.
 -   Full Maven regression PASS.
 -   M4 docs/progress được cập nhật.
+
+## Final M4 result
+
+M4 **COMPLETED** trong phạm vi Identity + Customer đơn giản tại `bf6383e`,
+nhánh `feature/nghia/moc-8`. Các mục planning phía trên và bốn assignment files
+là lịch sử; kết quả dưới đây phản ánh implementation cuối.
+
+Completed:
+
+- Customer domain và in-memory Customer repository.
+- Register tạo identity, liên kết/lưu Customer và trả customer ID.
+- Login trả accessToken và expiresAt.
+- Get Current User qua CurrentUser port; unauthenticated trả `(null, false)`.
+- IdentityService implementation và SpringCurrentUser adapter.
+- venue-dev wiring và Identity HTTP API: register, login, me.
+- Identity HTTP acceptance; focused tests và full regression được chủ dự án xác nhận BUILD SUCCESS.
+
+Security boundary: Login đã phát token; Bearer -> verification -> Authentication
+-> SecurityContext chưa hoàn chỉnh. Không coi behavior Bearer hiện tại là yêu cầu vĩnh viễn,
+và không công bố production authentication đã hoàn thành.
+
+Deferred:
+
+- Bearer/JWT verification, production TokenVerifier và authentication filter hoàn chỉnh.
+- Production authentication/JWT signing/BCrypt, refresh tokens, OAuth/external provider.
+- Password reset, email verification, advanced RBAC.
+- Production Identity persistence và production Customer/JPA persistence.
+- Cart/SeatHold/Booking/Checkout/Payment theo roadmap.
+
+### Integration history và attribution
+
+Frozen base: `3a44962`; các worker làm slice riêng, Nghĩa tích hợp vào nhánh M4.
+
+| Thành viên | Đóng góp và bằng chứng |
+| --- | --- |
+| Nguyễn Trung Nghĩa | Freeze contracts/base (bao gồm Customer invariants), tích hợp các slice, shared wiring và HTTP/security acceptance; `378cfe6`, `bf6383e` |
+| Bảo Long | Customer slice owner; Customer tests và in-memory repository/tests qua `f1c9bc7`, `2a222bd`, `5650921`; tích hợp tại `c63a020` |
+| Duy Anh | Register handler và unit tests; tích hợp tại `705efe2` |
+| Duy Khanh | Login, GetCurrentUser, IdentityService/ApplicationUser, SpringCurrentUser và tests; tích hợp tại `115a307` |
+
+Thứ tự tích hợp thực tế: Duy Khanh -> Duy Anh -> Bảo Long -> Nghĩa integration/HTTP.
+Đây là kết quả trên nhánh tích hợp, không phải khẳng định đã merge vào main.
+Kế hoạch acceptance gốc có dự kiến unauthenticated bị deny; thực tế `/identity/me`
+trả 200 với userId null/authenticated false. Authenticated principal được unit-test;
+Bearer HTTP authentication chưa triển khai.
+
+See:
+
+- [M4 implementation](m4-implementation.md)
+- [M4 acceptance](m4-acceptance.md)
