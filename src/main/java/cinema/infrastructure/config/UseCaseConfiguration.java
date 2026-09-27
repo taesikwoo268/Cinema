@@ -41,8 +41,25 @@ public class UseCaseConfiguration {
     }
 
     @Bean
-    public cinema.application.carts.commands.AddSeatToCartCommandHandler addSeatToCartCommandHandler() {
-        return new cinema.application.carts.commands.AddSeatToCartCommandHandler();
+    @Profile("venue-dev")
+    public cinema.application.carts.commands.AddSeatToCartCommandHandler addSeatToCartCommandHandler(
+            cinema.application.common.interfaces.CurrentUser currentUser,
+            cinema.application.common.interfaces.CustomerRepository customerRepository,
+            cinema.application.common.interfaces.ScreeningRepository screeningRepository,
+            cinema.application.common.interfaces.SeatRepository seatRepository,
+            cinema.application.common.interfaces.SeatReservationRepository seatReservationRepository,
+            cinema.application.common.interfaces.SeatHoldService seatHoldService,
+            cinema.application.common.interfaces.CartRepository cartRepository) {
+
+        return new cinema.application.carts.commands.AddSeatToCartCommandHandler(
+                currentUser,
+                customerRepository,
+                screeningRepository,
+                seatRepository,
+                seatReservationRepository,
+                seatHoldService,
+                cartRepository,
+                () -> UUID.randomUUID().toString());
     }
 
     @Bean
