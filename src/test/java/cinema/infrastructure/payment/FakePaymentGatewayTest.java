@@ -42,4 +42,22 @@ class FakePaymentGatewayTest {
         assertThrows(IllegalArgumentException.class, () -> gateway.pay("  ", AMOUNT));
         assertThrows(IllegalArgumentException.class, () -> gateway.pay("booking-1", null));
     }
+
+    @Test
+    void refundReturnsSuccessfulResultWithFakeRefundReference() {
+        var result = new FakePaymentGateway().refund("FAKE-PAY-1", AMOUNT);
+
+        assertTrue(result.successful());
+        assertFalse(result.providerReference().isBlank());
+        assertTrue(result.providerReference().startsWith("FAKE-REFUND-"));
+    }
+
+    @Test
+    void refundRejectsNullOrBlankPaymentReferenceAndNullAmount() {
+        var gateway = new FakePaymentGateway();
+
+        assertThrows(IllegalArgumentException.class, () -> gateway.refund(null, AMOUNT));
+        assertThrows(IllegalArgumentException.class, () -> gateway.refund(" ", AMOUNT));
+        assertThrows(IllegalArgumentException.class, () -> gateway.refund("FAKE-PAY-1", null));
+    }
 }
