@@ -112,8 +112,17 @@ public class UseCaseConfiguration {
     }
 
     @Bean
-    public cinema.application.bookings.commands.CancelBookingCommandHandler cancelBookingCommandHandler() {
-        return new cinema.application.bookings.commands.CancelBookingCommandHandler();
+    @Profile("venue-dev")
+    public cinema.application.bookings.commands.CancelBookingCommandHandler cancelBookingCommandHandler(
+            cinema.application.common.interfaces.CurrentUser currentUser,
+            cinema.application.common.interfaces.CustomerRepository customerRepository,
+            cinema.application.common.interfaces.BookingRepository bookingRepository,
+            cinema.application.common.interfaces.SeatHoldService seatHoldService) {
+        return new cinema.application.bookings.commands.CancelBookingCommandHandler(
+                currentUser,
+                customerRepository,
+                bookingRepository,
+                seatHoldService);
     }
 
     @Bean
