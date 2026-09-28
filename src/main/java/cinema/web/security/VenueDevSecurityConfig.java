@@ -9,8 +9,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
 
 /**
- * Development-only access to the M1 venue and M2 movie routes; other routes
- * remain denied.
+ * Development-only security configuration for venue-dev routes.
  */
 @Configuration
 @Profile("venue-dev")
@@ -32,6 +31,10 @@ public class VenueDevSecurityConfig {
         var register = paths.matcher(HttpMethod.POST, "/identity/register");
         var login = paths.matcher(HttpMethod.POST, "/identity/login");
         var currentUser = paths.matcher(HttpMethod.GET, "/identity/me");
+        var addCartSeat = paths.matcher(HttpMethod.POST, "/carts/seats");
+        var removeCartSeat = paths.matcher(HttpMethod.DELETE, "/carts/seats");
+        var clearCart = paths.matcher(HttpMethod.DELETE, "/carts");
+        var getMyCart = paths.matcher(HttpMethod.GET, "/carts/me");
 
         return http
                 .csrf(csrf -> csrf.ignoringRequestMatchers(
@@ -43,7 +46,10 @@ public class VenueDevSecurityConfig {
                 createScreening,
                 cancelScreening,
                 register,
-                login))
+                login,
+                addCartSeat,
+                removeCartSeat,
+                clearCart))
                 .authorizeHttpRequests(auth -> auth
                 .requestMatchers(
                         createCinema,
@@ -55,7 +61,11 @@ public class VenueDevSecurityConfig {
                         cancelScreening,
                         register,
                         login,
-                        currentUser
+                        currentUser,
+                        addCartSeat,
+                        removeCartSeat,
+                        clearCart,
+                        getMyCart
                 ).permitAll()
                 .requestMatchers(
                         paths.matcher(HttpMethod.GET, "/cinemas"),
