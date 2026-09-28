@@ -207,8 +207,16 @@ public class UseCaseConfiguration {
     }
 
     @Bean
-    public cinema.application.bookings.queries.GetBookingQueryHandler getBookingQueryHandler() {
-        return new cinema.application.bookings.queries.GetBookingQueryHandler();
+    @Profile("venue-dev")
+    public cinema.application.bookings.queries.GetBookingQueryHandler getBookingQueryHandler(
+            cinema.application.common.interfaces.CurrentUser currentUser,
+            cinema.application.common.interfaces.CustomerRepository customerRepository,
+            cinema.application.common.interfaces.BookingRepository bookingRepository) {
+
+        return new cinema.application.bookings.queries.GetBookingQueryHandler(
+                currentUser,
+                customerRepository,
+                bookingRepository);
     }
 
     @Bean
