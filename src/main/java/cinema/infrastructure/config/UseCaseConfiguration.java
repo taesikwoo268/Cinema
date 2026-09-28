@@ -93,8 +93,22 @@ public class UseCaseConfiguration {
     }
 
     @Bean
-    public cinema.application.bookings.commands.CheckoutCartCommandHandler checkoutCartCommandHandler() {
-        return new cinema.application.bookings.commands.CheckoutCartCommandHandler();
+    @Profile("venue-dev")
+    public cinema.application.bookings.commands.CheckoutCartCommandHandler checkoutCartCommandHandler(
+            cinema.application.common.interfaces.CurrentUser currentUser,
+            cinema.application.common.interfaces.CustomerRepository customerRepository,
+            cinema.application.common.interfaces.CartRepository cartRepository,
+            cinema.application.common.interfaces.BookingRepository bookingRepository,
+            cinema.application.common.interfaces.SeatHoldService seatHoldService,
+            cinema.application.common.interfaces.Clock clock) {
+        return new cinema.application.bookings.commands.CheckoutCartCommandHandler(
+                currentUser,
+                customerRepository,
+                cartRepository,
+                bookingRepository,
+                seatHoldService,
+                () -> UUID.randomUUID().toString(),
+                clock);
     }
 
     @Bean

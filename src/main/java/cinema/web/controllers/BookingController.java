@@ -1,5 +1,6 @@
 package cinema.web.controllers;
 
+import org.springframework.context.annotation.Profile;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
 import cinema.application.bookings.commands.CheckoutCartCommandHandler;
@@ -8,6 +9,7 @@ import cinema.application.bookings.queries.GetMyBookingsQueryHandler;
 import cinema.application.bookings.queries.GetBookingQueryHandler;
 /** HTTP methods, request mapping and response mapping are pending implementation. */
 @RestController
+@Profile("venue-dev")
 @RequestMapping("/bookings")
 public final class BookingController {
     private final CheckoutCartCommandHandler checkoutCartCommand;
