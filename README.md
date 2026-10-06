@@ -1,6 +1,11 @@
 # Cinema
 
-Cinema được xây lại theo Clean Architecture. Đã hoàn thiện **M0 — nền kiến trúc**, **M1 — Venue**, **M2 — Movie**, **M3 — Screening core** và **M4 — Identity + Customer**. Bước tiếp theo theo roadmap là **M5 — Cart + simple SeatHold**; luồng bán vé còn ở mức skeleton.
+Cinema được xây lại theo Clean Architecture. Đã hoàn thiện **M0 — nền kiến trúc**,
+**M1 — Venue**, **M2 — Movie**, **M3 — Screening core**,
+**M4 — Identity + Customer**, **M5 — Cart + simple SeatHold**
+và **M6 — Checkout + Booking**.
+
+Bước tiếp theo theo roadmap là **M7 — Fake Payment**.
 
 ## Kiến trúc và tài liệu
 
@@ -22,6 +27,8 @@ Tài liệu tổng thể nằm ở docs/; historical artifacts M1 ở [docs/m1/]
 M2: [đặc tả](docs/m2/m2-specification.md), [triển khai](docs/m2/m2-implementation.md), [nghiệm thu](docs/m2/m2-acceptance.md).
 M3: [đặc tả](docs/m3/m3-specification.md), [triển khai](docs/m3/m3-implementation.md), [nghiệm thu](docs/m3/m3-acceptance.md).
 M4: [tổng quan và phân công](docs/m4/m4-overview.md), [triển khai](docs/m4/m4-implementation.md), [nghiệm thu](docs/m4/m4-acceptance.md).
+M5: [đặc tả](docs/m5/m5-specification.md), [triển khai](docs/m5/m5-implementation.md), [nghiệm thu](docs/m5/m5-acceptance.md).
+M6: [đặc tả](docs/m6/m6-specification.md), [triển khai](docs/m6/m6-implementation.md), [nghiệm thu](docs/m6/m6-acceptance.md).
 
 ## Chạy và kiểm tra
 
@@ -44,7 +51,7 @@ Nếu Maven trỏ cache vào `C:\.m2` và không ghi được, truyền `-Dmaven
 vẫn deny-all. Profile venue-dev đã có controller, handler và repository in-memory
 thật cho Cinema/Hall/Seat, Movie, Screening và Identity + Customer, cùng xử lý lỗi 400/403/404/409.
 
-Chạy cấu hình phát triển M1–M4:
+Chạy cấu hình phát triển M1–M6:
 
 ```powershell
 .\mvnw.cmd spring-boot:run '-Dspring-boot.run.profiles=venue-dev'

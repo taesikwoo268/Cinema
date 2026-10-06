@@ -41,33 +41,107 @@ public class UseCaseConfiguration {
     }
 
     @Bean
-    public cinema.application.carts.commands.AddSeatToCartCommandHandler addSeatToCartCommandHandler() {
-        return new cinema.application.carts.commands.AddSeatToCartCommandHandler();
+    @Profile("venue-dev")
+    public cinema.application.carts.commands.AddSeatToCartCommandHandler addSeatToCartCommandHandler(
+            cinema.application.common.interfaces.CurrentUser currentUser,
+            cinema.application.common.interfaces.CustomerRepository customerRepository,
+            cinema.application.common.interfaces.ScreeningRepository screeningRepository,
+            cinema.application.common.interfaces.SeatRepository seatRepository,
+            cinema.application.common.interfaces.SeatReservationRepository seatReservationRepository,
+            cinema.application.common.interfaces.SeatHoldService seatHoldService,
+            cinema.application.common.interfaces.CartRepository cartRepository) {
+
+        return new cinema.application.carts.commands.AddSeatToCartCommandHandler(
+                currentUser,
+                customerRepository,
+                screeningRepository,
+                seatRepository,
+                seatReservationRepository,
+                seatHoldService,
+                cartRepository,
+                () -> UUID.randomUUID().toString());
     }
 
     @Bean
-    public cinema.application.carts.commands.RemoveSeatFromCartCommandHandler removeSeatFromCartCommandHandler() {
-        return new cinema.application.carts.commands.RemoveSeatFromCartCommandHandler();
+    @Profile("venue-dev")
+    public cinema.application.carts.commands.RemoveSeatFromCartCommandHandler removeSeatFromCartCommandHandler(
+            cinema.application.common.interfaces.CurrentUser currentUser,
+            cinema.application.common.interfaces.CustomerRepository customerRepository,
+            cinema.application.common.interfaces.CartRepository cartRepository,
+            cinema.application.common.interfaces.SeatHoldService seatHoldService) {
+
+        return new cinema.application.carts.commands.RemoveSeatFromCartCommandHandler(
+                currentUser,
+                customerRepository,
+                cartRepository,
+                seatHoldService);
     }
 
     @Bean
-    public cinema.application.carts.commands.ClearCartCommandHandler clearCartCommandHandler() {
-        return new cinema.application.carts.commands.ClearCartCommandHandler();
+    @Profile("venue-dev")
+    public cinema.application.carts.commands.ClearCartCommandHandler clearCartCommandHandler(
+            cinema.application.common.interfaces.CurrentUser currentUser,
+            cinema.application.common.interfaces.CustomerRepository customerRepository,
+            cinema.application.common.interfaces.CartRepository cartRepository,
+            cinema.application.common.interfaces.SeatHoldService seatHoldService) {
+
+        return new cinema.application.carts.commands.ClearCartCommandHandler(
+                currentUser,
+                customerRepository,
+                cartRepository,
+                seatHoldService);
     }
 
     @Bean
-    public cinema.application.bookings.commands.CheckoutCartCommandHandler checkoutCartCommandHandler() {
-        return new cinema.application.bookings.commands.CheckoutCartCommandHandler();
+    @Profile("venue-dev")
+    public cinema.application.bookings.commands.CheckoutCartCommandHandler checkoutCartCommandHandler(
+            cinema.application.common.interfaces.CurrentUser currentUser,
+            cinema.application.common.interfaces.CustomerRepository customerRepository,
+            cinema.application.common.interfaces.CartRepository cartRepository,
+            cinema.application.common.interfaces.BookingRepository bookingRepository,
+            cinema.application.common.interfaces.SeatHoldService seatHoldService,
+            cinema.application.common.interfaces.Clock clock) {
+        return new cinema.application.bookings.commands.CheckoutCartCommandHandler(
+                currentUser,
+                customerRepository,
+                cartRepository,
+                bookingRepository,
+                seatHoldService,
+                () -> UUID.randomUUID().toString(),
+                clock);
     }
 
     @Bean
-    public cinema.application.bookings.commands.CancelBookingCommandHandler cancelBookingCommandHandler() {
-        return new cinema.application.bookings.commands.CancelBookingCommandHandler();
+    @Profile("venue-dev")
+    public cinema.application.bookings.commands.CancelBookingCommandHandler cancelBookingCommandHandler(
+            cinema.application.common.interfaces.CurrentUser currentUser,
+            cinema.application.common.interfaces.CustomerRepository customerRepository,
+            cinema.application.common.interfaces.BookingRepository bookingRepository,
+            cinema.application.common.interfaces.SeatHoldService seatHoldService) {
+        return new cinema.application.bookings.commands.CancelBookingCommandHandler(
+                currentUser,
+                customerRepository,
+                bookingRepository,
+                seatHoldService);
     }
 
     @Bean
-    public cinema.application.payments.commands.PayBookingCommandHandler payBookingCommandHandler() {
-        return new cinema.application.payments.commands.PayBookingCommandHandler();
+    @Profile("venue-dev")
+    public cinema.application.payments.commands.PayBookingCommandHandler payBookingCommandHandler(
+            cinema.application.common.interfaces.CurrentUser currentUser,
+            cinema.application.common.interfaces.CustomerRepository customerRepository,
+            cinema.application.common.interfaces.BookingRepository bookingRepository,
+            cinema.application.common.interfaces.PaymentRepository paymentRepository,
+            cinema.application.common.interfaces.PaymentGateway paymentGateway
+    ) {
+        return new cinema.application.payments.commands.PayBookingCommandHandler(
+                currentUser,
+                customerRepository,
+                bookingRepository,
+                paymentRepository,
+                paymentGateway,
+                () -> UUID.randomUUID().toString()
+        );
     }
 
     @Bean
@@ -122,18 +196,41 @@ public class UseCaseConfiguration {
     }
 
     @Bean
-    public cinema.application.carts.queries.GetMyCartQueryHandler getMyCartQueryHandler() {
-        return new cinema.application.carts.queries.GetMyCartQueryHandler();
+    @Profile("venue-dev")
+    public cinema.application.carts.queries.GetMyCartQueryHandler getMyCartQueryHandler(
+            cinema.application.common.interfaces.CurrentUser currentUser,
+            cinema.application.common.interfaces.CustomerRepository customerRepository,
+            cinema.application.common.interfaces.CartRepository cartRepository) {
+
+        return new cinema.application.carts.queries.GetMyCartQueryHandler(
+                currentUser,
+                customerRepository,
+                cartRepository);
     }
 
     @Bean
-    public cinema.application.bookings.queries.GetMyBookingsQueryHandler getMyBookingsQueryHandler() {
-        return new cinema.application.bookings.queries.GetMyBookingsQueryHandler();
+    @Profile("venue-dev")
+    public cinema.application.bookings.queries.GetMyBookingsQueryHandler getMyBookingsQueryHandler(
+            cinema.application.common.interfaces.CurrentUser currentUser,
+            cinema.application.common.interfaces.CustomerRepository customerRepository,
+            cinema.application.common.interfaces.BookingRepository bookingRepository) {
+        return new cinema.application.bookings.queries.GetMyBookingsQueryHandler(
+                currentUser,
+                customerRepository,
+                bookingRepository);
     }
 
     @Bean
-    public cinema.application.bookings.queries.GetBookingQueryHandler getBookingQueryHandler() {
-        return new cinema.application.bookings.queries.GetBookingQueryHandler();
+    @Profile("venue-dev")
+    public cinema.application.bookings.queries.GetBookingQueryHandler getBookingQueryHandler(
+            cinema.application.common.interfaces.CurrentUser currentUser,
+            cinema.application.common.interfaces.CustomerRepository customerRepository,
+            cinema.application.common.interfaces.BookingRepository bookingRepository) {
+
+        return new cinema.application.bookings.queries.GetBookingQueryHandler(
+                currentUser,
+                customerRepository,
+                bookingRepository);
     }
 
     @Bean
