@@ -39,6 +39,7 @@ public class VenueDevSecurityConfig {
         var cancelBooking = paths.matcher(HttpMethod.POST, "/bookings/{id}/cancel");
         var getMyBookings = paths.matcher(HttpMethod.GET, "/bookings/me");
         var getBooking = paths.matcher(HttpMethod.GET, "/bookings/{id}");
+        var payBooking = paths.matcher(HttpMethod.POST, "/payments/{bookingId}");
 
         return http
                 .csrf(csrf -> csrf.ignoringRequestMatchers(
@@ -55,7 +56,8 @@ public class VenueDevSecurityConfig {
                 removeCartSeat,
                 clearCart,
                 checkoutBooking,
-                cancelBooking))
+                cancelBooking,
+                payBooking))
                 .authorizeHttpRequests(auth -> auth
                 .requestMatchers(
                         createCinema,
@@ -75,7 +77,8 @@ public class VenueDevSecurityConfig {
                         checkoutBooking,
                         cancelBooking,
                         getMyBookings,
-                        getBooking
+                        getBooking,
+                        payBooking
                 ).permitAll()
                 .requestMatchers(
                         paths.matcher(HttpMethod.GET, "/cinemas"),

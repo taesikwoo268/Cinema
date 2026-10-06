@@ -126,8 +126,22 @@ public class UseCaseConfiguration {
     }
 
     @Bean
-    public cinema.application.payments.commands.PayBookingCommandHandler payBookingCommandHandler() {
-        return new cinema.application.payments.commands.PayBookingCommandHandler();
+    @Profile("venue-dev")
+    public cinema.application.payments.commands.PayBookingCommandHandler payBookingCommandHandler(
+            cinema.application.common.interfaces.CurrentUser currentUser,
+            cinema.application.common.interfaces.CustomerRepository customerRepository,
+            cinema.application.common.interfaces.BookingRepository bookingRepository,
+            cinema.application.common.interfaces.PaymentRepository paymentRepository,
+            cinema.application.common.interfaces.PaymentGateway paymentGateway
+    ) {
+        return new cinema.application.payments.commands.PayBookingCommandHandler(
+                currentUser,
+                customerRepository,
+                bookingRepository,
+                paymentRepository,
+                paymentGateway,
+                () -> UUID.randomUUID().toString()
+        );
     }
 
     @Bean
