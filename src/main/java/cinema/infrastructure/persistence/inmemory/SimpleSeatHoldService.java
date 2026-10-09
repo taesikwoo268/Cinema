@@ -29,6 +29,12 @@ public final class SimpleSeatHoldService implements SeatHoldService {
         return customerId.equals(owners.get(new SeatKey(screeningId, seatId)));
     }
 
+    @Override
+    public synchronized boolean isHeld(String screeningId, String seatId) {
+        validate("availability", screeningId, seatId);
+        return owners.containsKey(new SeatKey(screeningId, seatId));
+    }
+
     private static void validate(String customerId, String screeningId, String seatId) {
         if (customerId == null || customerId.isBlank()) {
             throw new IllegalArgumentException("customerId must not be blank");

@@ -1,6 +1,7 @@
 package cinema.infrastructure.config;
 
 import java.util.UUID;
+import cinema.application.common.interfaces.*;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -132,7 +133,8 @@ public class UseCaseConfiguration {
             cinema.application.common.interfaces.CustomerRepository customerRepository,
             cinema.application.common.interfaces.BookingRepository bookingRepository,
             cinema.application.common.interfaces.PaymentRepository paymentRepository,
-            cinema.application.common.interfaces.PaymentGateway paymentGateway
+            cinema.application.common.interfaces.PaymentGateway paymentGateway,
+            TicketRepository tickets, SeatReservationRepository reservations
     ) {
         return new cinema.application.payments.commands.PayBookingCommandHandler(
                 currentUser,
@@ -140,7 +142,7 @@ public class UseCaseConfiguration {
                 bookingRepository,
                 paymentRepository,
                 paymentGateway,
-                () -> UUID.randomUUID().toString()
+                () -> UUID.randomUUID().toString(), tickets, reservations
         );
     }
 
@@ -191,8 +193,10 @@ public class UseCaseConfiguration {
     }
 
     @Bean
-    public cinema.application.screenings.queries.GetAvailableSeatsQueryHandler getAvailableSeatsQueryHandler() {
-        return new cinema.application.screenings.queries.GetAvailableSeatsQueryHandler();
+    @Profile("venue-dev")
+    public cinema.application.screenings.queries.GetAvailableSeatsQueryHandler getAvailableSeatsQueryHandler(
+            ScreeningRepository screenings, SeatRepository seats, SeatReservationRepository reservations, SeatHoldService holds) {
+        return new cinema.application.screenings.queries.GetAvailableSeatsQueryHandler(screenings, seats, reservations, holds);
     }
 
     @Bean
@@ -234,13 +238,17 @@ public class UseCaseConfiguration {
     }
 
     @Bean
-    public cinema.application.tickets.queries.GetMyTicketsQueryHandler getMyTicketsQueryHandler() {
-        return new cinema.application.tickets.queries.GetMyTicketsQueryHandler();
+    @Profile("venue-dev")
+    public cinema.application.tickets.queries.GetMyTicketsQueryHandler getMyTicketsQueryHandler(
+            CurrentUser currentUser, CustomerRepository customers, BookingRepository bookings, TicketRepository tickets) {
+        return new cinema.application.tickets.queries.GetMyTicketsQueryHandler(currentUser, customers, bookings, tickets);
     }
 
     @Bean
-    public cinema.application.tickets.queries.GetTicketQueryHandler getTicketQueryHandler() {
-        return new cinema.application.tickets.queries.GetTicketQueryHandler();
+    @Profile("venue-dev")
+    public cinema.application.tickets.queries.GetTicketQueryHandler getTicketQueryHandler(
+            CurrentUser currentUser, CustomerRepository customers, BookingRepository bookings, TicketRepository tickets) {
+        return new cinema.application.tickets.queries.GetTicketQueryHandler(currentUser, customers, bookings, tickets);
     }
 
     @Bean

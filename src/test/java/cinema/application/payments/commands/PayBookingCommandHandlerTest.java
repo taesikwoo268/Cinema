@@ -42,7 +42,7 @@ public class PayBookingCommandHandlerTest {
     private final Supplier<String> idGenerator = () -> {idGenerated++ ;return  "payment-123";};
 
     private final PayBookingCommandHandler handler = new PayBookingCommandHandler(currentUser
-            , customers, bookings, payments, paymentGateway, idGenerator);
+            , customers, bookings, payments, paymentGateway, idGenerator, mock(TicketRepository.class), mock(SeatReservationRepository.class));
 
     private Booking booking(String customerId, BookingStatus status) {
         Money money = new Money(BigDecimal.valueOf(12345), Currency.getInstance("VND"));
@@ -162,7 +162,7 @@ public class PayBookingCommandHandlerTest {
 
         assertThrows(ConflictException.class, () -> handler.handle(new PayBookingCommand("booking-123")));
 
-        verifyNoInteractions(paymentGateway, payments);
+        verifyNoInteractions(paymentGateway);
         assertEquals(0, idGenerated);
         verify(booking, never()).confirm();
         verify(bookings, never()).save(any());

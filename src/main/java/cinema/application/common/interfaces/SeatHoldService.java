@@ -6,5 +6,7 @@ public interface SeatHoldService {
 
     void release(String customerId, String screeningId, String seatId);
 
+    boolean isHeld(String screeningId, String seatId);
+
     boolean isHeldBy(String customerId, String screeningId, String seatId);
 }
