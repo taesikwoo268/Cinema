@@ -66,6 +66,11 @@ public final class ScreeningController {
         return getScreeningsQuery.handle(new GetScreeningsQuery(movieId));
     }
 
+    @GetMapping("/{id}/available-seats")
+    public List<cinema.application.common.models.SeatView> availableSeats(@PathVariable String id) {
+        return getAvailableSeatsQuery.handle(new cinema.application.screenings.queries.GetAvailableSeatsQuery(id));
+    }
+
     @PostMapping("/{id}/cancel")
     public ResponseEntity<Void> cancel(@PathVariable String id) {
         cancelScreeningCommand.handle(new CancelScreeningCommand(id));

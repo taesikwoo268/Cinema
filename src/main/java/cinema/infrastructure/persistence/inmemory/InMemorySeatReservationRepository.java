@@ -2,29 +2,37 @@ package cinema.infrastructure.persistence.inmemory;
 
 import cinema.application.common.exceptions.ConflictException;
 import cinema.application.common.interfaces.SeatReservationRepository;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Objects;
+import cinema.infrastructure.persistence.inmemory.InMemorySeatState.SeatKey;
 
 public final class InMemorySeatReservationRepository implements SeatReservationRepository {
-    private record SeatKey(String screeningId, String seatId) { }
+    private final InMemorySeatState state;
 
-    private final Map<SeatKey, String> bookings = new HashMap<>();
+    public InMemorySeatReservationRepository() { this(new InMemorySeatState()); }
 
-    @Override
-    public synchronized boolean isBooked(String screeningId, String seatId) {
-        validateId(screeningId, "screeningId");
-        validateId(seatId, "seatId");
-        return bookings.containsKey(new SeatKey(screeningId, seatId));
+    public InMemorySeatReservationRepository(InMemorySeatState state) {
+        this.state = Objects.requireNonNull(state);
     }
 
     @Override
-    public synchronized void markBooked(String screeningId, String seatId, String bookingId) {
+    public boolean isBooked(String screeningId, String seatId) {
+        validateId(screeningId, "screeningId");
+        validateId(seatId, "seatId");
+        synchronized (state) {
+            return state.bookings.containsKey(new SeatKey(screeningId, seatId));
+        }
+    }
+
+    @Override
+    public void markBooked(String screeningId, String seatId, String bookingId) {
         validateId(screeningId, "screeningId");
         validateId(seatId, "seatId");
         validateId(bookingId, "bookingId");
-        String existing = bookings.putIfAbsent(new SeatKey(screeningId, seatId), bookingId);
-        if (existing != null && !existing.equals(bookingId)) {
-            throw new ConflictException("Seat already booked for screening");
+        synchronized (state) {
+            String existing = state.bookings.putIfAbsent(new SeatKey(screeningId, seatId), bookingId);
+            if (existing != null && !existing.equals(bookingId)) {
+                throw new ConflictException("Seat already booked for screening");
+            }
         }
     }
 

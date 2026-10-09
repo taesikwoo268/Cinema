@@ -14,6 +14,12 @@ import java.util.Currency;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import cinema.infrastructure.persistence.inmemory.InMemorySeatState;
+import cinema.infrastructure.persistence.inmemory.InMemorySeatReservationRepository;
+import cinema.infrastructure.persistence.inmemory.SimpleSeatHoldService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -257,5 +263,43 @@ class AddSeatToCartCommandHandlerTest {
         assertSame(failure, assertThrows(RuntimeException.class, () -> handler.handle(command)));
         assertEquals(before, cart.getItems());
         assertArrayEquals(new Throwable[] {cleanup}, failure.getSuppressed());
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {false, true})
+    void bookingBetweenPrecheckAndHoldRejectsAddWithoutChangingCart(boolean existing) throws Exception {
+        Cart cart = existing ? existingCart() : null;
+        var before = existing ? cart.getItems() : List.<CartItem>of();
+        var state = new InMemorySeatState();
+        var realReservations = spy(new InMemorySeatReservationRepository(state));
+        var realHolds = new SimpleSeatHoldService(state);
+        var checked = new CountDownLatch(1);
+        var booked = new CountDownLatch(1);
+        doAnswer(invocation -> {
+            boolean result = (boolean) invocation.callRealMethod();
+            checked.countDown();
+            assertTrue(booked.await(5, TimeUnit.SECONDS));
+            return result;
+        }).when(realReservations).isBooked("s1", "a1");
+        var racingHandler = new AddSeatToCartCommandHandler(user, customers, screenings, seats,
+                realReservations, realHolds, carts, ids);
+        try (var executor = Executors.newFixedThreadPool(2)) {
+            var add = executor.submit(() -> assertThrows(ConflictException.class, () -> racingHandler.handle(command)));
+            var payment = executor.submit(() -> {
+                assertTrue(checked.await(5, TimeUnit.SECONDS));
+                try {
+                    realReservations.markBooked("s1", "a1", "paid-booking");
+                } finally {
+                    booked.countDown();
+                }
+                return null;
+            });
+            payment.get(5, TimeUnit.SECONDS);
+            add.get(5, TimeUnit.SECONDS);
+        }
+        assertFalse(realHolds.isHeld("s1", "a1"));
+        assertTrue(realReservations.isBooked("s1", "a1"));
+        if (existing) assertEquals(before, cart.getItems());
+        verify(carts, never()).save(any());
     }
 }

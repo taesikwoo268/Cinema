@@ -1,11 +1,13 @@
 package cinema.web.controllers;
 
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.RequestMapping;
-import cinema.application.tickets.queries.GetMyTicketsQueryHandler;
-import cinema.application.tickets.queries.GetTicketQueryHandler;
-/** HTTP methods, request mapping and response mapping are pending implementation. */
+import cinema.application.tickets.queries.*;
+import cinema.application.common.models.TicketView;
+import org.springframework.context.annotation.Profile;
+import org.springframework.web.bind.annotation.*;
+import java.util.List;
+
 @RestController
+@Profile("venue-dev")
 @RequestMapping("/tickets")
 public final class TicketController {
     private final GetMyTicketsQueryHandler getMyTicketsQuery;
@@ -14,4 +16,6 @@ public final class TicketController {
         this.getMyTicketsQuery = getMyTicketsQuery;
         this.getTicketQuery = getTicketQuery;
     }
+    @GetMapping("/me") public List<TicketView> mine() { return getMyTicketsQuery.handle(new GetMyTicketsQuery()); }
+    @GetMapping("/{id}") public TicketView get(@PathVariable String id) { return getTicketQuery.handle(new GetTicketQuery(id)); }
 }

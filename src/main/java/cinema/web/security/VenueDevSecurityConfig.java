@@ -78,7 +78,9 @@ public class VenueDevSecurityConfig {
                         cancelBooking,
                         getMyBookings,
                         getBooking,
-                        payBooking
+                        payBooking,
+                        paths.matcher(HttpMethod.GET, "/tickets/me"),
+                        paths.matcher(HttpMethod.GET, "/tickets/{id}")
                 ).permitAll()
                 .requestMatchers(
                         paths.matcher(HttpMethod.GET, "/cinemas"),
@@ -89,7 +91,8 @@ public class VenueDevSecurityConfig {
                         paths.matcher(HttpMethod.GET, "/movies"),
                         paths.matcher(HttpMethod.GET, "/movies/{id}"),
                         getScreenings,
-                        getScreening
+                        getScreening,
+                        paths.matcher(HttpMethod.GET, "/screenings/{id}/available-seats")
                 ).permitAll()
                 .anyRequest().denyAll())
                 .build();

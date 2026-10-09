@@ -21,7 +21,9 @@ class DefaultVenueSecurityTest {
     @CsvSource({
         "GET, /cinemas", "GET, /cinemas/c1", "GET, /cinemas/c1/halls",
         "GET, /halls/h1", "GET, /halls/h1/seats",
-        "POST, /cinemas", "POST, /halls", "POST, /seats"
+        "POST, /cinemas", "POST, /halls", "POST, /seats",
+        "GET, /tickets/me", "GET, /tickets/t1", "GET, /screenings/s1/available-seats",
+        "GET, /bookings/me", "GET, /bookings/b1", "POST, /payments/b1"
     })
     void deniesVenueRoutesOutsideDevelopmentProfile(String method, String path) throws Exception {
         mvc.perform(request(HttpMethod.valueOf(method), path).with(csrf()))

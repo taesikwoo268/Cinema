@@ -8,6 +8,7 @@ import cinema.application.common.interfaces.CartRepository;
 import cinema.application.common.interfaces.SeatHoldService;
 import cinema.application.common.interfaces.SeatReservationRepository;
 import cinema.infrastructure.persistence.inmemory.InMemoryCartRepository;
+import cinema.infrastructure.persistence.inmemory.InMemorySeatState;
 import cinema.infrastructure.persistence.inmemory.InMemorySeatReservationRepository;
 import cinema.infrastructure.persistence.inmemory.SimpleSeatHoldService;
 
@@ -21,12 +22,17 @@ public class CartConfiguration {
     }
 
     @Bean
-    public SeatHoldService seatHoldService() {
-        return new SimpleSeatHoldService();
+    public InMemorySeatState seatState() {
+        return new InMemorySeatState();
     }
 
     @Bean
-    public SeatReservationRepository seatReservationRepository() {
-        return new InMemorySeatReservationRepository();
+    public SeatHoldService seatHoldService(InMemorySeatState state) {
+        return new SimpleSeatHoldService(state);
+    }
+
+    @Bean
+    public SeatReservationRepository seatReservationRepository(InMemorySeatState state) {
+        return new InMemorySeatReservationRepository(state);
     }
 }

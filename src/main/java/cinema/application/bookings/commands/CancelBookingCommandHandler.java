@@ -41,16 +41,22 @@ public final class CancelBookingCommandHandler implements UseCase<CancelBookingC
         }
         var customer = customers.findByUserId(userId)
                 .orElseThrow(() -> new NotFoundException("Customer not found for user: " + userId));
-        var booking = bookings.findById(bookingId)
-                .orElseThrow(() -> new NotFoundException("Booking not found: " + bookingId));
-        if (!customer.getId().equals(booking.getCustomerId())) {
-            throw new ForbiddenException("Booking belongs to another customer");
+        synchronized (bookings) {
+            var booking = bookings.findById(bookingId)
+                    .orElseThrow(() -> new NotFoundException("Booking not found: " + bookingId));
+            if (!customer.getId().equals(booking.getCustomerId())) {
+                throw new ForbiddenException("Booking belongs to another customer");
+            }
+            try {
+                booking.cancel();
+            } catch (cinema.domain.common.DomainException ex) {
+                throw new cinema.application.common.exceptions.ConflictException(ex.getMessage());
+            }
+            for (var item : booking.getItems()) {
+                holds.release(booking.getCustomerId(), booking.getScreeningId(), item.seatId());
+            }
+            bookings.save(booking);
+            return null;
         }
-        booking.cancel();
-        for (var item : booking.getItems()) {
-            holds.release(booking.getCustomerId(), booking.getScreeningId(), item.seatId());
-        }
-        bookings.save(booking);
-        return null;
     }
 }

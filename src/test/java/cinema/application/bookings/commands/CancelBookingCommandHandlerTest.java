@@ -129,7 +129,7 @@ class CancelBookingCommandHandlerTest {
     @EnumSource(value = BookingStatus.class, names = {"CONFIRMED", "CANCELLED"})
     void domainRejectsTerminalStatesWithoutReleaseOrSave(BookingStatus status) {
         Booking booking = booking("c1", status);
-        assertThrows(DomainException.class, () -> handler.handle(command));
+        assertThrows(cinema.application.common.exceptions.ConflictException.class, () -> handler.handle(command));
         verify(booking).cancel();
         assertEquals(status, booking.getStatus());
         verifyNoInteractions(holds);
