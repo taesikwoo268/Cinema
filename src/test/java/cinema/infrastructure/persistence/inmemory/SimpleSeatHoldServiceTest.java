@@ -134,4 +134,22 @@ class SimpleSeatHoldServiceTest {
             assertEquals(secondWon, service.isHeldBy("c2", "s1", "a1"));
         }
     }
+
+    @Test
+    void permanentBookingRejectsEveryNewHoldIncludingOriginalOwnerAfterRelease() {
+        var state = new InMemorySeatState();
+        var holds = new SimpleSeatHoldService(state);
+        var reservations = new InMemorySeatReservationRepository(state);
+        assertTrue(holds.hold("c1", "s1", "a1"));
+        reservations.markBooked("s1", "a1", "b1");
+        assertTrue(holds.isHeldBy("c1", "s1", "a1"));
+        assertFalse(holds.hold("c1", "s1", "a1"));
+        assertFalse(holds.hold("c2", "s1", "a1"));
+        holds.release("c1", "s1", "a1");
+        assertFalse(holds.hold("c1", "s1", "a1"));
+        assertFalse(holds.hold("c2", "s1", "a1"));
+        assertFalse(holds.isHeld("s1", "a1"));
+        assertTrue(reservations.isBooked("s1", "a1"));
+        assertTrue(holds.hold("c2", "s2", "a1"));
+    }
 }

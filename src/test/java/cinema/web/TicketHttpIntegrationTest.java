@@ -79,6 +79,8 @@ class TicketHttpIntegrationTest {
         http.perform(post("/bookings/"+booking+"/cancel").with(user(owner))).andExpect(status().isConflict());
         holds.release(customer,screening,seat);
         assertTrue(reservations.isBooked(screening,seat));
+        assertFalse(holds.hold(customer,screening,seat));
+        assertFalse(holds.hold("other-customer",screening,seat));
         http.perform(get("/screenings/"+screening+"/available-seats"))
                 .andExpect(status().isOk()).andExpect(jsonPath("$[0].available").value(false));
         http.perform(post("/carts/seats").with(user(other)).contentType(MediaType.APPLICATION_JSON).content(cartBody(seat)))

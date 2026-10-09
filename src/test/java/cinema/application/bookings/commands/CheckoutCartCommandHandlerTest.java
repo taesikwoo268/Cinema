@@ -11,6 +11,11 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.*;
 import java.util.function.Supplier;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import cinema.infrastructure.persistence.inmemory.InMemoryCartRepository;
+import cinema.infrastructure.persistence.inmemory.InMemoryBookingRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -179,5 +184,97 @@ class CheckoutCartCommandHandlerTest {
         verify(cart, never()).clear();
         verify(carts, never()).save(any());
         verify(holds, never()).release(anyString(), anyString(), anyString());
+    }
+
+    @Test
+    void concurrentCheckoutConsumesSameCartExactlyOnceAcrossHandlerInstances() throws Exception {
+        var realCarts = new InMemoryCartRepository();
+        var concurrentReads = mock(CartRepository.class);
+        var realBookings = new InMemoryBookingRepository();
+        var cart = new Cart("cart", "c1", List.of(item("s1", "a1", "10", "USD"),
+                item("s2", "a2", "20", "USD"), item("s1", "a3", "10", "USD")));
+        realCarts.save(cart);
+        var bothLoaded = new CountDownLatch(2);
+        // Wait outside the real repository's monitor so both lookups can finish.
+        doAnswer(invocation -> {
+            var found = realCarts.findActiveByCustomerId("c1");
+            bothLoaded.countDown();
+            assertTrue(bothLoaded.await(5, TimeUnit.SECONDS));
+            return found;
+        }).when(concurrentReads).findActiveByCustomerId("c1");
+        doAnswer(invocation -> {
+            realCarts.save(invocation.getArgument(0));
+            return null;
+        }).when(concurrentReads).save(any());
+        Supplier<String> uniqueIds = () -> UUID.randomUUID().toString();
+        var firstHandler = new CheckoutCartCommandHandler(user, customers, concurrentReads, realBookings, holds, uniqueIds, clock);
+        var secondHandler = new CheckoutCartCommandHandler(user, customers, concurrentReads, realBookings, holds, uniqueIds, clock);
+        try (var executor = Executors.newFixedThreadPool(2)) {
+            var first = executor.submit(() -> checkoutOutcome(firstHandler));
+            var second = executor.submit(() -> checkoutOutcome(secondHandler));
+            var results = List.of(first.get(5, TimeUnit.SECONDS), second.get(5, TimeUnit.SECONDS));
+            assertEquals(1, results.stream().filter(cinema.application.common.models.CheckoutResult.class::isInstance).count());
+            assertEquals(1, results.stream().filter(ValidationException.class::isInstance).count());
+            var success = (cinema.application.common.models.CheckoutResult) results.stream()
+                    .filter(cinema.application.common.models.CheckoutResult.class::isInstance).findFirst().orElseThrow();
+            assertEquals(2, success.bookingIds().size());
+            assertEquals(new HashSet<>(success.bookingIds()), new HashSet<>(realBookings.findByCustomerId("c1")
+                    .stream().map(Booking::getId).toList()));
+        }
+        var saved = realBookings.findByCustomerId("c1");
+        assertEquals(2, saved.size());
+        assertEquals(Set.of("s1", "s2"), new HashSet<>(saved.stream().map(Booking::getScreeningId).toList()));
+        assertEquals(3, saved.stream().mapToInt(b -> b.getItems().size()).sum());
+        assertTrue(cart.getItems().isEmpty());
+        verify(concurrentReads, times(1)).save(cart);
+        verify(holds).isHeldBy("c1", "s1", "a1");
+        verify(holds).isHeldBy("c1", "s2", "a2");
+        verify(holds).isHeldBy("c1", "s1", "a3");
+        verify(holds, never()).release(anyString(), anyString(), anyString());
+    }
+
+    private Object checkoutOutcome(CheckoutCartCommandHandler checkout) {
+        try {
+            return checkout.handle(command);
+        } catch (ValidationException expected) {
+            return expected;
+        }
+    }
+
+    @Test
+    void checkoutOfDifferentCartProceedsWhileFirstCartValidates() throws Exception {
+        var realCarts = new InMemoryCartRepository();
+        var realBookings = new InMemoryBookingRepository();
+        realCarts.save(new Cart("cart1", "c1", List.of(item("s1", "a1", "10", "USD"))));
+        realCarts.save(new Cart("cart2", "c2", List.of(item("s2", "a2", "20", "USD"))));
+        var secondUser = mock(CurrentUser.class);
+        when(secondUser.isAuthenticated()).thenReturn(true);
+        when(secondUser.getUserId()).thenReturn("u2");
+        when(customers.findByUserId("u2")).thenReturn(Optional.of(new Customer("c2", "u2", "Second")));
+        var validatingFirst = new CountDownLatch(1);
+        var secondFinished = new CountDownLatch(1);
+        when(holds.isHeldBy("c1", "s1", "a1")).thenAnswer(invocation -> {
+            validatingFirst.countDown();
+            assertTrue(secondFinished.await(5, TimeUnit.SECONDS));
+            return true;
+        });
+        Supplier<String> uniqueIds = () -> UUID.randomUUID().toString();
+        var firstHandler = new CheckoutCartCommandHandler(user, customers, realCarts, realBookings, holds, uniqueIds, clock);
+        var secondHandler = new CheckoutCartCommandHandler(secondUser, customers, realCarts, realBookings, holds, uniqueIds, clock);
+        try (var executor = Executors.newFixedThreadPool(2)) {
+            var first = executor.submit(() -> firstHandler.handle(command));
+            var second = executor.submit(() -> {
+                assertTrue(validatingFirst.await(5, TimeUnit.SECONDS));
+                try {
+                    return secondHandler.handle(command);
+                } finally {
+                    secondFinished.countDown();
+                }
+            });
+            assertEquals(1, second.get(5, TimeUnit.SECONDS).bookingIds().size());
+            assertEquals(1, first.get(5, TimeUnit.SECONDS).bookingIds().size());
+        }
+        assertEquals(1, realBookings.findByCustomerId("c1").size());
+        assertEquals(1, realBookings.findByCustomerId("c2").size());
     }
 }

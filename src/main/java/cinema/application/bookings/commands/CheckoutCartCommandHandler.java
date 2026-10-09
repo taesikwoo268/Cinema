@@ -48,34 +48,37 @@ public final class CheckoutCartCommandHandler implements UseCase<CheckoutCartCom
         String customerId = customer.getId();
         var cart = carts.findActiveByCustomerId(customerId)
                 .orElseThrow(() -> new NotFoundException("Active cart not found for customer: " + customerId));
-        var items = cart.getItems();
-        if (items.isEmpty()) throw new ValidationException("Cart must not be empty");
-        for (var item : items) {
-            if (!holds.isHeldBy(customerId, item.screeningId(), item.seatId())) {
-                throw new ConflictException("Seat hold missing for customer");
-            }
-        }
-        var groups = new LinkedHashMap<String, List<BookingItem>>();
-        for (var item : items) {
-            groups.computeIfAbsent(item.screeningId(), ignored -> new ArrayList<>())
-                    .add(new BookingItem(item.seatId(), item.unitPrice()));
-        }
-        var pending = new ArrayList<Booking>();
-        for (var group : groups.entrySet()) {
-            var currency = group.getValue().get(0).price().currency();
-            BigDecimal amount = BigDecimal.ZERO;
-            for (var item : group.getValue()) {
-                if (!currency.equals(item.price().currency())) {
-                    throw new DomainException("Booking item currencies must match");
+        // V1 repositories return the same active cart instance to competing requests.
+        synchronized (cart) {
+            var items = cart.getItems();
+            if (items.isEmpty()) throw new ValidationException("Cart must not be empty");
+            for (var item : items) {
+                if (!holds.isHeldBy(customerId, item.screeningId(), item.seatId())) {
+                    throw new ConflictException("Seat hold missing for customer");
                 }
-                amount = amount.add(item.price().amount());
             }
-            pending.add(new Booking(idGenerator.get(), customerId, group.getKey(), group.getValue(),
-                    new Money(amount, currency), BookingStatus.PENDING, clock.now()));
+            var groups = new LinkedHashMap<String, List<BookingItem>>();
+            for (var item : items) {
+                groups.computeIfAbsent(item.screeningId(), ignored -> new ArrayList<>())
+                        .add(new BookingItem(item.seatId(), item.unitPrice()));
+            }
+            var pending = new ArrayList<Booking>();
+            for (var group : groups.entrySet()) {
+                var currency = group.getValue().get(0).price().currency();
+                BigDecimal amount = BigDecimal.ZERO;
+                for (var item : group.getValue()) {
+                    if (!currency.equals(item.price().currency())) {
+                        throw new DomainException("Booking item currencies must match");
+                    }
+                    amount = amount.add(item.price().amount());
+                }
+                pending.add(new Booking(idGenerator.get(), customerId, group.getKey(), group.getValue(),
+                        new Money(amount, currency), BookingStatus.PENDING, clock.now()));
+            }
+            for (var booking : pending) bookings.save(booking);
+            cart.clear();
+            carts.save(cart);
+            return new CheckoutResult(pending.stream().map(Booking::getId).toList());
         }
-        for (var booking : pending) bookings.save(booking);
-        cart.clear();
-        carts.save(cart);
-        return new CheckoutResult(pending.stream().map(Booking::getId).toList());
     }
 }

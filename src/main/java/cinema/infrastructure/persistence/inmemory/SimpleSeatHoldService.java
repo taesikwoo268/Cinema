@@ -1,38 +1,52 @@
 package cinema.infrastructure.persistence.inmemory;
 
 import cinema.application.common.interfaces.SeatHoldService;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Objects;
+import cinema.infrastructure.persistence.inmemory.InMemorySeatState.SeatKey;
 
 /** Simple in-memory seat ownership without expiration. */
 public final class SimpleSeatHoldService implements SeatHoldService {
-    private record SeatKey(String screeningId, String seatId) { }
+    private final InMemorySeatState state;
 
-    private final Map<SeatKey, String> owners = new HashMap<>();
+    public SimpleSeatHoldService() { this(new InMemorySeatState()); }
 
-    @Override
-    public synchronized boolean hold(String customerId, String screeningId, String seatId) {
-        validate(customerId, screeningId, seatId);
-        String owner = owners.putIfAbsent(new SeatKey(screeningId, seatId), customerId);
-        return owner == null || owner.equals(customerId);
+    public SimpleSeatHoldService(InMemorySeatState state) {
+        this.state = Objects.requireNonNull(state);
     }
 
     @Override
-    public synchronized void release(String customerId, String screeningId, String seatId) {
+    public boolean hold(String customerId, String screeningId, String seatId) {
         validate(customerId, screeningId, seatId);
-        owners.remove(new SeatKey(screeningId, seatId), customerId);
+        synchronized (state) {
+            var key = new SeatKey(screeningId, seatId);
+            if (state.bookings.containsKey(key)) return false;
+            String owner = state.owners.putIfAbsent(key, customerId);
+            return owner == null || owner.equals(customerId);
+        }
     }
 
     @Override
-    public synchronized boolean isHeldBy(String customerId, String screeningId, String seatId) {
+    public void release(String customerId, String screeningId, String seatId) {
         validate(customerId, screeningId, seatId);
-        return customerId.equals(owners.get(new SeatKey(screeningId, seatId)));
+        synchronized (state) {
+            state.owners.remove(new SeatKey(screeningId, seatId), customerId);
+        }
     }
 
     @Override
-    public synchronized boolean isHeld(String screeningId, String seatId) {
+    public boolean isHeldBy(String customerId, String screeningId, String seatId) {
+        validate(customerId, screeningId, seatId);
+        synchronized (state) {
+            return customerId.equals(state.owners.get(new SeatKey(screeningId, seatId)));
+        }
+    }
+
+    @Override
+    public boolean isHeld(String screeningId, String seatId) {
         validate("availability", screeningId, seatId);
-        return owners.containsKey(new SeatKey(screeningId, seatId));
+        synchronized (state) {
+            return state.owners.containsKey(new SeatKey(screeningId, seatId));
+        }
     }
 
     private static void validate(String customerId, String screeningId, String seatId) {
