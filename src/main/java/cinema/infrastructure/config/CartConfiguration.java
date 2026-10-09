@@ -13,7 +13,7 @@ import cinema.infrastructure.persistence.inmemory.InMemorySeatReservationReposit
 import cinema.infrastructure.persistence.inmemory.SimpleSeatHoldService;
 
 @Configuration
-@Profile("venue-dev")
+@Profile("venue-dev & !mysql")
 public class CartConfiguration {
 
     @Bean

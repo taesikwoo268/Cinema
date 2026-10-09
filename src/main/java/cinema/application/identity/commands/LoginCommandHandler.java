@@ -6,7 +6,7 @@ import cinema.application.common.interfaces.UseCase;
 import cinema.application.common.models.AuthenticationResult;
 
 /** Authenticates a user through the identity port. */
-public final class LoginCommandHandler implements UseCase<LoginCommand, AuthenticationResult> {
+public class LoginCommandHandler implements UseCase<LoginCommand, AuthenticationResult> {
     private final IdentityService identityService;
 
     public LoginCommandHandler(IdentityService identityService) {

@@ -8,7 +8,7 @@ import cinema.application.common.interfaces.UseCase;
 import cinema.domain.common.DomainException;
 import cinema.domain.screening.Screening;
 
-public final class CancelScreeningCommandHandler implements UseCase<CancelScreeningCommand, Void> {
+public class CancelScreeningCommandHandler implements UseCase<CancelScreeningCommand, Void> {
 
     private final ScreeningRepository screenings;
 

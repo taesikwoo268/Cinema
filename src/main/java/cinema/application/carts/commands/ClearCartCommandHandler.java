@@ -9,7 +9,7 @@ import cinema.application.common.interfaces.CustomerRepository;
 import cinema.application.common.interfaces.SeatHoldService;
 import cinema.application.common.interfaces.UseCase;
 
-public final class ClearCartCommandHandler implements UseCase<ClearCartCommand, Void> {
+public class ClearCartCommandHandler implements UseCase<ClearCartCommand, Void> {
 
     private final CurrentUser currentUser;
     private final CustomerRepository customers;

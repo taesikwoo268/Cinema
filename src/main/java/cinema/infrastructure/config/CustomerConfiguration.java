@@ -8,7 +8,7 @@ import cinema.application.common.interfaces.CustomerRepository;
 import cinema.infrastructure.persistence.inmemory.InMemoryCustomerRepository;
 
 @Configuration
-@Profile("venue-dev")
+@Profile("venue-dev & !mysql")
 public class CustomerConfiguration {
 
     @Bean

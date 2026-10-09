@@ -19,7 +19,7 @@ import cinema.web.requests.CreateHallRequest;
 import cinema.web.responses.CreatedResourceResponse;
 
 @RestController
-@Profile("venue-dev")
+@Profile({"venue-dev", "mysql"})
 @RequestMapping("/halls")
 public final class HallController {
 

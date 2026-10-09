@@ -5,7 +5,7 @@ import cinema.infrastructure.persistence.inmemory.InMemoryTicketRepository;
 import org.springframework.context.annotation.*;
 
 @Configuration
-@Profile("venue-dev")
+@Profile("venue-dev & !mysql")
 public class TicketConfiguration {
     @Bean public TicketRepository ticketRepository(BookingRepository bookings) {
         return new InMemoryTicketRepository(bookings);

@@ -1,13 +1,10 @@
 package cinema.infrastructure.persistence.entities;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-/** Mapping skeleton: remaining columns and constraints are pending. */
+import jakarta.persistence.*;
+
 @Entity
-@Table(name = "customer_records")
-public class CustomerJpaEntity {
-    @Id private String id;
-    protected CustomerJpaEntity() { }
-    public String getId() { return id; }
+@Table(name = "customer_records", uniqueConstraints = {@UniqueConstraint(columnNames = {"user_id"})})
+public class CustomerJpaEntity extends JpaRecord {
+    @Column(name = "user_id", nullable = false, length = 128) public String userId;
+    @Column(name = "display_name", nullable = false, length = 255) public String displayName;
 }

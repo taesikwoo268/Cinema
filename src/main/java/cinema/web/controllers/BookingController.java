@@ -24,7 +24,7 @@ import cinema.application.common.models.CheckoutResult;
 
 /** HTTP endpoints for customer booking use cases. */
 @RestController
-@Profile("venue-dev")
+@Profile({"venue-dev", "mysql"})
 @RequestMapping("/bookings")
 public final class BookingController {
 

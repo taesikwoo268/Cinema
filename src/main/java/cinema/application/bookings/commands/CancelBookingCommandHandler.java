@@ -9,7 +9,7 @@ import cinema.application.common.interfaces.CustomerRepository;
 import cinema.application.common.interfaces.SeatHoldService;
 import cinema.application.common.interfaces.UseCase;
 
-public final class CancelBookingCommandHandler implements UseCase<CancelBookingCommand, Void> {
+public class CancelBookingCommandHandler implements UseCase<CancelBookingCommand, Void> {
     private final CurrentUser currentUser;
     private final CustomerRepository customers;
     private final BookingRepository bookings;

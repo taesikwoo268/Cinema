@@ -30,7 +30,7 @@ import cinema.web.responses.CreatedResourceResponse;
  * implementation.
  */
 @RestController
-@Profile("venue-dev")
+@Profile({"venue-dev", "mysql"})
 @RequestMapping("/screenings")
 public final class ScreeningController {
 

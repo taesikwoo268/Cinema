@@ -10,7 +10,7 @@ import cinema.domain.customer.Customer;
 
 import java.util.function.Supplier;
 
-public final class RegisterCommandHandler implements UseCase<RegisterCommand, String> {
+public class RegisterCommandHandler implements UseCase<RegisterCommand, String> {
 
     private final IdentityService identities;
     private final CustomerRepository customers;

@@ -8,7 +8,7 @@ import cinema.domain.movie.Movie;
 import cinema.domain.movie.MovieStatus;
 import java.util.function.Supplier;
 
-public final class CreateMovieCommandHandler implements UseCase<CreateMovieCommand, String> {
+public class CreateMovieCommandHandler implements UseCase<CreateMovieCommand, String> {
     private final MovieRepository movies;
     private final Supplier<String> idGenerator;
 

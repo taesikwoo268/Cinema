@@ -12,7 +12,7 @@ import org.springframework.security.web.servlet.util.matcher.PathPatternRequestM
  * Development-only security configuration for venue-dev routes.
  */
 @Configuration
-@Profile("venue-dev")
+@Profile({"venue-dev", "mysql"})
 public class VenueDevSecurityConfig {
 
     @Bean

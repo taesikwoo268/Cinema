@@ -11,7 +11,7 @@ import cinema.application.payments.commands.PayBookingCommand;
 import cinema.application.payments.commands.PayBookingCommandHandler;
 
 @RestController
-@Profile("venue-dev")
+@Profile({"venue-dev", "mysql"})
 @RequestMapping("/payments")
 public final class PaymentController {
 
