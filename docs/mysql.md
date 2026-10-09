@@ -17,9 +17,19 @@ Set environment variables outside Git (create/grant the account using your norma
 - `CINEMA_DB_PASSWORD`: its password
 
 Run `mvn spring-boot:run -Dspring-boot.run.profiles=mysql`.
-Flyway applies `V1__init_schema.sql` and `V2__retain_deleted_movie_references.sql`; Hibernate only validates the schema. The initial V1 file was an empty, inactive scaffold before this package. Start with a fresh database. No credentials or local data belong in Git.
+Flyway applies V1/V2 and `V3__authentication_tokens_and_roles.sql`; Hibernate only validates the schema. Existing Package 2 databases upgrade through V3 without changing V1/V2. No credentials or local data belong in Git.
 
-`venue-dev` remains in-memory. `mysql` selects only persistent adapters, even if both profiles are supplied. With neither profile, HTTP remains deny-all. The mysql routes use the same CurrentUser/ownership boundaries as venue-dev. Accounts and password hashes persist, but existing login tokens still have no authentication filter; this package does not introduce production authentication.
+`venue-dev` remains in-memory. `mysql` selects only persistent adapters and its own security chain, even if both profiles are supplied. With neither profile, HTTP remains deny-all.
+
+## Authentication (Package 3)
+
+Register at `POST /identity/register` with `email`, `password`, `displayName`, then log in at `POST /identity/login` with `email`, `password`. Send the returned `accessToken` as `Authorization: Bearer <accessToken>`; the response still includes `expiresAt`. Tokens expire after one hour and survive application restarts. Only their SHA-256 hashes are stored. Existing Package 2 placeholder tokens are not valid; log in again. Passwords remain PBKDF2 hashes.
+
+Catalog GET routes and registration/login are public. Catalog creation, movie deletion and screening cancellation require ADMIN. Cart, booking, payment, ticket and `/identity/me` routes require CUSTOMER or ADMIN; ownership checks apply to both roles. Errors retain the existing 403/`FORBIDDEN` contract. There is no cookie/session authentication; use HTTPS outside localhost and never log or commit tokens.
+
+Registration always creates CUSTOMER accounts. A database administrator can promote an already registered account with `UPDATE user_records SET role='ADMIN' WHERE email='your-admin-email';`. There is no default admin, password or public role-change endpoint. Role changes apply on the next request, including with existing tokens.
+
+Refresh tokens, a logout/revocation endpoint, password reset, login rate limiting and automatic expired-token cleanup are outside this package. Expired tokens are rejected even while their rows remain. The payment failure window below is unchanged.
 
 ## Transactions and consistency
 
@@ -41,4 +51,6 @@ The shared persistence contract covers round trips, rollback after a gateway suc
 
 Verified locally against actual MySQL 9.4.0 as well as H2. The Spring Boot-managed Flyway 11.7.2 emits a warning that MySQL 9.4 is newer than its tested range; migrations, validation, constraints and the workflow contract are nevertheless exercised on that server. Other MySQL versions require their own verification before deployment.
 
-Final verification: `mvn clean test` with MySQL enabled passed 758 tests, 0 failures, 0 errors, 8 pre-existing skipped tests; `git diff --check` passed. Both application restart and actual isolated MySQL server restart were verified: all 32 tickets and 19 confirmed bookings present before the server restart remained afterward, with migrations 1 and 2 intact.
+Package 2 verification: `mvn clean test` with MySQL enabled passed 758 tests, 0 failures, 0 errors, 8 pre-existing skipped tests; `git diff --check` passed. Both application restart and actual isolated MySQL server restart were verified: all 32 tickets and 19 confirmed bookings present before the server restart remained afterward, with migrations 1 and 2 intact.
+
+Package 3 verification: `mvn clean test` passed 787 tests, 0 failures, 0 errors, 8 pre-existing skips, including 29 contract tests each on H2 and isolated MySQL 9.4. V2-to-V3 upgrades preserve existing accounts; tests cover real login tokens, roles/ownership, restart and cross-instance verification, transaction rollback, combined profiles and the full booking/payment/ticket flow. `git diff --check` passed. The user's database on port 3306 was not used for tests or migrated by this work.

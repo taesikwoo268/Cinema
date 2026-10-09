@@ -42,7 +42,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.anonymous;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -53,7 +52,10 @@ abstract class PersistentWorkflowContract {
     abstract String databaseUrl();
     boolean mysql() { return databaseUrl().startsWith("jdbc:mysql:"); }
     ConfigurableApplicationContext start() {
-        return new SpringApplicationBuilder(CinemaApplication.class, TestPorts.class).profiles("mysql").run(
+        return startWithProfiles("mysql");
+    }
+    ConfigurableApplicationContext startWithProfiles(String... profiles) {
+        return new SpringApplicationBuilder(CinemaApplication.class, TestPorts.class).profiles(profiles).run(
                 "--server.port=0", "--server.address=127.0.0.1", "--spring.main.banner-mode=off", "--logging.level.root=WARN",
                 "--spring.datasource.url=" + databaseUrl(),
                 "--spring.datasource.driver-class-name=" + (mysql() ? "com.mysql.cj.jdbc.Driver" : "org.h2.Driver"),
@@ -245,16 +247,206 @@ abstract class PersistentWorkflowContract {
     @Test void fullHttpCheckoutPaymentTicketsUsePersistentRepositories() throws Exception {
         var f = seed();
         var mvc = MockMvcBuilders.webAppContextSetup((WebApplicationContext) app).apply(springSecurity()).build();
+        var account = registerAndLogin(mvc);
         String json = "{\"screeningId\":\"" + f.screening() + "\",\"seatId\":\"" + f.seat() + "\"}";
-        mvc.perform(post("/carts/seats").with(user(f.user())).contentType("application/json").content(json)).andExpect(status().isNoContent());
-        String body = mvc.perform(post("/bookings/checkout").with(user(f.user()))).andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+        mvc.perform(post("/carts/seats").header("Authorization", account.bearer()).contentType("application/json").content(json)).andExpect(status().isNoContent());
+        String body = mvc.perform(post("/bookings/checkout").header("Authorization", account.bearer())).andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
         String booking = bean(ObjectMapper.class).readTree(body).get("bookingIds").get(0).asText();
-        mvc.perform(post("/payments/" + booking).with(user(f.user()))).andExpect(status().isOk()).andExpect(jsonPath("$.successful").value(true));
-        mvc.perform(get("/bookings/" + booking).with(user(f.user()))).andExpect(status().isOk()).andExpect(jsonPath("$.status").value("CONFIRMED"));
-        mvc.perform(get("/tickets/me").with(user(f.user()))).andExpect(status().isOk()).andExpect(jsonPath("$.length()").value(1));
+        int calls = bean(TestGateway.class).calls.get();
+        mvc.perform(post("/payments/" + booking).header("Authorization", account.bearer())).andExpect(status().isOk()).andExpect(jsonPath("$.successful").value(true));
+        mvc.perform(post("/payments/" + booking).header("Authorization", account.bearer())).andExpect(status().isOk()).andExpect(jsonPath("$.successful").value(true));
+        assertEquals(calls + 1, bean(TestGateway.class).calls.get());
+        assertEquals(1, count("payment_records", booking));
+        mvc.perform(get("/bookings/" + booking).header("Authorization", account.bearer())).andExpect(status().isOk()).andExpect(jsonPath("$.status").value("CONFIRMED"));
+        mvc.perform(get("/tickets/me").header("Authorization", account.bearer())).andExpect(status().isOk()).andExpect(jsonPath("$.length()").value(1));
         SecurityContextHolder.clearContext();
         mvc.perform(get("/tickets/me").with(anonymous())).andExpect(status().isForbidden());
         assertEquals(1, count("ticket_records", booking));
+    }
+
+    record HttpAccount(String email, String password, String userId, String customerId, String token) {
+        String bearer() { return "Bearer " + token; }
+    }
+
+    org.springframework.test.web.servlet.MockMvc http(ConfigurableApplicationContext context) {
+        return MockMvcBuilders.webAppContextSetup((WebApplicationContext) context).apply(springSecurity()).build();
+    }
+
+    HttpAccount registerAndLogin(org.springframework.test.web.servlet.MockMvc mvc) throws Exception {
+        SecurityContextHolder.clearContext();
+        String email = id() + "@example.com", password = id();
+        var mapper = bean(ObjectMapper.class);
+        String registered = mvc.perform(post("/identity/register").contentType("application/json")
+                        .content(mapper.writeValueAsString(Map.of("email", email, "password", password, "displayName", "Customer", "role", "ADMIN"))))
+                .andExpect(status().isCreated()).andReturn().getResponse().getContentAsString();
+        String loggedIn = mvc.perform(post("/identity/login").contentType("application/json")
+                        .content(mapper.writeValueAsString(Map.of("email", email, "password", password))))
+                .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+        String userId = sql().queryForObject("select id from user_records where email=?", String.class, email);
+        assertEquals("CUSTOMER", sql().queryForObject("select role from user_records where id=?", String.class, userId));
+        return new HttpAccount(email, password, userId, mapper.readTree(registered).get("id").asText(),
+                mapper.readTree(loggedIn).get("accessToken").asText());
+    }
+
+    @Test void bearerTokensAreHashedAndSurviveRestartAndAnotherApplicationInstance() throws Exception {
+        var account = registerAndLogin(http(app));
+        String stored = sql().queryForObject("select token_hash from access_token_records where user_id=?", String.class, account.userId());
+        assertEquals(64, stored.length()); assertNotEquals(account.token(), stored);
+        assertEquals(java.util.HexFormat.of().formatHex(java.security.MessageDigest.getInstance("SHA-256")
+                .digest(account.token().getBytes(java.nio.charset.StandardCharsets.US_ASCII))), stored);
+        try (var second = start()) {
+            http(second).perform(get("/identity/me").header("Authorization", account.bearer()))
+                    .andExpect(status().isOk()).andExpect(jsonPath("$.userId").value(account.userId()));
+        }
+        app.close(); app = start();
+        http(app).perform(get("/identity/me").header("Authorization", account.bearer()))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.userId").value(account.userId()));
+        assertNull(SecurityContextHolder.getContext().getAuthentication());
+        http(app).perform(get("/identity/me")).andExpect(status().isForbidden()).andExpect(jsonPath("$.code").value("FORBIDDEN"));
+    }
+
+    @Test void invalidExpiredAndDuplicateBearerHeadersAreRejectedWithoutSessionFallback() throws Exception {
+        var mvc = http(app); var account = registerAndLogin(mvc);
+        for (String header : List.of("Basic abc", "Bearer ", "Bearer invalid", "Bearer " + "x".repeat(43),
+                account.bearer() + " ", account.bearer() + ", " + account.bearer())) {
+            mvc.perform(get("/identity/me").header("Authorization", header))
+                    .andExpect(status().isForbidden()).andExpect(jsonPath("$.code").value("FORBIDDEN"));
+        }
+        mvc.perform(get("/identity/me").header("Authorization", account.bearer(), account.bearer())).andExpect(status().isForbidden());
+        mvc.perform(get("/identity/me").header("Authorization", account.bearer()))
+                .andExpect(status().isOk()).andExpect(cookie().doesNotExist("JSESSIONID"));
+        sql().update("update access_token_records set expires_at=? where user_id=?",
+                java.sql.Timestamp.from(Instant.parse("2000-01-01T00:00:00Z")), account.userId());
+        mvc.perform(get("/identity/me").header("Authorization", account.bearer())).andExpect(status().isForbidden());
+        mvc.perform(post("/identity/login").contentType("application/json").content(bean(ObjectMapper.class)
+                .writeValueAsString(Map.of("email", account.email(), "password", "incorrect"))))
+                .andExpect(status().isForbidden()).andExpect(jsonPath("$.message").value("Invalid credentials"));
+        assertEquals(1L, sql().queryForObject("select count(*) from access_token_records where user_id=?", Long.class, account.userId()));
+    }
+
+    @Test void customerCannotManageCatalogAndDatabaseRoleChangesApplyToExistingTokens() throws Exception {
+        var mvc = http(app); var account = registerAndLogin(mvc);
+        for (String route : List.of("/cinemas", "/halls", "/seats", "/movies", "/screenings", "/screenings/absent/cancel")) {
+            mvc.perform(post(route).header("Authorization", account.bearer()).contentType("application/json").content("{}"))
+                    .andExpect(status().isForbidden());
+            mvc.perform(post(route).contentType("application/json").content("{}"))
+                    .andExpect(status().isForbidden());
+        }
+        mvc.perform(delete("/movies/absent").header("Authorization", account.bearer())).andExpect(status().isForbidden());
+        mvc.perform(get("/movies")).andExpect(status().isOk());
+        sql().update("update user_records set role='ADMIN' where id=?", account.userId());
+        mvc.perform(post("/cinemas").header("Authorization", account.bearer()).contentType("application/json")
+                .content("{\"name\":\"Admin cinema\",\"address\":\"Address\"}"))
+                .andExpect(status().isCreated());
+        sql().update("update user_records set role='CUSTOMER' where id=?", account.userId());
+        mvc.perform(post("/cinemas").header("Authorization", account.bearer()).contentType("application/json")
+                .content("{\"name\":\"Denied\",\"address\":\"Address\"}"))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test void bearerOwnershipChecksAlsoApplyToAdmins() throws Exception {
+        var f = seed(); var mvc = http(app); var owner = registerAndLogin(mvc); var other = registerAndLogin(mvc);
+        var b = booking(f, owner.customerId());
+        var ticket = new Ticket(id(), b.getId(), f.screening(), f.seat(), id(), TicketStatus.VALID);
+        bean(TicketRepository.class).save(ticket);
+        for (String role : List.of("CUSTOMER", "ADMIN")) {
+            sql().update("update user_records set role=? where id=?", role, other.userId());
+            mvc.perform(get("/bookings/" + b.getId()).header("Authorization", other.bearer())).andExpect(status().isForbidden());
+            mvc.perform(post("/bookings/" + b.getId() + "/cancel").header("Authorization", other.bearer())).andExpect(status().isForbidden());
+            mvc.perform(post("/payments/" + b.getId()).header("Authorization", other.bearer())).andExpect(status().isForbidden());
+            mvc.perform(get("/tickets/" + ticket.getId()).header("Authorization", other.bearer())).andExpect(status().isForbidden());
+            mvc.perform(get("/tickets/me").header("Authorization", other.bearer())).andExpect(status().isOk()).andExpect(jsonPath("$.length()").value(0));
+        }
+        assertEquals(BookingStatus.PENDING, bean(BookingRepository.class).findById(b.getId()).orElseThrow().getStatus());
+        assertEquals(0, count("payment_records", b.getId()));
+        mvc.perform(get("/tickets/" + ticket.getId()).header("Authorization", owner.bearer())).andExpect(status().isOk());
+    }
+
+    String createWithToken(org.springframework.test.web.servlet.MockMvc mvc, HttpAccount account,
+            String route, Map<String, ?> input) throws Exception {
+        var response = mvc.perform(post(route).header("Authorization", account.bearer())
+                        .contentType("application/json").content(bean(ObjectMapper.class).writeValueAsString(input)))
+                .andExpect(status().isCreated()).andReturn().getResponse().getContentAsString();
+        return bean(ObjectMapper.class).readTree(response).get("id").asText();
+    }
+
+    @Test void adminCanManageEveryCatalogMutationThroughBearerAuthentication() throws Exception {
+        var mvc = http(app); var admin = registerAndLogin(mvc);
+        sql().update("update user_records set role='ADMIN' where id=?", admin.userId());
+        String cinema = createWithToken(mvc, admin, "/cinemas", Map.of("name", "Cinema", "address", "Address"));
+        String hall = createWithToken(mvc, admin, "/halls", Map.of("cinemaId", cinema, "name", "Hall"));
+        createWithToken(mvc, admin, "/seats", Map.of("hallId", hall, "row", "A", "number", 1, "type", "NORMAL"));
+        String movie = createWithToken(mvc, admin, "/movies", Map.of("title", "Movie", "description", "Description", "durationMinutes", 120, "ageRating", "PG"));
+        String screening = createWithToken(mvc, admin, "/screenings", Map.of("movieId", movie, "hallId", hall,
+                "startTime", "2030-01-01T10:00:00Z", "endTime", "2030-01-01T12:00:00Z", "basePrice", 12, "currency", "USD"));
+        mvc.perform(post("/screenings/" + screening + "/cancel").header("Authorization", admin.bearer())).andExpect(status().isNoContent());
+        mvc.perform(delete("/movies/" + movie).header("Authorization", admin.bearer())).andExpect(status().isNoContent());
+        mvc.perform(get("/movies/" + movie)).andExpect(status().isNotFound());
+        mvc.perform(get("/unimplemented").header("Authorization", admin.bearer())).andExpect(status().isForbidden());
+    }
+
+    @Test void registrationRollbackRemovesUserAndCustomerTogether() {
+        String email = id() + "@example.com";
+        var tx = new TransactionTemplate(bean(PlatformTransactionManager.class));
+        String[] userId = new String[1];
+        assertThrows(IllegalStateException.class, () -> tx.execute(status -> {
+            bean(cinema.application.identity.commands.RegisterCommandHandler.class).handle(
+                    new cinema.application.identity.commands.RegisterCommand(email, id(), "Rollback"));
+            userId[0] = sql().queryForObject("select id from user_records where email=?", String.class, email);
+            throw new IllegalStateException("rollback");
+        }));
+        assertEquals(0L, sql().queryForObject("select count(*) from user_records where email=?", Long.class, email));
+        assertEquals(0L, sql().queryForObject("select count(*) from customer_records where user_id=?", Long.class, userId[0]));
+    }
+
+    @Test void failedLoginTransactionDoesNotLeaveUsableToken() throws Exception {
+        var account = registerAndLogin(http(app));
+        var tx = new TransactionTemplate(bean(PlatformTransactionManager.class));
+        String[] rolledBackToken = new String[1];
+        assertThrows(IllegalStateException.class, () -> tx.execute(status -> {
+            rolledBackToken[0] = bean(cinema.application.identity.commands.LoginCommandHandler.class).handle(
+                    new cinema.application.identity.commands.LoginCommand(account.email(), account.password())).accessToken();
+            throw new IllegalStateException("rollback after token flush");
+        }));
+        assertTrue(bean(TokenVerifier.class).verify(rolledBackToken[0]).isEmpty());
+        assertTrue(bean(TokenVerifier.class).verify(account.token()).isPresent());
+        assertEquals(1L, sql().queryForObject("select count(*) from access_token_records where user_id=?", Long.class, account.userId()));
+    }
+
+    @Test void migrationFromPackage2PreservesExistingAccountsAndDefaultsToCustomer() {
+        String schema = "auth_upgrade_" + id().replace("-", "");
+        var source = bean(javax.sql.DataSource.class);
+        var options = Map.of("tableOptions", mysql() ? "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin" : "");
+        org.flywaydb.core.Flyway.configure().dataSource(source).schemas(schema).defaultSchema(schema)
+                .placeholders(options).target("2").load().migrate();
+        String userId = id();
+        sql().update("insert into " + schema + ".user_records(id,email,password_hash) values(?,?,?)", userId, "legacy@example.com", "existing-hash");
+        sql().update("insert into " + schema + ".customer_records(id,user_id,display_name) values(?,?,?)", id(), userId, "Existing customer");
+        org.flywaydb.core.Flyway.configure().dataSource(source).schemas(schema).defaultSchema(schema)
+                .placeholders(options).load().migrate();
+        assertEquals("CUSTOMER", sql().queryForObject("select role from " + schema + ".user_records where id=?", String.class, userId));
+        assertEquals("existing-hash", sql().queryForObject("select password_hash from " + schema + ".user_records where id=?", String.class, userId));
+        assertEquals(1L, sql().queryForObject("select count(*) from " + schema + ".customer_records where user_id=?", Long.class, userId));
+        var rejected = assertThrows(org.springframework.dao.DataAccessException.class, () -> sql().update(
+                "update " + schema + ".user_records set role='SUPERADMIN' where id=?", userId));
+        var cause = assertInstanceOf(java.sql.SQLException.class, rejected.getMostSpecificCause());
+        assertEquals(mysql() ? 3819 : 23513, cause.getErrorCode());
+        assertEquals("CUSTOMER", sql().queryForObject("select role from " + schema + ".user_records where id=?", String.class, userId));
+    }
+
+    @Test void combinedProfilesStillUseMysqlSecurityAndPersistentRepositories() throws Exception {
+        try (var combined = startWithProfiles("mysql", "venue-dev")) {
+            assertEquals(1, combined.getBeansOfType(org.springframework.security.web.SecurityFilterChain.class).size());
+            assertTrue(combined.containsBean("mysqlSecurityFilterChain"));
+            assertFalse(combined.containsBean("venueDevSecurityFilterChain"));
+            assertFalse(combined.getBean(CartRepository.class).getClass().getName().contains("inmemory"));
+            http(combined).perform(post("/cinemas").contentType("application/json")
+                    .content("{\"name\":\"Denied\",\"address\":\"Address\"}"))
+                    .andExpect(status().isForbidden());
+            var account = registerAndLogin(http(combined));
+            http(combined).perform(get("/identity/me").header("Authorization", account.bearer()))
+                    .andExpect(status().isOk()).andExpect(jsonPath("$.userId").value(account.userId()));
+        }
     }
 
     @Test void applicationRestartRetainsDataAndSuccessfulPaymentPreventsRecharging() {
