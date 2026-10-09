@@ -10,6 +10,7 @@ import cinema.application.common.interfaces.SeatHoldService;
 import cinema.application.common.interfaces.UseCase;
 
 public final class RemoveSeatFromCartCommandHandler implements UseCase<RemoveSeatFromCartCommand, Void> {
+
     private final CurrentUser currentUser;
     private final CustomerRepository customers;
     private final CartRepository carts;
@@ -48,33 +49,39 @@ public final class RemoveSeatFromCartCommandHandler implements UseCase<RemoveSea
         String customerId = customer.getId();
         var cart = carts.findActiveByCustomerId(customerId)
                 .orElseThrow(() -> new NotFoundException("Active cart not found for customer: " + customerId));
-        var removed = cart.getItems().stream()
-                .filter(item -> item.screeningId().equals(screeningId) && item.seatId().equals(seatId))
-                .findFirst().orElseThrow(() -> new NotFoundException("Cart item not found"));
+        synchronized (cart) {
+            var removed = cart.getItems().stream()
+                    .filter(item -> item.screeningId().equals(screeningId) && item.seatId().equals(seatId))
+                    .findFirst().orElseThrow(() -> new NotFoundException("Cart item not found"));
 
-        cart.removeItem(screeningId, seatId);
-        boolean released = false;
-        try {
-            holds.release(customerId, screeningId, seatId);
-            released = true;
-            carts.save(cart);
-            return null;
-        } catch (RuntimeException | Error original) {
+            cart.removeItem(screeningId, seatId);
+            boolean released = false;
             try {
-                cart.addItem(removed);
-            } catch (RuntimeException | Error cleanup) {
-                if (cleanup != original) original.addSuppressed(cleanup);
-            }
-            if (released) {
+                holds.release(customerId, screeningId, seatId);
+                released = true;
+                carts.save(cart);
+                return null;
+            } catch (RuntimeException | Error original) {
                 try {
-                    if (!holds.hold(customerId, screeningId, seatId)) {
-                        throw new IllegalStateException("Could not restore seat hold");
-                    }
+                    cart.addItem(removed);
                 } catch (RuntimeException | Error cleanup) {
-                    if (cleanup != original) original.addSuppressed(cleanup);
+                    if (cleanup != original) {
+                        original.addSuppressed(cleanup);
+                    }
                 }
+                if (released) {
+                    try {
+                        if (!holds.hold(customerId, screeningId, seatId)) {
+                            throw new IllegalStateException("Could not restore seat hold");
+                        }
+                    } catch (RuntimeException | Error cleanup) {
+                        if (cleanup != original) {
+                            original.addSuppressed(cleanup);
+                        }
+                    }
+                }
+                throw original;
             }
-            throw original;
         }
     }
 }

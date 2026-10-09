@@ -1,17 +1,26 @@
 package cinema.application.carts.commands;
 
+import java.util.List;
+import java.util.function.Supplier;
+
 import cinema.application.common.exceptions.ConflictException;
 import cinema.application.common.exceptions.ForbiddenException;
 import cinema.application.common.exceptions.NotFoundException;
 import cinema.application.common.exceptions.ValidationException;
-import cinema.application.common.interfaces.*;
+import cinema.application.common.interfaces.CartRepository;
+import cinema.application.common.interfaces.CurrentUser;
+import cinema.application.common.interfaces.CustomerRepository;
+import cinema.application.common.interfaces.ScreeningRepository;
+import cinema.application.common.interfaces.SeatHoldService;
+import cinema.application.common.interfaces.SeatRepository;
+import cinema.application.common.interfaces.SeatReservationRepository;
+import cinema.application.common.interfaces.UseCase;
 import cinema.domain.cart.Cart;
 import cinema.domain.cart.CartItem;
 import cinema.domain.screening.ScreeningStatus;
-import java.util.List;
-import java.util.function.Supplier;
 
 public final class AddSeatToCartCommandHandler implements UseCase<AddSeatToCartCommand, Void> {
+
     private final CurrentUser currentUser;
     private final CustomerRepository customers;
     private final ScreeningRepository screenings;
@@ -71,38 +80,48 @@ public final class AddSeatToCartCommandHandler implements UseCase<AddSeatToCartC
             throw new ConflictException("Seat already booked for screening");
         }
         String customerId = customer.getId();
-        Cart cart = carts.findActiveByCustomerId(customerId)
-                .orElseGet(() -> new Cart(idGenerator.get(), customerId, List.of()));
-        if (cart.getItems().stream().anyMatch(item -> item.screeningId().equals(screeningId)
-                && item.seatId().equals(seatId))) {
-            throw new ConflictException("Seat already in cart for screening");
-        }
-        boolean alreadyHeld = holds.isHeldBy(customerId, screeningId, seatId);
-        if (!holds.hold(customerId, screeningId, seatId)) {
-            throw new ConflictException("Seat held by another customer");
-        }
-        boolean added = false;
-        try {
-            cart.addItem(new CartItem(screeningId, seatId, screening.getBasePrice()));
-            added = true;
-            carts.save(cart);
-            return null;
-        } catch (RuntimeException | Error original) {
-            if (added) {
+        // V1 keeps one Customer instance per user; guard first-cart creation through save.
+        synchronized (customer) {
+            Cart cart = carts.findActiveByCustomerId(customerId)
+                    .orElseGet(() -> new Cart(idGenerator.get(), customerId, List.of()));
+            synchronized (cart) {
+                if (cart.getItems().stream().anyMatch(item ->
+                        item.screeningId().equals(screeningId)
+                                && item.seatId().equals(seatId))) {
+                    throw new ConflictException("Seat already in cart for screening");
+                }
+
+                boolean alreadyHeld = holds.isHeldBy(customerId, screeningId, seatId);
+
+                if (!holds.hold(customerId, screeningId, seatId)) {
+                    throw new ConflictException("Seat held or permanently booked");
+                }
+
+                boolean added = false;
                 try {
-                    cart.removeItem(screeningId, seatId);
-                } catch (RuntimeException | Error cleanup) {
-                    if (cleanup != original) original.addSuppressed(cleanup);
+                    cart.addItem(new CartItem(
+                            screeningId, seatId, screening.getBasePrice()));
+                    added = true;
+                    carts.save(cart);
+                    return null;
+                } catch (RuntimeException | Error original) {
+                    if (added) {
+                        try {
+                            cart.removeItem(screeningId, seatId);
+                        } catch (RuntimeException | Error cleanup) {
+                            if (cleanup != original) original.addSuppressed(cleanup);
+                        }
+                    }
+                    if (!alreadyHeld) {
+                        try {
+                            holds.release(customerId, screeningId, seatId);
+                        } catch (RuntimeException | Error cleanup) {
+                            if (cleanup != original) original.addSuppressed(cleanup);
+                        }
+                    }
+                    throw original;
                 }
             }
-            if (!alreadyHeld) {
-                try {
-                    holds.release(customerId, screeningId, seatId);
-                } catch (RuntimeException | Error cleanup) {
-                    if (cleanup != original) original.addSuppressed(cleanup);
-                }
-            }
-            throw original;
         }
     }
 }
