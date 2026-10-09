@@ -35,8 +35,11 @@ public class JpaMovieRepositoryAdapter implements MovieRepository {
     }
     @Override public void save(Movie model) {
         Objects.requireNonNull(model);
-        data.lockById(model.getId());
-        em.merge(mapper.toEntity(model));
+        var existing = data.lockById(model.getId());
+        var entity = mapper.toEntity(model);
+        // A stale domain snapshot must never undo a committed soft deletion.
+        entity.deleted = existing.map(e -> e.deleted).orElse(false);
+        em.merge(entity);
         em.flush();
     }
 }

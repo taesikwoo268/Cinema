@@ -18,6 +18,8 @@ import cinema.domain.common.Money;
 import cinema.domain.ticket.*;
 import cinema.infrastructure.payment.FakePaymentGateway;
 import cinema.infrastructure.persistence.adapters.JpaTicketRepositoryAdapter;
+import cinema.infrastructure.persistence.adapters.JpaCustomerRepositoryAdapter;
+import cinema.infrastructure.persistence.adapters.JpaCartRepositoryAdapter;
 import org.junit.jupiter.api.*;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -289,6 +291,112 @@ abstract class PersistentWorkflowContract {
         assertEquals(2, bean(TicketRepository.class).findByCustomerId(f.customer()).size());
     }
 
+    @Test void savingStaleMovieCannotUndoSoftDeletion() {
+        var f = seed(); String booking = checkout(f); pay(booking);
+        var movies = bean(MovieRepository.class);
+        var stale = movies.findById(f.movie()).orElseThrow();
+        movies.deleteById(f.movie());
+        movies.save(stale);
+        assertTrue(movies.findById(f.movie()).isEmpty());
+        assertTrue(movies.findAll().stream().noneMatch(m -> m.getId().equals(f.movie())));
+        assertEquals(f.movie(), bean(ScreeningRepository.class).findById(f.screening()).orElseThrow().getMovieId());
+        assertEquals(2, bean(TicketRepository.class).findByCustomerId(f.customer()).size());
+    }
+
+    @Test void everyCommandHandlerHasMysqlTransactionAdvice() {
+        var advice = app.getBean("mysqlCommandTransaction");
+        var handlers = app.getBeansOfType(UseCase.class).values().stream()
+                .filter(b -> org.springframework.aop.support.AopUtils.getTargetClass(b).getSimpleName().endsWith("CommandHandler"))
+                .toList();
+        assertTrue(handlers.size() >= 15);
+        for (var handler : handlers) {
+            var advised = assertInstanceOf(org.springframework.aop.framework.Advised.class, handler);
+            assertTrue(Arrays.stream(advised.getAdvisors()).anyMatch(a -> a.getAdvice() == advice), handler.getClass().getName());
+        }
+    }
+
+    @Test void eachCartCommandRollsBackCartHoldsAndBookingsAfterSaveFailure() {
+        for (String operation : List.of("add", "remove", "clear", "checkout")) {
+            var f = seed(); add(f, f.seat());
+            bean(TestCarts.class).fail = true;
+            try {
+                assertThrows(IllegalStateException.class, () -> cartCommand(app, f, operation));
+            } finally { bean(TestCarts.class).fail = false; }
+            var items = bean(CartRepository.class).findActiveByCustomerId(f.customer()).orElseThrow().getItems();
+            assertEquals(List.of(f.seat()), items.stream().map(CartItem::seatId).toList());
+            assertTrue(bean(SeatHoldService.class).isHeldBy(f.customer(), f.screening(), f.seat()));
+            assertFalse(bean(SeatHoldService.class).isHeld(f.screening(), f.secondSeat()));
+            assertTrue(bean(BookingRepository.class).findByCustomerId(f.customer()).isEmpty());
+        }
+    }
+
+    Object cartCommand(ConfigurableApplicationContext context, Fixture f, String operation) {
+        authenticate(f.user());
+        return switch (operation) {
+            case "add" -> context.getBean(AddSeatToCartCommandHandler.class).handle(new AddSeatToCartCommand(f.screening(), f.secondSeat()));
+            case "remove" -> context.getBean(RemoveSeatFromCartCommandHandler.class).handle(new RemoveSeatFromCartCommand(f.screening(), f.seat()));
+            case "clear" -> context.getBean(ClearCartCommandHandler.class).handle(new ClearCartCommand());
+            case "checkout" -> context.getBean(CheckoutCartCommandHandler.class).handle(new CheckoutCartCommand());
+            default -> throw new AssertionError(operation);
+        };
+    }
+
+    static void await(CountDownLatch latch) {
+        try { assertTrue(latch.await(15, TimeUnit.SECONDS), "Coordination timed out"); }
+        catch (InterruptedException ex) { Thread.currentThread().interrupt(); throw new AssertionError(ex); }
+    }
+
+    @Test void checkoutSerializesWithEveryCartMutationAcrossContextsInBothOrders() throws Exception {
+        try (var second = start()) {
+            for (String mutation : List.of("add", "remove", "clear", "checkout")) {
+                for (boolean checkoutFirst : List.of(true, false)) {
+                    var f = seed(); add(f, f.seat());
+                    var locked = new CountDownLatch(1);
+                    var release = new CountDownLatch(1);
+                    var competing = new CountDownLatch(1);
+                    bean(TestCustomers.class).afterLock = () -> {
+                        assertTrue(org.springframework.transaction.support.TransactionSynchronizationManager.isActualTransactionActive());
+                        locked.countDown(); await(release);
+                    };
+                    second.getBean(TestCustomers.class).beforeLock = competing::countDown;
+                    Object firstResult, secondResult;
+                    try (var pool = Executors.newFixedThreadPool(2)) {
+                        var first = pool.submit(() -> run(new CountDownLatch(0),
+                                () -> cartCommand(app, f, checkoutFirst ? "checkout" : mutation)));
+                        try {
+                            await(locked);
+                            var other = pool.submit(() -> run(new CountDownLatch(0),
+                                    () -> cartCommand(second, f, checkoutFirst ? mutation : "checkout")));
+                            await(competing);
+                            release.countDown();
+                            firstResult = first.get(30, TimeUnit.SECONDS);
+                            secondResult = other.get(30, TimeUnit.SECONDS);
+                        } finally {
+                            release.countDown();
+                            bean(TestCustomers.class).afterLock = () -> {};
+                            second.getBean(TestCustomers.class).beforeLock = () -> {};
+                        }
+                    }
+                    assertFalse(firstResult instanceof RuntimeException, String.valueOf(firstResult));
+                    var bookings = bean(BookingRepository.class).findByCustomerId(f.customer());
+                    var cart = bean(CartRepository.class).findActiveByCustomerId(f.customer()).orElseThrow();
+                    if (mutation.equals("add")) {
+                        assertFalse(secondResult instanceof RuntimeException, String.valueOf(secondResult));
+                        assertEquals(1, bookings.size());
+                        assertEquals(checkoutFirst ? 1 : 2, bookings.getFirst().getItems().size());
+                        assertEquals(checkoutFirst ? List.of(f.secondSeat()) : List.of(), cart.getItems().stream().map(CartItem::seatId).toList());
+                    } else {
+                        assertEquals(checkoutFirst || mutation.equals("checkout") ? 1 : 0, bookings.size());
+                        assertTrue(cart.getItems().isEmpty());
+                        if (mutation.equals("checkout") || !checkoutFirst) assertInstanceOf(ValidationException.class, secondResult);
+                        else if (mutation.equals("remove")) assertInstanceOf(NotFoundException.class, secondResult);
+                        else assertNull(secondResult);
+                    }
+                }
+            }
+        }
+    }
+
     @Test void overlappingScreeningsCannotBeInsertedConcurrently() throws Exception {
         var f = seed();
         var start = Instant.parse("2030-01-01T14:00:00Z");
@@ -349,6 +457,30 @@ abstract class PersistentWorkflowContract {
     static class TestPorts {
         @Bean @Primary TestGateway testGateway() { return new TestGateway(); }
         @Bean @Primary TestTickets testTickets(JpaTicketRepositoryAdapter delegate) { return new TestTickets(delegate); }
+        @Bean @Primary TestCustomers testCustomers(JpaCustomerRepositoryAdapter delegate) { return new TestCustomers(delegate); }
+        @Bean @Primary TestCarts testCarts(JpaCartRepositoryAdapter delegate) { return new TestCarts(delegate); }
+    }
+    static class TestCustomers implements CustomerRepository {
+        final CustomerRepository delegate;
+        volatile Runnable beforeLock = () -> {}, afterLock = () -> {};
+        TestCustomers(CustomerRepository delegate) { this.delegate = delegate; }
+        public Optional<Customer> findById(String id) { return delegate.findById(id); }
+        public Optional<Customer> findByUserId(String id) {
+            beforeLock.run();
+            var result = delegate.findByUserId(id);
+            afterLock.run();
+            return result;
+        }
+        public void save(Customer customer) { delegate.save(customer); }
+    }
+    static class TestCarts implements CartRepository {
+        final CartRepository delegate; volatile boolean fail;
+        TestCarts(CartRepository delegate) { this.delegate = delegate; }
+        public Optional<Cart> findActiveByCustomerId(String id) { return delegate.findActiveByCustomerId(id); }
+        public void save(Cart cart) {
+            delegate.save(cart);
+            if (fail) throw new IllegalStateException("Failure after cart flush");
+        }
     }
     static class TestGateway implements PaymentGateway {
         final FakePaymentGateway delegate = new FakePaymentGateway(); final AtomicInteger calls = new AtomicInteger(); volatile boolean fail;
