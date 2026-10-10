@@ -1,6 +1,6 @@
 # Tiến độ Cinema V1
 
-Cập nhật tài liệu: **2026-10-10**. Trạng thái dưới đây đối chiếu code đến `10f53a4`; không đồng nghĩa mọi thay đổi đã vào main hoặc database local đã được migrate.
+Cập nhật tài liệu: **2026-10-10**. Trạng thái dưới đây đối chiếu backend đến `4e60859`, bổ sung M12 trên `feature/nghia/m12-delivery`; không đồng nghĩa mọi thay đổi đã vào main hoặc database local đã được migrate.
 
 ## Checklist hiện tại
 
@@ -16,7 +16,7 @@ Cập nhật tài liệu: **2026-10-10**. Trạng thái dưới đây đối chi
 - [x] M9 — Ownership; Package 3 bổ sung CUSTOMER/ADMIN ở HTTP.
 - [x] M10 — REST workflow, mapping lỗi 400/403/404/409.
 - [x] M11 — JPA/MySQL, Flyway, transaction, locking/uniqueness và integration tests.
-- [ ] M12 — Docker / OpenAPI / benchmark; chưa có nghiệm thu.
+- [x] M12 — Docker / OpenAPI / benchmark; [nghiệm thu](m12/acceptance.md).
 - [ ] Frontend đơn giản và smoke test trên môi trường của người dùng.
 
 “Đã triển khai” ở đây là code và kiểm thử trên feature branch; trạng thái merge cần kiểm tra riêng trên GitHub.
@@ -29,7 +29,7 @@ Cập nhật tài liệu: **2026-10-10**. Trạng thái dưới đây đối chi
 | 2 | `ed9b0c2`, `97bb72c` | M11; MySQL, transaction tests, movie soft-delete regression |
 | 3 | `10f53a4` | Database Bearer tokens, roles, security chain MySQL, migration V3 |
 
-Package 3 được tạo từ Package 2 vì main chưa chứa Package 2 tại thời điểm bắt đầu. Review/merge Package 2 trước Package 3; không xóa milestone branches. Đợt sửa tài liệu này không fetch, merge, push hoặc thay database.
+Package 3 được tạo từ Package 2 vì main chưa chứa Package 2 tại thời điểm bắt đầu. Review/merge Package 2 trước Package 3; không xóa milestone branches. M12 bàn giao trên nhánh riêng; không tự merge hoặc xóa branches.
 
 ## Kết quả kiểm thử đã ghi nhận
 
@@ -38,10 +38,11 @@ Package 3 được tạo từ Package 2 vì main chưa chứa Package 2 tại th
 | Package 1 ban đầu | 708 | 0 | 0 | 8 |
 | Package 2 sau review `97bb72c` | 766 | 0 | 0 | 8 |
 | Package 3 `10f53a4` | 787 | 0 | 0 | 8 |
+| M12 — Docker / MySQL 8.4 | 787 | 0 | 0 | 8 |
 
 Package 3: `mvn clean test` có MySQL thực tế 9.4; 29 contract tests trên H2 và 29 trên MySQL đều đạt. Bao gồm V2 → V3 giữ dữ liệu, token qua restart/hai app contexts, role/ownership, rollback, concurrency, payment retry và HTTP checkout → payment → ticket bằng token thật. `git diff --check` đạt. 8 skipped là acceptance scaffolds cũ, không được dùng làm bằng chứng cho workflow; workflow được kiểm tra bằng các test mới có assertion.
 
-Không chạy lại Maven trong đợt cập nhật tài liệu. Không suy ra MySQL đã được kiểm tra từ một lần chạy chỉ có H2.
+M12 đã chạy Maven trong Docker với MySQL 8.4; OpenAPI 31 operations, benchmark, consistency và restart smoke đạt. Xem [baseline](m12/benchmark-baseline.md). Không chạy lại Maven trong bước chốt tài liệu. Không suy ra MySQL đã được kiểm tra từ một lần chạy chỉ có H2.
 
 ## Công việc tiếp theo
 
@@ -50,7 +51,7 @@ Không chạy lại Maven trong đợt cập nhật tài liệu. Không suy ra M
 3. Đăng ký customer/admin, cấp role admin qua SQL có kiểm soát, nhập dữ liệu mẫu qua API.
 4. Smoke test bằng Postman: login → chọn ghế → checkout → pay → ticket; restart và đọc lại dữ liệu.
 5. Bắt đầu frontend: đăng nhập, phim/suất chiếu, chọn ghế, giỏ/thanh toán giả, vé của tôi. Chọn dev proxy/CORS trước khi tích hợp trình duyệt.
-6. M12 và các nâng cấp vận hành được giao riêng; chưa tự coi là hoàn thành.
+6. Review bàn giao M12 và CI trước khi chủ dự án quyết định merge; nâng cấp vận hành ngoài V1 được giao riêng.
 
 Giới hạn: hold chưa có TTL; thanh toán giả; token chưa có refresh/logout/reset/rate limit/cleanup; gateway thành công trước DB commit vẫn là failure window. Chi tiết [mysql.md](mysql.md).
 

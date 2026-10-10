@@ -1,5 +1,8 @@
 # Build output
 /target/
+/benchmarks/fixtures/
+/benchmarks/results/
+**/node_modules/
 /build/
 /out/
 *.class

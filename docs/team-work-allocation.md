@@ -10,7 +10,7 @@ M0–M11 và authentication Package 3 đã được triển khai/kiểm thử tr
 | Package 2 | `feature/nghia/backend-package-2` | JPA/MySQL; review fixes đến `97bb72c` |
 | Package 3 | `feature/nghia/backend-package-3` | Bearer/roles đến `10f53a4`; dựa trên Package 2 |
 
-Nguyễn Trung Nghĩa phụ trách review/tích hợp các nhánh package. Không gán lại attribution của các slice M1/M4 cho người khác. Phân công frontend hoặc M12 cho Bảo Long, Duy Anh, Duy Khánh chưa được chốt; các thành viên có thể nhận review/smoke test sau khi chủ dự án phân công, không tự giả định đã hoàn thành.
+Nguyễn Trung Nghĩa phụ trách review/tích hợp các nhánh package. Không gán lại attribution của các slice M1/M4 cho người khác. M12 được bàn giao trên `feature/nghia/m12-delivery` với [bằng chứng](m12/acceptance.md). Phân công frontend cho Bảo Long, Duy Anh, Duy Khánh chưa được chốt; các thành viên có thể nhận review/smoke test sau khi chủ dự án phân công, không tự giả định đã hoàn thành.
 
 Việc cần làm: review Package 2 rồi Package 3, xác nhận CI và migration local, chuẩn bị dữ liệu demo, kiểm tra API bằng token thật, sau đó giao frontend. Không tự merge main hoặc xóa branches. “Implementation đã xong” và “đã merge main” được theo dõi riêng.
 
@@ -358,4 +358,4 @@ Các kết quả kiểm thử V1 đã được nghiệm thu phải được gi�
 
 ## 6. Trạng thái và bước tiếp theo
 
-Xem bảng bàn giao hiện tại ở đầu tài liệu và [progress](cinema-v1-progress.md). Không còn trạng thái M5 “NEXT / NOT STARTED”. Kết quả Package 3 đã ghi nhận: 787 tests, 0 failures/errors, 8 skips có sẵn; H2 và MySQL thực tế đều được chạy. M12 và frontend chưa được nghiệm thu.
+Xem bảng bàn giao hiện tại ở đầu tài liệu và [progress](cinema-v1-progress.md). Không còn trạng thái M5 “NEXT / NOT STARTED”. Kết quả Package 3 đã ghi nhận: 787 tests, 0 failures/errors, 8 skips có sẵn; H2 và MySQL thực tế đều được chạy. M12 đã nghiệm thu Docker/OpenAPI/benchmark trên feature branch; frontend chưa được nghiệm thu.

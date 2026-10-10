@@ -10,7 +10,7 @@
 | Chạy local MySQL | URL đúng, migrations V1–V3 thành công, dữ liệu còn sau restart |
 | Dữ liệu demo và Postman | ADMIN tạo danh mục; CUSTOMER hoàn tất checkout/payment/tickets |
 | Frontend cơ bản | 5 màn hình: đăng nhập, phim/suất chiếu, chọn ghế, giỏ/thanh toán giả, vé |
-| M12 | Docker, OpenAPI, benchmark baseline; chưa được nghiệm thu |
+| Review M12 | Docker, OpenAPI, benchmark baseline đã nghiệm thu trên feature branch; xem [bằng chứng](m12/acceptance.md) |
 
 Các quyết định hiện hành: MySQL có database transactions/row locks; token ngẫu nhiên không phải JWT, PBKDF2 cho password, 403 theo contract. Seat hold chưa có TTL; không có Redis/RabbitMQ, payment provider thật, refresh/logout/reset password/rate limiting. Failure window giữa gateway success và DB commit vẫn tồn tại. [Progress](cinema-v1-progress.md) là nguồn trạng thái; [mysql.md](mysql.md) là hướng dẫn chạy.
 

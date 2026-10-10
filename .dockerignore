@@ -1,0 +1,13 @@
+.git
+target
+frontend
+node_modules
+.env
+.env.*
+*.log
+*.tmp
+**/*.tmp
+**/*.log
+benchmarks
+benchmarks/fixtures
+docs
