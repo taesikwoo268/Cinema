@@ -1,5 +1,7 @@
 # M7-C — PayBooking Application Use Case
 
+> Hồ sơ phân công M7 tại thời điểm triển khai, giữ để tra cứu attribution; không phải backlog hiện tại. Fake Payment đã có, Package 1 bổ sung ticket/finalization/retry, Package 2 bổ sung transaction MySQL và Package 3 xác thực Bearer. Xem [tiến độ hiện tại](../cinema-v1-progress.md) trước khi giao việc hoặc dùng hướng dẫn security cũ.
+
 ## 1. Mục tiêu
 
 Implement use case:

@@ -1,35 +1,62 @@
 # Tiến độ Cinema V1
 
-Ngày lưu kế hoạch: 2026-09-17.
+Cập nhật tài liệu: **2026-10-10**. Trạng thái dưới đây đối chiếu code đến `10f53a4`; không đồng nghĩa mọi thay đổi đã vào main hoặc database local đã được migrate.
 
-Kế hoạch chi tiết: [Cinema V1](cinema-v1-plan.md). Tài liệu này ghi nhận trạng thái milestone, kết quả kiểm thử và công việc còn lại của dự án; M4 giữ attribution theo lịch sử tích hợp nhóm.
+## Checklist hiện tại
 
-## Nguyên tắc thực hiện
+- [x] M0 — nền Clean Architecture và architecture tests.
+- [x] M1 — Cinema / Hall / Seat.
+- [x] M2 — Movie; MySQL soft delete giữ tham chiếu lịch sử.
+- [x] M3 — Screening core và available-seats.
+- [x] M4 — Identity + Customer; Package 3 bổ sung xác thực Bearer cho MySQL.
+- [x] M5 — Cart + SeatHold; bảo vệ mutation/first-cart creation.
+- [x] M6 — Checkout + Booking; nhóm theo screening, chống checkout trùng.
+- [x] M7 — Fake Payment, ownership và retry.
+- [x] M8 — Ticket domain, phát vé theo booking item và idempotency.
+- [x] M9 — Ownership; Package 3 bổ sung CUSTOMER/ADMIN ở HTTP.
+- [x] M10 — REST workflow, mapping lỗi 400/403/404/409.
+- [x] M11 — JPA/MySQL, Flyway, transaction, locking/uniqueness và integration tests.
+- [ ] M12 — Docker / OpenAPI / benchmark; chưa có nghiệm thu.
+- [ ] Frontend đơn giản và smoke test trên môi trường của người dùng.
 
-- Nghiệp vụ tương đối đầy đủ, công nghệ triển khai cố tình đơn giản.
-- Giữ Clean Architecture; Domain độc lập, Application điều phối qua các port, Infrastructure cung cấp adapter, Web chuyển đổi HTTP.
-- V1 dùng identity đơn giản, fake payment và seat hold DB/in-memory. Các nâng cấp JWT, BCrypt, Redis, RabbitMQ, thanh toán thật và concurrency nâng cao thuộc Phase 2.
-- Làm tuần tự từng milestone; xác minh tiêu chí hoàn thành và kiểm thử liên quan trước khi chuyển bước.
-- Sau mỗi milestone, cập nhật checklist, kết quả kiểm thử và việc còn lại tại tài liệu này.
-- Chưa đánh dấu hoàn thành dựa trên skeleton hoặc mô tả cũ; cần đối chiếu code và kiểm thử thực tế.
+“Đã triển khai” ở đây là code và kiểm thử trên feature branch; trạng thái merge cần kiểm tra riêng trên GitHub.
 
-## Checklist
+## Bàn giao theo package
 
-Kế hoạch gồm **13 milestone**, từ M0 đến M12.
+| Package | Commit mốc | Phạm vi |
+| --- | --- | --- |
+| 1 | `2c7f219`, `f79445b`, `9a6be03` | M8–M10; concurrency fixes cho seat/cart/checkout |
+| 2 | `ed9b0c2`, `97bb72c` | M11; MySQL, transaction tests, movie soft-delete regression |
+| 3 | `10f53a4` | Database Bearer tokens, roles, security chain MySQL, migration V3 |
 
-- [x] **M0 — Architecture foundation:** hoàn thiện thành phần chung và port; 13 DomainRulesTest và 6 architecture tests đạt, không bỏ qua.
-- [x] **M1 — Cinema / Hall / Seat:** hoàn thành ngày 2026-09-21; đã kiểm chứng luồng HTTP và các điều kiện kỹ thuật.
-- [x] **M2 — Movie:** tạo, xóa và truy vấn phim; kiểm tra tiêu đề và thời lượng.
-- [x] **M3 — Screening:** hoàn thành Screening core: tạo, truy vấn, liệt kê theo Movie, hủy, kiểm tra lịch trùng cùng Hall, HTTP API và security trong venue-dev. GetAvailableSeats, booking và trạng thái bookable vẫn deferred.
-- [x] **M4 — Identity + Customer:** Customer, Register, Login phát token, Current User, in-memory adapters, venue-dev wiring và HTTP API đã hoàn thành. Bearer/JWT verification và production authentication còn deferred.
-- [ ] **M5 — Cart + simple SeatHold:** thêm/xóa ghế, kiểm tra phòng, trạng thái ghế và chủ giỏ; giữ ghế qua SeatHoldService.
-- [ ] **M6 — Checkout + Booking:** nhóm giỏ theo suất chiếu; một Booking thuộc một Screening; quản lý PENDING / CONFIRMED / CANCELLED.
-- [ ] **M7 — Fake Payment:** kiểm tra ownership và booking PENDING; thanh toán giả thành công, lưu Payment và xác nhận Booking.
-- [ ] **M8 — Ticket:** phát hành một vé cho mỗi BookingItem sau thanh toán thành công; mã vé và trạng thái hợp lệ.
-- [ ] **M9 — Ownership / Authorization:** hoàn thiện kiểm tra quyền tại Application cho xem/hủy/thanh toán booking và xem vé.
-- [ ] **M10 — REST Controllers + Exception handling:** nối đầy đủ API, DTO và xử lý lỗi.
-- [ ] **M11 — Persistence + integration tests:** adapter JPA và mapping ở Infrastructure; kiểm thử luồng tích hợp từ đăng nhập đến nhận vé.
-- [ ] **M12 — Docker + OpenAPI + Benchmark:** đóng gói, tài liệu API và đo baseline trước Phase 2.
+Package 3 được tạo từ Package 2 vì main chưa chứa Package 2 tại thời điểm bắt đầu. Review/merge Package 2 trước Package 3; không xóa milestone branches. Đợt sửa tài liệu này không fetch, merge, push hoặc thay database.
+
+## Kết quả kiểm thử đã ghi nhận
+
+| Checkpoint | Tests run | Failures | Errors | Skipped |
+| --- | ---: | ---: | ---: | ---: |
+| Package 1 ban đầu | 708 | 0 | 0 | 8 |
+| Package 2 sau review `97bb72c` | 766 | 0 | 0 | 8 |
+| Package 3 `10f53a4` | 787 | 0 | 0 | 8 |
+
+Package 3: `mvn clean test` có MySQL thực tế 9.4; 29 contract tests trên H2 và 29 trên MySQL đều đạt. Bao gồm V2 → V3 giữ dữ liệu, token qua restart/hai app contexts, role/ownership, rollback, concurrency, payment retry và HTTP checkout → payment → ticket bằng token thật. `git diff --check` đạt. 8 skipped là acceptance scaffolds cũ, không được dùng làm bằng chứng cho workflow; workflow được kiểm tra bằng các test mới có assertion.
+
+Không chạy lại Maven trong đợt cập nhật tài liệu. Không suy ra MySQL đã được kiểm tra từ một lần chạy chỉ có H2.
+
+## Công việc tiếp theo
+
+1. Review diff và merge Package 2 → Package 3 sau khi kiểm tra CI/conflict.
+2. Sao lưu database local, chạy profile `mysql` với đúng URL (ví dụ `localhost:3306/cinema_package2`), xác nhận Flyway V1–V3.
+3. Đăng ký customer/admin, cấp role admin qua SQL có kiểm soát, nhập dữ liệu mẫu qua API.
+4. Smoke test bằng Postman: login → chọn ghế → checkout → pay → ticket; restart và đọc lại dữ liệu.
+5. Bắt đầu frontend: đăng nhập, phim/suất chiếu, chọn ghế, giỏ/thanh toán giả, vé của tôi. Chọn dev proxy/CORS trước khi tích hợp trình duyệt.
+6. M12 và các nâng cấp vận hành được giao riêng; chưa tự coi là hoàn thành.
+
+Giới hạn: hold chưa có TTL; thanh toán giả; token chưa có refresh/logout/reset/rate limit/cleanup; gateway thành công trước DB commit vẫn là failure window. Chi tiết [mysql.md](mysql.md).
+
+## Hồ sơ lịch sử M0–M4
+
+Các mục còn lại giữ nguyên attribution và bằng chứng tại thời điểm cũ. Các trạng thái “chưa triển khai/deferred”, quy trình cá nhân và số test bên dưới không thay thế checklist hiện tại ở đầu tài liệu.
 
 ## Trạng thái thực tế M1 — 2026-09-21
 
@@ -126,9 +153,9 @@ Tài liệu: [overview](m4/m4-overview.md), [implementation](m4/m4-implementatio
 Không coi một báo cáo test từ D:\MyCinema là bằng chứng cho D:\Cinema.
 [Bằng chứng nghiệm thu kỹ thuật](m1/m1-acceptance.md) ghi lớp test và lệnh chạy.
 
-## Bước tiếp theo
+## Bước tiếp theo tại checkpoint cũ
 
-M5 — Cart + simple SeatHold: NEXT / NOT STARTED theo roadmap hiện có. Các lần chạy test tiếp theo do chủ dự án thực hiện; trợ lý cung cấp lệnh, không tự chạy test.
+Phần này đã được thay thế bởi công việc hiện tại ở đầu tài liệu. Không tiếp tục giao M5 như một milestone chưa triển khai.
 
 ## Lịch sử M1 — 2026-09-18 (không phải trạng thái hiện tại)
 

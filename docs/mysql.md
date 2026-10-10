@@ -1,10 +1,10 @@
 # Cinema V1 MySQL profile
 
-Package 2 starts from main `8f1b6f6`, which includes Package 1 commit `9a6be03`.
+Current guide for Packages 2 and 3 (code checkpoint `10f53a4`). Package 2 started from main `8f1b6f6`, including Package 1 `9a6be03`; Package 3 builds on Package 2. Implementation status is separate from merge/deployment status.
 
 ## Local setup
 
-Use a dedicated MySQL 8.4+ database and an account restricted to that database. With your administrator session:
+Target MySQL 8.4+; actual verification below used 9.4, not every supported version. Use a dedicated database and an account restricted to that database. With your administrator session:
 
 ```sql
 CREATE DATABASE cinema CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;
@@ -45,7 +45,7 @@ A payment transaction records the result, confirms the booking, reserves all sea
 
 ## Verification
 
-`mvn clean test` runs the existing suite plus H2 persistence tests. For the same contract against a dedicated MySQL test database, set `CINEMA_TEST_MYSQL_URL`, `CINEMA_TEST_MYSQL_USER`, and `CINEMA_TEST_MYSQL_PASSWORD`, then run `mvn clean test`. Test fixtures use fresh IDs and leave data in that dedicated database. When the test URL is absent only the new MySQL contract is skipped; existing tests are unchanged.
+`mvn clean test` runs the existing suite plus H2 persistence tests. For the same contract against a dedicated MySQL test database, set `CINEMA_TEST_MYSQL_URL`, `CINEMA_TEST_MYSQL_USER`, and `CINEMA_TEST_MYSQL_PASSWORD`, then run `mvn clean test`. The V2-to-V3 upgrade test creates separate `auth_upgrade_*` schemas; the test account needs schema-creation privileges on an isolated test server. Never grant those privileges to the application account just to run tests. Test fixtures use fresh IDs and leave data in the dedicated test database and upgrade schemas. When the test URL is absent only the new MySQL contract is skipped; existing tests are unchanged.
 
 The shared persistence contract covers round trips, rollback after a gateway success and partial ticket write, raw SQL uniqueness, independent application-context races, multiple-screening checkout, HTTP checkout/payment/tickets, and complete application-context restart. H2 uses the same migrations without MySQL table options; it is not a substitute for the MySQL run.
 

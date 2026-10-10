@@ -1,5 +1,23 @@
 # Kế hoạch xây dựng Cinema V1
 
+## Kế hoạch hiện hành — 2026-10-10
+
+Đối chiếu đến `10f53a4`: M0–M11 đã có implementation và tests trên feature branches. Package 1 hoàn thiện ticket/ownership/REST; Package 2 triển khai JPA/MySQL; Package 3 triển khai Bearer token lưu hash và CUSTOMER/ADMIN. Không còn giao lại M5–M11 như công việc chưa bắt đầu.
+
+| Việc tiếp theo | Đầu ra / nghiệm thu |
+| --- | --- |
+| Review Package 2 → Package 3 | CI đạt, xử lý conflict nếu có, chủ dự án quyết định merge |
+| Chạy local MySQL | URL đúng, migrations V1–V3 thành công, dữ liệu còn sau restart |
+| Dữ liệu demo và Postman | ADMIN tạo danh mục; CUSTOMER hoàn tất checkout/payment/tickets |
+| Frontend cơ bản | 5 màn hình: đăng nhập, phim/suất chiếu, chọn ghế, giỏ/thanh toán giả, vé |
+| M12 | Docker, OpenAPI, benchmark baseline; chưa được nghiệm thu |
+
+Các quyết định hiện hành: MySQL có database transactions/row locks; token ngẫu nhiên không phải JWT, PBKDF2 cho password, 403 theo contract. Seat hold chưa có TTL; không có Redis/RabbitMQ, payment provider thật, refresh/logout/reset password/rate limiting. Failure window giữa gateway success và DB commit vẫn tồn tại. [Progress](cinema-v1-progress.md) là nguồn trạng thái; [mysql.md](mysql.md) là hướng dẫn chạy.
+
+## Kế hoạch gốc — lưu lịch sử
+
+Phần dưới giữ thiết kế và thứ tự ban đầu, không phải danh sách implementation còn thiếu. Những phương án JWT, concurrency, persistence hoặc hạn chế authentication ghi trong kế hoạch gốc cần đọc cùng quyết định hiện hành phía trên. M12 được theo dõi là Docker/OpenAPI/benchmark; testing đã được làm xuyên suốt các package, không đợi một milestone cuối.
+
 ## Nguyên tắc triển khai
 
 > **Nghiệp vụ tương đối đầy đủ, công nghệ triển khai cố tình đơn giản.**
