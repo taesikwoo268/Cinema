@@ -1,0 +1,19 @@
+{
+  "commit": "a51fb7f496f599243415d797f283baa2ecdff8bd",
+  "verified_at_utc": "2026-10-10T09:17:00.788402+00:00",
+  "status": "passed",
+  "checks": [
+    "GET/POST without token rejected",
+    "Customer denied admin operation",
+    "Checkout/payment/confirmed booking/valid ticket",
+    "Cross-customer ticket/payment access rejected",
+    "Payment retry preserves ticket",
+    "Database counts after retry match"
+  ],
+  "counts": {
+    "confirmed_bookings": 1,
+    "reservations": 1,
+    "tickets": 1,
+    "successful_payments": 1
+  }
+}

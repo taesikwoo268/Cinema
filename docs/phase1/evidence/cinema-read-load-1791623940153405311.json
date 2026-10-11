@@ -1,0 +1,242 @@
+{
+  "commit": "a51fb7f496f599243415d797f283baa2ecdff8bd",
+  "started_at_utc": "2026-10-10T09:19:00.153660+00:00",
+  "logical_cpus": 4,
+  "memory_total": "MemTotal:       32869448 kB",
+  "java": "openjdk version \"25.0.4.1\" 2026-08-18\nOpenJDK Runtime Environment (build 25.0.4.1+1-1-24.04.4-Ubuntu)\nOpenJDK 64-Bit Server VM (build 25.0.4.1+1-1-24.04.4-Ubuntu, mixed mode, sharing)",
+  "mysql": "8.0.46-0ubuntu0.24.04.4",
+  "think_time_seconds": 1,
+  "request_timeout_seconds": 10,
+  "paths": [
+    [
+      "movies",
+      "/movies"
+    ],
+    [
+      "screenings",
+      "/screenings?movieId=931f2fec-7e80-4556-8872-4cfd82411896"
+    ],
+    [
+      "available-seats",
+      "/screenings/93b563d7-7ec9-47c8-8fb6-7cfa2ac64541/available-seats"
+    ]
+  ],
+  "fixture": {
+    "movie_id": "931f2fec-7e80-4556-8872-4cfd82411896",
+    "hall_id": "285aea7a-f7ec-4192-a1a4-9549c6b4fc28",
+    "screening_id": "93b563d7-7ec9-47c8-8fb6-7cfa2ac64541",
+    "seat_ids": [
+      "8cc25534-9de6-404b-a8a7-d783354fab99",
+      "1690229b-9a58-4fa4-a228-8b192b1e2c6f",
+      "083c2ceb-60da-49ec-a294-9af8544e1f4f",
+      "8363ea77-96f9-4260-84f1-0cb822be75e9",
+      "0f075950-ed4b-4cb3-aa27-20b97a472a94",
+      "445716ad-71f6-44d5-ac84-051db8a95894",
+      "e63d5f00-21b1-47f5-b15d-0caf01841f4a",
+      "9b3680b7-ce45-46f0-ba8d-91f789c0e2be",
+      "7a0481de-7f37-4158-bb6d-d5f7ad740fda",
+      "a14d580b-b046-4ba8-bcff-55304337e990",
+      "09e01ef1-fb1f-4e22-83d6-395af6b9a1a2",
+      "0ca256ea-090f-4975-aeb8-fc6f8784b1a8",
+      "1889fc66-a868-4f61-a8fa-2be798cf6a8e",
+      "837f5eca-8e53-4a3f-ac57-47727f4f04c4",
+      "13e7249c-ac10-4a1b-bb5a-20f497f07784",
+      "df834dc2-eab8-4853-8bbc-5c1e158c01d7",
+      "b547fc5e-e78d-4f4d-9d77-a1302d7d9ff9",
+      "e5b3678e-a12f-4a56-9360-4644079a6877",
+      "15e4e84e-3586-486e-adca-3296751a02cd",
+      "6d398465-8479-4bc7-9717-e63816a8fe98",
+      "84930b22-2009-4511-a574-629c02bbf6b1",
+      "3afa502c-79cd-4a15-bce7-115f6fc8dac9",
+      "b6f277f3-2569-44bb-89f0-0520fb8ca2cd",
+      "b374b52c-469f-4306-bb16-cc09d5f4f6d5",
+      "76a82cc2-d0a9-489c-92b7-ef895edb791a",
+      "b31a18d3-8289-4f28-b2c1-dd12a9f34143",
+      "5af6eb2e-9a26-4fbb-886a-5c34670b1ac6",
+      "4de7574d-a1f6-4f3f-b51e-37df502d3923",
+      "a0956148-6e04-404d-b615-91b46178a73e",
+      "d3fa1c84-020d-473b-a006-879e6addd1a7"
+    ]
+  },
+  "notes": [
+    "Backend, MySQL and load generator share the Kaggle CPU runtime.",
+    "Small dataset; smoke-test catalog remains in database.",
+    "Public read endpoints; connection pooling; no automatic retries.",
+    "Latency includes failed requests. Status 0 means no HTTP response.",
+    "Exploratory stop thresholds: errors >= 1% or endpoint p95 >= 2000 ms."
+  ],
+  "status": "stopped_at_threshold",
+  "samples": [
+    {
+      "users": 10,
+      "duration_seconds": 60.02,
+      "requests": 1413,
+      "successful_requests_per_second": 23.54,
+      "error_percent": 0.0,
+      "endpoints": {
+        "movies": {
+          "requests": 471,
+          "errors": 0,
+          "p50_ms": 4.44,
+          "p95_ms": 14.62,
+          "p99_ms": 27.62,
+          "statuses": {
+            "200": 471
+          },
+          "error_types": {}
+        },
+        "screenings": {
+          "requests": 471,
+          "errors": 0,
+          "p50_ms": 4.22,
+          "p95_ms": 15.38,
+          "p99_ms": 25.0,
+          "statuses": {
+            "200": 471
+          },
+          "error_types": {}
+        },
+        "available-seats": {
+          "requests": 471,
+          "errors": 0,
+          "p50_ms": 312.78,
+          "p95_ms": 544.06,
+          "p99_ms": 758.95,
+          "statuses": {
+            "200": 471
+          },
+          "error_types": {}
+        }
+      },
+      "backend_exit_code_after": null
+    },
+    {
+      "users": 25,
+      "duration_seconds": 60.16,
+      "requests": 3204,
+      "successful_requests_per_second": 53.25,
+      "error_percent": 0.0,
+      "endpoints": {
+        "movies": {
+          "requests": 1068,
+          "errors": 0,
+          "p50_ms": 3.47,
+          "p95_ms": 15.81,
+          "p99_ms": 45.53,
+          "statuses": {
+            "200": 1068
+          },
+          "error_types": {}
+        },
+        "screenings": {
+          "requests": 1068,
+          "errors": 0,
+          "p50_ms": 3.33,
+          "p95_ms": 14.55,
+          "p99_ms": 42.98,
+          "statuses": {
+            "200": 1068
+          },
+          "error_types": {}
+        },
+        "available-seats": {
+          "requests": 1068,
+          "errors": 0,
+          "p50_ms": 344.49,
+          "p95_ms": 943.58,
+          "p99_ms": 1196.3,
+          "statuses": {
+            "200": 1068
+          },
+          "error_types": {}
+        }
+      },
+      "backend_exit_code_after": null
+    },
+    {
+      "users": 50,
+      "duration_seconds": 60.8,
+      "requests": 3614,
+      "successful_requests_per_second": 59.44,
+      "error_percent": 0.0,
+      "endpoints": {
+        "movies": {
+          "requests": 1206,
+          "errors": 0,
+          "p50_ms": 21.24,
+          "p95_ms": 79.34,
+          "p99_ms": 126.51,
+          "statuses": {
+            "200": 1206
+          },
+          "error_types": {}
+        },
+        "screenings": {
+          "requests": 1204,
+          "errors": 0,
+          "p50_ms": 21.15,
+          "p95_ms": 66.11,
+          "p99_ms": 102.91,
+          "statuses": {
+            "200": 1204
+          },
+          "error_types": {}
+        },
+        "available-seats": {
+          "requests": 1204,
+          "errors": 0,
+          "p50_ms": 1454.88,
+          "p95_ms": 2105.67,
+          "p99_ms": 2259.34,
+          "statuses": {
+            "200": 1204
+          },
+          "error_types": {}
+        }
+      },
+      "backend_exit_code_after": null
+    }
+  ],
+  "warmup": {
+    "users": 5,
+    "duration_seconds": 15.0,
+    "requests": 171,
+    "successful_requests_per_second": 11.4,
+    "error_percent": 0.0,
+    "endpoints": {
+      "movies": {
+        "requests": 57,
+        "errors": 0,
+        "p50_ms": 6.61,
+        "p95_ms": 21.96,
+        "p99_ms": 28.15,
+        "statuses": {
+          "200": 57
+        },
+        "error_types": {}
+      },
+      "screenings": {
+        "requests": 57,
+        "errors": 0,
+        "p50_ms": 6.03,
+        "p95_ms": 15.8,
+        "p99_ms": 21.43,
+        "statuses": {
+          "200": 57
+        },
+        "error_types": {}
+      },
+      "available-seats": {
+        "requests": 57,
+        "errors": 0,
+        "p50_ms": 293.9,
+        "p95_ms": 769.1,
+        "p99_ms": 770.28,
+        "statuses": {
+          "200": 57
+        },
+        "error_types": {}
+      }
+    }
+  }
+}

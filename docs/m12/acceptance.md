@@ -24,6 +24,7 @@ Verified on 2026-10-10 on `feature/nghia/m12-delivery`; this does not assert a m
 - [Baseline data](baseline.json)
 - [Docker guide](docker.md)
 - [API guide](api.md)
+- [Phase 1 Kaggle CPU verification](../phase1/kaggle-results.md) — separate Java/MySQL runtime and dataset; includes the measured latency threshold breach at 50 users.
 
 ## Limitations
 

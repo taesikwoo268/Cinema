@@ -44,6 +44,10 @@ Package 3: `mvn clean test` có MySQL thực tế 9.4; 29 contract tests trên H
 
 M12 đã chạy Maven trong Docker với MySQL 8.4; OpenAPI 31 operations, benchmark, consistency và restart smoke đạt. Xem [baseline](m12/benchmark-baseline.md). Không chạy lại Maven trong bước chốt tài liệu. Không suy ra MySQL đã được kiểm tra từ một lần chạy chỉ có H2.
 
+## Bằng chứng Kaggle cho Pha 1
+
+Ngày 2026-10-10, người thực hiện chạy backend `a51fb7f` trên Kaggle CPU với Java 25/MySQL 8.0.46. Đã nhập ba JSON smoke, tải đọc và concurrency; [báo cáo](phase1/kaggle-results.md), [checklist](phase1/requirements-checklist.md). Tải đọc 25 người dùng đạt tiêu chí; 50 người dùng không lỗi HTTP nhưng p95 ghế vượt 2 giây. 30 booking ghế riêng và 10 khách tranh một ghế đều đúng số bản ghi. Đã bổ sung [notebook và hướng dẫn chạy lại](../benchmarks/kaggle/README.md), đối chiếu ba báo cáo nhúng khớp JSON gốc; không chạy lại Maven/benchmark trong đợt cập nhật tài liệu này.
+
 ## Công việc tiếp theo
 
 1. Review diff và merge Package 2 → Package 3 sau khi kiểm tra CI/conflict.

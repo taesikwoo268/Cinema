@@ -1,0 +1,17 @@
+{
+  "provenance": "User-exported Kaggle notebook reports; original bytes preserved. Reports cross-checked locally; tests not rerun.",
+  "files": [
+    {
+      "file": "cinema-smoke-1791623820788528717.json",
+      "sha256": "ec90e8b9577205e432618cbffe4364b062cdd179acdd9320af66d20c9320cfc4"
+    },
+    {
+      "file": "cinema-read-load-1791623940153405311.json",
+      "sha256": "a33f2eb8f2f2339633a3125036ad4b146423b97857f8939f59665f31b156970b"
+    },
+    {
+      "file": "cinema-write-load-1791624608923200157.json",
+      "sha256": "d7534f3144b1cde00f6907090780fd1f5f2d1d74bcca5334ceaa795de76bddf3"
+    }
+  ]
+}
