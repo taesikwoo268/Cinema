@@ -1,0 +1,190 @@
+{
+  "commit": "a51fb7f496f599243415d797f283baa2ecdff8bd",
+  "started_at_utc": "2026-10-10T09:30:08.923273+00:00",
+  "status": "passed",
+  "note": "Finite concurrency checks, not sustained booking capacity.",
+  "separate_seats": {
+    "outcomes": [
+      {
+        "status": "success",
+        "booking_id": "44e9eeaa-291f-42af-af55-95fc418a7d4a"
+      },
+      {
+        "status": "success",
+        "booking_id": "d62957c4-a64a-44c0-9520-26e7d53986a8"
+      },
+      {
+        "status": "success",
+        "booking_id": "eb40b256-aaa9-45b5-a6c3-f92c346e0401"
+      },
+      {
+        "status": "success",
+        "booking_id": "923d1c2b-939c-4d9d-a67a-6b134d1af6b1"
+      },
+      {
+        "status": "success",
+        "booking_id": "1f5bb567-bae7-43d7-91b6-94b1cc3fcaf5"
+      },
+      {
+        "status": "success",
+        "booking_id": "47bb1616-d951-428c-9bff-97482bffb34f"
+      },
+      {
+        "status": "success",
+        "booking_id": "b366683e-14e6-4139-9f7d-fd529324812e"
+      },
+      {
+        "status": "success",
+        "booking_id": "8966ac1e-3c1a-4eac-9c4d-15c5f648e13b"
+      },
+      {
+        "status": "success",
+        "booking_id": "33c892ae-6462-4323-a670-4ab39c62a2b2"
+      },
+      {
+        "status": "success",
+        "booking_id": "b0dddb3e-9e10-4534-b9fb-5e15b77dc499"
+      },
+      {
+        "status": "success",
+        "booking_id": "5e31d9a9-2c48-42ed-82a0-c492ae0880e9"
+      },
+      {
+        "status": "success",
+        "booking_id": "37da9026-3e09-46fb-ac3a-da52511df254"
+      },
+      {
+        "status": "success",
+        "booking_id": "c5a98263-b2c9-4f06-be8d-541146004773"
+      },
+      {
+        "status": "success",
+        "booking_id": "ade1574a-142e-4d75-8840-1be98b3ef383"
+      },
+      {
+        "status": "success",
+        "booking_id": "800fc60d-97ef-4f25-b46b-a950d1337590"
+      },
+      {
+        "status": "success",
+        "booking_id": "a4c10d1f-11bc-47e9-bca9-648acab06175"
+      },
+      {
+        "status": "success",
+        "booking_id": "a4fe8e9b-8689-42d8-b791-0497a1fa4994"
+      },
+      {
+        "status": "success",
+        "booking_id": "2eb12a68-3fec-4139-a266-262cfe210ca0"
+      },
+      {
+        "status": "success",
+        "booking_id": "90428a4c-8670-41ff-8c37-a1a2c0c230f0"
+      },
+      {
+        "status": "success",
+        "booking_id": "fc033d0e-086a-44f3-bad2-29c2af627205"
+      },
+      {
+        "status": "success",
+        "booking_id": "9c5a164a-b3c5-405d-8cbd-6f72fc5cc91c"
+      },
+      {
+        "status": "success",
+        "booking_id": "258fed39-9827-4a37-9f3b-97115e8dae2e"
+      },
+      {
+        "status": "success",
+        "booking_id": "7f1cc05a-2442-4d62-8a9e-ccd1f3089bdc"
+      },
+      {
+        "status": "success",
+        "booking_id": "58535ef8-dd4a-4d22-81ac-ea1527caa672"
+      },
+      {
+        "status": "success",
+        "booking_id": "c53eeb70-d38c-448a-bf25-6718a3028f9a"
+      },
+      {
+        "status": "success",
+        "booking_id": "e6974171-8af5-490b-801b-e13c83d0c089"
+      },
+      {
+        "status": "success",
+        "booking_id": "571e74f0-9a25-4af3-92c0-3fbc41041e3e"
+      },
+      {
+        "status": "success",
+        "booking_id": "2a687548-584c-4a0a-a587-600d3b3e8d69"
+      },
+      {
+        "status": "success",
+        "booking_id": "2dbc4c21-bb0a-434c-a41a-a771809a156f"
+      },
+      {
+        "status": "success",
+        "booking_id": "574ee4f0-0840-4777-be63-4cd5a0e56008"
+      }
+    ],
+    "database": {
+      "bookings": 30,
+      "confirmed_bookings": 30,
+      "reservations": 30,
+      "tickets": 30,
+      "payments": 30,
+      "successful_payments": 30
+    }
+  },
+  "same_seat": {
+    "outcomes": [
+      {
+        "status": "conflict",
+        "http": 409
+      },
+      {
+        "status": "conflict",
+        "http": 409
+      },
+      {
+        "status": "success",
+        "booking_id": "37ed2c0c-4fc6-487a-a200-337d77016d8e"
+      },
+      {
+        "status": "conflict",
+        "http": 409
+      },
+      {
+        "status": "conflict",
+        "http": 409
+      },
+      {
+        "status": "conflict",
+        "http": 409
+      },
+      {
+        "status": "conflict",
+        "http": 409
+      },
+      {
+        "status": "conflict",
+        "http": 409
+      },
+      {
+        "status": "conflict",
+        "http": 409
+      },
+      {
+        "status": "conflict",
+        "http": 409
+      }
+    ],
+    "database": {
+      "bookings": 1,
+      "confirmed_bookings": 1,
+      "reservations": 1,
+      "tickets": 1,
+      "payments": 1,
+      "successful_payments": 1
+    }
+  }
+}

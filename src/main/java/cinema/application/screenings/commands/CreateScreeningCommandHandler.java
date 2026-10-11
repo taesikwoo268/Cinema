@@ -14,7 +14,7 @@ import cinema.domain.common.DomainException;
 import cinema.domain.common.Money;
 import cinema.domain.screening.Screening;
 
-public final class CreateScreeningCommandHandler implements UseCase<CreateScreeningCommand, String> {
+public class CreateScreeningCommandHandler implements UseCase<CreateScreeningCommand, String> {
 
     private final ScreeningRepository screenings;
     private final MovieRepository movies;

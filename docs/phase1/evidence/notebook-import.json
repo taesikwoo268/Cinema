@@ -1,0 +1,14 @@
+{
+  "sourceFilename": "cinema-phase-1-kaggle-cpu-clean.ipynb",
+  "sourceSha256": "39781091f85e288db888e978088f9d5905f6c97cd4d4bd0916f50d2e79aaaf02",
+  "repositoryNotebook": "benchmarks/kaggle/cinema-phase-1-kaggle-cpu-clean.ipynb",
+  "repositorySha256": "d99d2f0cf23d7b8f952784dcfd6443115b249a0b561827a83a70b8af491067ba",
+  "embeddedReportsMatched": 3,
+  "changes": [
+    "Replace unused Kaggle template cell with instructions",
+    "Clear outputs, execution counts and per-cell metadata",
+    "Use REPORT_PATH/evidence/WRITE_PATH for downloads",
+    "Set Kaggle Internet metadata to true"
+  ],
+  "verification": "Measurement and business-check cell sources unchanged; imported notebook not re-executed."
+}

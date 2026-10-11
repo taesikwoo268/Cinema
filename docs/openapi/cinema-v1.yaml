@@ -1,0 +1,1384 @@
+openapi: 3.0.3
+info:
+  title: Cinema V1 API
+  version: 1.0.0
+  description: MySQL profile contract. Opaque Bearer authentication,
+    CUSTOMER/ADMIN, owner-only bookings/payment/tickets. Default profile denies
+    all. venue-dev retains its historical development security. Unexpected
+    infrastructure failures may return 5xx; documented 4xx responses describe
+    the shared error contract, not every path-specific outcome.
+servers:
+  - url: http://localhost:8081
+    description: Docker local
+  - url: http://localhost:8080
+    description: Local JVM
+tags:
+  - name: Identity
+  - name: Cinemas
+  - name: Halls
+  - name: Seats
+  - name: Movies
+  - name: Screenings
+  - name: Cart
+  - name: Bookings
+  - name: Payments
+  - name: Tickets
+paths:
+  /cinemas:
+    post:
+      operationId: createCinema
+      tags:
+        - Cinemas
+      summary: Create cinema
+      description: Requires ADMIN. Ownership checks apply to customer resources,
+        including ADMIN.
+      security:
+        - bearerAuth: []
+      responses:
+        "201":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreatedResourceResponse"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCinemaRequest"
+    get:
+      operationId: getCinemas
+      tags:
+        - Cinemas
+      summary: Get cinemas
+      description: Public catalog operation.
+      security: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CinemaView"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+  /halls:
+    post:
+      operationId: createHall
+      tags:
+        - Halls
+      summary: Create hall
+      description: Requires ADMIN. Ownership checks apply to customer resources,
+        including ADMIN.
+      security:
+        - bearerAuth: []
+      responses:
+        "201":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreatedResourceResponse"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateHallRequest"
+  /seats:
+    post:
+      operationId: createSeat
+      tags:
+        - Seats
+      summary: Create seat
+      description: Requires ADMIN. Ownership checks apply to customer resources,
+        including ADMIN.
+      security:
+        - bearerAuth: []
+      responses:
+        "201":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreatedResourceResponse"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateSeatRequest"
+  /movies:
+    post:
+      operationId: createMovie
+      tags:
+        - Movies
+      summary: Create movie
+      description: Requires ADMIN. Ownership checks apply to customer resources,
+        including ADMIN.
+      security:
+        - bearerAuth: []
+      responses:
+        "201":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreatedResourceResponse"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateMovieRequest"
+    get:
+      operationId: getMovies
+      tags:
+        - Movies
+      summary: Get movies
+      description: Public catalog operation.
+      security: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MovieView"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+  /screenings:
+    post:
+      operationId: createScreening
+      tags:
+        - Screenings
+      summary: Create screening
+      description: Requires ADMIN. Ownership checks apply to customer resources,
+        including ADMIN.
+      security:
+        - bearerAuth: []
+      responses:
+        "201":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreatedResourceResponse"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateScreeningRequest"
+    get:
+      operationId: getScreenings
+      tags:
+        - Screenings
+      summary: Get screenings
+      description: Public catalog operation.
+      security: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ScreeningView"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+      parameters:
+        - name: movieId
+          in: query
+          required: true
+          schema:
+            type: string
+            minLength: 1
+  /cinemas/{id}:
+    get:
+      operationId: getCinema
+      tags:
+        - Cinemas
+      summary: Get cinema
+      description: Public catalog operation.
+      security: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CinemaView"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            minLength: 1
+  /cinemas/{id}/halls:
+    get:
+      operationId: getCinemaHalls
+      tags:
+        - Halls
+      summary: Get cinema halls
+      description: Public catalog operation.
+      security: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/HallView"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            minLength: 1
+  /halls/{id}:
+    get:
+      operationId: getHall
+      tags:
+        - Halls
+      summary: Get hall
+      description: Public catalog operation.
+      security: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HallView"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            minLength: 1
+  /halls/{id}/seats:
+    get:
+      operationId: getHallSeats
+      tags:
+        - Seats
+      summary: Get hall seats
+      description: Public catalog operation.
+      security: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PhysicalSeatView"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            minLength: 1
+  /movies/{id}:
+    get:
+      operationId: getMovie
+      tags:
+        - Movies
+      summary: Get movie
+      description: Public catalog operation.
+      security: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MovieView"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            minLength: 1
+    delete:
+      operationId: deleteMovie
+      tags:
+        - Movies
+      summary: Delete movie
+      description: Soft deletion in MySQL. Historical references remain; subsequent
+        movie reads return 404.
+      security:
+        - bearerAuth: []
+      responses:
+        "204":
+          description: No content
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            minLength: 1
+  /screenings/{id}:
+    get:
+      operationId: getScreening
+      tags:
+        - Screenings
+      summary: Get screening
+      description: Public catalog operation.
+      security: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ScreeningView"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            minLength: 1
+  /screenings/{id}/available-seats:
+    get:
+      operationId: getAvailableSeats
+      tags:
+        - Screenings
+      summary: Get available seats
+      description: Public catalog operation.
+      security: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SeatView"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            minLength: 1
+  /screenings/{id}/cancel:
+    post:
+      operationId: cancelScreening
+      tags:
+        - Screenings
+      summary: Cancel screening
+      description: Requires ADMIN. Ownership checks apply to customer resources,
+        including ADMIN.
+      security:
+        - bearerAuth: []
+      responses:
+        "204":
+          description: No content
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            minLength: 1
+  /identity/register:
+    post:
+      operationId: register
+      tags:
+        - Identity
+      summary: Register
+      description: Creates a CUSTOMER account. Returns customer ID, not identity user
+        ID. Role input is not accepted as authority.
+      security: []
+      responses:
+        "201":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreatedResourceResponse"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterRequest"
+  /identity/login:
+    post:
+      operationId: login
+      tags:
+        - Identity
+      summary: Login
+      description: Returns an opaque Bearer token and expiry. Invalid credentials
+        return 403.
+      security: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticationResult"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+  /identity/me:
+    get:
+      operationId: getCurrentUser
+      tags:
+        - Identity
+      summary: Get current user
+      description: Requires CUSTOMER or ADMIN. Ownership checks apply to customer
+        resources, including ADMIN.
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CurrentUserView"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+  /carts/seats:
+    post:
+      operationId: addCartSeat
+      tags:
+        - Cart
+      summary: Add cart seat
+      description: Requires CUSTOMER or ADMIN. Ownership checks apply to customer
+        resources, including ADMIN.
+      security:
+        - bearerAuth: []
+      responses:
+        "204":
+          description: No content
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CartSeatRequest"
+    delete:
+      operationId: removeCartSeat
+      tags:
+        - Cart
+      summary: Remove cart seat
+      description: Requires CUSTOMER or ADMIN. This DELETE operation requires a JSON
+        body containing screeningId and seatId.
+      security:
+        - bearerAuth: []
+      responses:
+        "204":
+          description: No content
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CartSeatRequest"
+  /carts:
+    delete:
+      operationId: clearCart
+      tags:
+        - Cart
+      summary: Clear cart
+      description: Requires CUSTOMER or ADMIN. Ownership checks apply to customer
+        resources, including ADMIN.
+      security:
+        - bearerAuth: []
+      responses:
+        "204":
+          description: No content
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+  /carts/me:
+    get:
+      operationId: getMyCart
+      tags:
+        - Cart
+      summary: Get my cart
+      description: Returns own active cart. Returns 404 if no cart has been created.
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CartView"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+  /bookings/checkout:
+    post:
+      operationId: checkout
+      tags:
+        - Bookings
+      summary: Checkout
+      description: Consumes own cart; one PENDING booking per screening. Empty cart is
+        400; missing holds are 409.
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CheckoutResult"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+  /bookings/{id}/cancel:
+    post:
+      operationId: cancelBooking
+      tags:
+        - Bookings
+      summary: Cancel booking
+      description: Owner only. Paid/CONFIRMED bookings cannot be cancelled by this
+        pending-booking operation.
+      security:
+        - bearerAuth: []
+      responses:
+        "204":
+          description: No content
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            minLength: 1
+  /bookings/me:
+    get:
+      operationId: getMyBookings
+      tags:
+        - Bookings
+      summary: Get my bookings
+      description: Requires CUSTOMER or ADMIN. Ownership checks apply to customer
+        resources, including ADMIN.
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/BookingView"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+  /bookings/{id}:
+    get:
+      operationId: getBooking
+      tags:
+        - Bookings
+      summary: Get booking
+      description: Requires CUSTOMER or ADMIN. Ownership checks apply to customer
+        resources, including ADMIN.
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BookingView"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            minLength: 1
+  /payments/{bookingId}:
+    post:
+      operationId: payBooking
+      tags:
+        - Payments
+      summary: Pay booking
+      description: Owner only. FakePaymentGateway. HTTP 200 may contain
+        successful=false. Retry of a committed successful payment returns its
+        original result without charging again. Gateway success before database
+        rollback remains a failure window.
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaymentResult"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+      parameters:
+        - name: bookingId
+          in: path
+          required: true
+          schema:
+            type: string
+            minLength: 1
+  /tickets/me:
+    get:
+      operationId: getMyTickets
+      tags:
+        - Tickets
+      summary: Get my tickets
+      description: Requires CUSTOMER or ADMIN. Ownership checks apply to customer
+        resources, including ADMIN.
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TicketView"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+  /tickets/{id}:
+    get:
+      operationId: getTicket
+      tags:
+        - Tickets
+      summary: Get ticket
+      description: Requires CUSTOMER or ADMIN. Ownership checks apply to customer
+        resources, including ADMIN.
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TicketView"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            minLength: 1
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: Opaque token from login; not JWT. Invalid or missing credentials on
+        protected operations return 403.
+  schemas:
+    CreateCinemaRequest:
+      type: object
+      required:
+        - name
+        - address
+      properties:
+        name:
+          type: string
+        address:
+          type: string
+      example:
+        name: Cinema Demo
+        address: Demo address
+    CreateHallRequest:
+      type: object
+      required:
+        - cinemaId
+        - name
+      properties:
+        cinemaId:
+          type: string
+        name:
+          type: string
+      example:
+        cinemaId: cinema-id
+        name: Hall A
+    CreateSeatRequest:
+      type: object
+      required:
+        - hallId
+        - row
+        - number
+        - type
+      properties:
+        hallId:
+          type: string
+        row:
+          type: string
+        number:
+          type: integer
+          format: int32
+          minimum: 1
+        type:
+          type: string
+          enum:
+            - NORMAL
+            - VIP
+            - COUPLE
+      example:
+        hallId: hall-id
+        row: A
+        number: 1
+        type: NORMAL
+    CreateMovieRequest:
+      type: object
+      required:
+        - title
+        - durationMinutes
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+          nullable: true
+        durationMinutes:
+          type: integer
+          format: int32
+          minimum: 1
+        ageRating:
+          type: string
+          nullable: true
+      example:
+        title: Demo movie
+        description: Example
+        durationMinutes: 120
+        ageRating: PG
+    CreateScreeningRequest:
+      type: object
+      required:
+        - movieId
+        - hallId
+        - startTime
+        - endTime
+        - basePrice
+        - currency
+      properties:
+        movieId:
+          type: string
+        hallId:
+          type: string
+        startTime:
+          type: string
+          format: date-time
+        endTime:
+          type: string
+          format: date-time
+        basePrice:
+          type: number
+        currency:
+          type: string
+      example:
+        movieId: movie-id
+        hallId: hall-id
+        startTime: 2030-01-01T10:00:00Z
+        endTime: 2030-01-01T12:00:00Z
+        basePrice: 12
+        currency: USD
+    RegisterRequest:
+      type: object
+      required:
+        - email
+        - password
+        - displayName
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+          writeOnly: true
+        displayName:
+          type: string
+      example:
+        email: customer@example.com
+        password: replace-with-your-password
+        displayName: Customer
+    LoginRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+          writeOnly: true
+      example:
+        email: customer@example.com
+        password: replace-with-your-password
+    CartSeatRequest:
+      type: object
+      required:
+        - screeningId
+        - seatId
+      properties:
+        screeningId:
+          type: string
+        seatId:
+          type: string
+      example:
+        screeningId: screening-id
+        seatId: seat-id
+    CreatedResourceResponse:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          type: string
+          example: a4cce1dc-7d14-4860-88dc-9b02a3e1ea7c
+    ErrorResponse:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+          example: FORBIDDEN
+        message:
+          type: string
+          example: Authentication required
+    AuthenticationResult:
+      type: object
+      required:
+        - accessToken
+        - expiresAt
+      properties:
+        accessToken:
+          type: string
+          description: Opaque Bearer token. Not JWT. Expires after one hour; never log it.
+        expiresAt:
+          type: string
+          format: date-time
+    CurrentUserView:
+      type: object
+      required:
+        - userId
+        - authenticated
+      properties:
+        userId:
+          type: string
+        authenticated:
+          type: boolean
+    CinemaView:
+      type: object
+      required:
+        - id
+        - name
+        - address
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        address:
+          type: string
+    HallView:
+      type: object
+      required:
+        - id
+        - cinemaId
+        - name
+      properties:
+        id:
+          type: string
+        cinemaId:
+          type: string
+        name:
+          type: string
+    PhysicalSeatView:
+      type: object
+      required:
+        - id
+        - hallId
+        - row
+        - number
+        - type
+      properties:
+        id:
+          type: string
+        hallId:
+          type: string
+        row:
+          type: string
+        number:
+          type: integer
+          format: int32
+          minimum: 1
+        type:
+          type: string
+          enum:
+            - NORMAL
+            - VIP
+            - COUPLE
+    MovieView:
+      type: object
+      required:
+        - id
+        - title
+        - durationMinutes
+        - status
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+          nullable: true
+        durationMinutes:
+          type: integer
+          format: int32
+          minimum: 1
+        ageRating:
+          type: string
+          nullable: true
+        status:
+          type: string
+          enum:
+            - COMING_SOON
+            - SHOWING
+            - ARCHIVED
+    ScreeningView:
+      type: object
+      required:
+        - id
+        - movieId
+        - hallId
+        - startTime
+        - endTime
+        - basePrice
+        - currency
+        - status
+      properties:
+        id:
+          type: string
+        movieId:
+          type: string
+        hallId:
+          type: string
+        startTime:
+          type: string
+          format: date-time
+        endTime:
+          type: string
+          format: date-time
+        basePrice:
+          type: number
+        currency:
+          type: string
+        status:
+          type: string
+          enum:
+            - SCHEDULED
+            - CANCELLED
+            - COMPLETED
+    SeatView:
+      type: object
+      required:
+        - id
+        - row
+        - number
+        - type
+        - available
+      properties:
+        id:
+          type: string
+        row:
+          type: string
+        number:
+          type: integer
+          format: int32
+          minimum: 1
+        type:
+          type: string
+          enum:
+            - NORMAL
+            - VIP
+            - COUPLE
+        available:
+          type: boolean
+    CartView:
+      type: object
+      required:
+        - id
+        - customerId
+        - items
+      properties:
+        id:
+          type: string
+        customerId:
+          type: string
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/CartItemView"
+    CartItemView:
+      type: object
+      required:
+        - screeningId
+        - seatId
+        - unitPrice
+        - currency
+      properties:
+        screeningId:
+          type: string
+        seatId:
+          type: string
+        unitPrice:
+          type: number
+        currency:
+          type: string
+    BookingView:
+      type: object
+      required:
+        - id
+        - screeningId
+        - status
+        - totalAmount
+        - currency
+      properties:
+        id:
+          type: string
+        screeningId:
+          type: string
+        status:
+          type: string
+          enum:
+            - PENDING
+            - CONFIRMED
+            - CANCELLED
+        totalAmount:
+          type: number
+        currency:
+          type: string
+    CheckoutResult:
+      type: object
+      required:
+        - bookingIds
+      properties:
+        bookingIds:
+          type: array
+          items:
+            type: string
+    PaymentResult:
+      type: object
+      required:
+        - successful
+      properties:
+        successful:
+          type: boolean
+          description: False is a processed failed payment, even when HTTP status is 200.
+        providerReference:
+          type: string
+          nullable: true
+    TicketView:
+      type: object
+      required:
+        - id
+        - bookingId
+        - screeningId
+        - seatId
+        - ticketCode
+        - status
+      properties:
+        id:
+          type: string
+        bookingId:
+          type: string
+        screeningId:
+          type: string
+        seatId:
+          type: string
+        ticketCode:
+          type: string
+        status:
+          type: string
+          enum:
+            - VALID
+            - USED
+            - CANCELLED
+  responses:
+    ValidationError:
+      description: Invalid request / malformed JSON
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    Forbidden:
+      description: Missing or invalid authentication, role denied, or foreign ownership
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    Conflict:
+      description: Duplicate resource or state/concurrency conflict
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"

@@ -1,5 +1,21 @@
 # Phân công công việc Cinema V1
 
+## Bàn giao hiện tại — 2026-10-10
+
+M0–M11 và authentication Package 3 đã được triển khai/kiểm thử trên nhánh chứa `10f53a4`. Các bảng phân công milestone bên dưới là lịch sử, không phải yêu cầu làm lại công việc đã hoàn thành.
+
+| Phần việc | Nhánh / bàn giao | Trạng thái kỹ thuật |
+| --- | --- | --- |
+| Package 1 | `feature/nghia/backend-package-1` | Ticket, ownership, REST, seat/cart concurrency |
+| Package 2 | `feature/nghia/backend-package-2` | JPA/MySQL; review fixes đến `97bb72c` |
+| Package 3 | `feature/nghia/backend-package-3` | Bearer/roles đến `10f53a4`; dựa trên Package 2 |
+
+Nguyễn Trung Nghĩa phụ trách review/tích hợp các nhánh package. Không gán lại attribution của các slice M1/M4 cho người khác. M12 được bàn giao trên `feature/nghia/m12-delivery` với [bằng chứng](m12/acceptance.md). Phân công frontend cho Bảo Long, Duy Anh, Duy Khánh chưa được chốt; các thành viên có thể nhận review/smoke test sau khi chủ dự án phân công, không tự giả định đã hoàn thành.
+
+Việc cần làm: review Package 2 rồi Package 3, xác nhận CI và migration local, chuẩn bị dữ liệu demo, kiểm tra API bằng token thật, sau đó giao frontend. Không tự merge main hoặc xóa branches. “Implementation đã xong” và “đã merge main” được theo dõi riêng.
+
+## Phân công và quy trình gốc — lịch sử
+
 Ghi chú lịch sử: M1/M2 từng được nghiệm thu theo quy trình cá nhân. M4 đã tích hợp các slice theo phân công nhóm riêng tại [overview M4](m4/m4-overview.md). Phân công M1 và các kế hoạch nhóm dưới đây được giữ làm lịch sử; không phải phân công mới cho M3. M2 thực tế do Nghia triển khai toàn bộ. Trạng thái hiện tại xem mục 6 và [progress](cinema-v1-progress.md).
 
 ## 1. Phạm vi và nguyên tắc
@@ -342,11 +358,4 @@ Các kết quả kiểm thử V1 đã được nghiệm thu phải được gi�
 
 ## 6. Trạng thái và bước tiếp theo
 
-- **M1 — Venue:** COMPLETED; lịch sử ownership và phân công giữ nguyên tại [docs/m1/](m1/).
-- **M2 — Movie:** COMPLETED; Owner: Nghia, toàn bộ scope từ Domain đến HTTP acceptance.
-- **M3 — Screening:** COMPLETED cho Screening core; chi tiết tại [M3 acceptance](m3/m3-acceptance.md).
-- **M4 — Identity + Customer:** COMPLETED theo phạm vi M4; giữ attribution và lịch sử tích hợp ở mốc 8 phía trên. Bearer/JWT và production authentication/persistence deferred.
-- **M5 — Cart + simple SeatHold:** NEXT / NOT STARTED theo roadmap.
-- Các milestone sau vẫn là kế hoạch, không được coi là đã triển khai.
-- Checkpoint M2: 230 tests, 0 failures, 0 errors, 8 workflow skipped.
-- Trạng thái và bằng chứng hiện tại: [Tiến độ Cinema V1](cinema-v1-progress.md).
+Xem bảng bàn giao hiện tại ở đầu tài liệu và [progress](cinema-v1-progress.md). Không còn trạng thái M5 “NEXT / NOT STARTED”. Kết quả Package 3 đã ghi nhận: 787 tests, 0 failures/errors, 8 skips có sẵn; H2 và MySQL thực tế đều được chạy. M12 đã nghiệm thu Docker/OpenAPI/benchmark trên feature branch; frontend chưa được nghiệm thu.

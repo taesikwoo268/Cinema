@@ -5,7 +5,7 @@ import cinema.application.common.exceptions.ValidationException;
 import cinema.application.common.interfaces.MovieRepository;
 import cinema.application.common.interfaces.UseCase;
 
-public final class DeleteMovieCommandHandler implements UseCase<DeleteMovieCommand, Void> {
+public class DeleteMovieCommandHandler implements UseCase<DeleteMovieCommand, Void> {
     private final MovieRepository movies;
 
     public DeleteMovieCommandHandler(MovieRepository movies) {

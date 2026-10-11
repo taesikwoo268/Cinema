@@ -11,7 +11,7 @@ import cinema.domain.common.DomainException;
 import java.util.function.Supplier;
 
 
-public final class CreateHallCommandHandler implements UseCase<CreateHallCommand, String> {
+public class CreateHallCommandHandler implements UseCase<CreateHallCommand, String> {
     private final CinemaRepository cinemas;
     private final HallRepository halls;
     private final Supplier<String> idGenerator;

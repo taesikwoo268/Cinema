@@ -11,7 +11,7 @@ import cinema.domain.cinema.SeatType;
 import cinema.domain.common.DomainException;
 import java.util.function.Supplier;
 
-public final class CreateSeatCommandHandler implements UseCase<CreateSeatCommand, String> {
+public class CreateSeatCommandHandler implements UseCase<CreateSeatCommand, String> {
     private final HallRepository halls;
     private final SeatRepository seats;
     private final Supplier<String> idGenerator;

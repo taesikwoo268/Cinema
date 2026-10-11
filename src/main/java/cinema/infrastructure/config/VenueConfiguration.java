@@ -22,20 +22,23 @@ import cinema.infrastructure.persistence.inmemory.InMemoryHallRepository;
 import cinema.infrastructure.persistence.inmemory.InMemorySeatRepository;
 
 @Configuration
-@Profile("venue-dev")
+@Profile({"venue-dev", "mysql"})
 public class VenueConfiguration {
 
     @Bean
+    @Profile("!mysql")
     public CinemaRepository cinemaRepository() {
         return new InMemoryCinemaRepository();
     }
 
     @Bean
+    @Profile("!mysql")
     public HallRepository hallRepository() {
         return new InMemoryHallRepository();
     }
 
     @Bean
+    @Profile("!mysql")
     public SeatRepository seatRepository() {
         return new InMemorySeatRepository();
     }

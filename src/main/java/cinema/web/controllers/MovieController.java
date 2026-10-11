@@ -25,7 +25,7 @@ import cinema.web.requests.CreateMovieRequest;
 import cinema.web.responses.CreatedResourceResponse;
 
 @RestController
-@Profile("venue-dev")
+@Profile({"venue-dev", "mysql"})
 @RequestMapping("/movies")
 public final class MovieController {
     private final CreateMovieCommandHandler createMovieCommand;

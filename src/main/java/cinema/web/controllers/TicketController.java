@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@Profile("venue-dev")
+@Profile({"venue-dev", "mysql"})
 @RequestMapping("/tickets")
 public final class TicketController {
     private final GetMyTicketsQueryHandler getMyTicketsQuery;

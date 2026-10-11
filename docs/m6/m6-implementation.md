@@ -1,5 +1,7 @@
 # M6 Implementation
 
+> Hồ sơ implementation M6 tại thời điểm triển khai. Checkout/cart concurrency và JPA transactions được bổ sung trong Package 1–2; xác thực Bearer trong Package 3. Xem [tiến độ hiện tại](../cinema-v1-progress.md).
+
 ## 1. Scope
 
 M6 triển khai luồng **Checkout + Booking** trên nền Cart và SeatHold của M5.
@@ -27,3 +29,4 @@ M6 hoàn thiện hai thành phần domain chính:
 ```text
 Booking
 BookingItem
+```

@@ -1,5 +1,19 @@
 # Cinema — Architecture & Domain Specification
 
+## Đối chiếu implementation — 2026-10-10
+
+Đây là đặc tả kiến trúc có cả mục tiêu thiết kế. Trạng thái code đến `10f53a4`:
+
+- Domain thuần Java; Application phụ thuộc ports; Infrastructure không import Web; Web không truy cập JPA trực tiếp.
+- `mysql`: JPA adapters, Flyway V1–V3, READ COMMITTED command transactions, customer/booking/screening/hall row locks và constraints. Không dựa riêng vào Java monitors cho nhiều instance.
+- `venue-dev`: in-memory và process-local coordination, không có durable transaction; default profile deny-all.
+- Identity MySQL: `DatabaseTokenService` triển khai `TokenVerifier`; `BearerAuthenticationFilter` xác lập user ID và role; `MysqlSecurityConfig` bảo vệ endpoints. Token không phải JWT, password dùng PBKDF2. Scaffold `JwtService`/`JwtAuthenticationFilter` đã được thay thế.
+- Ownership vẫn ở Application và áp dụng cả ADMIN. Token lỗi/thiếu quyền trả 403 như contract hiện tại.
+- Payment thành công commit cùng booking CONFIRMED, reservations và tickets. Retry committed success không charge lại; external success trước DB commit chưa được giải quyết nguyên tử.
+- Hold chưa có thời hạn, không có refund flow hay ticket admission/cancellation HTTP API. Permanent reservation luôn ưu tiên hơn hold.
+
+Các diagram/mô tả JWT, Redis, event broker, TTL, refund hoặc inventory bên dưới là ý tưởng mở rộng, không phải tính năng đã chạy. Schema thực tế xem [relational-schema.md](relational-schema.md), trạng thái xem [progress](cinema-v1-progress.md).
+
 Tài liệu mô tả kiến trúc, mô hình domain, quy tắc nghiệp vụ và các quyết định thiết kế của hệ thống Cinema. Mục 14 tổng hợp các hợp đồng và ràng buộc triển khai.
 
 Đây là đặc tả thiết kế; trạng thái triển khai xem [README](../README.md). Bảng, khóa, ERD và transaction xem [Lược đồ quan hệ](relational-schema.md).

@@ -19,7 +19,7 @@ import cinema.domain.cart.Cart;
 import cinema.domain.cart.CartItem;
 import cinema.domain.screening.ScreeningStatus;
 
-public final class AddSeatToCartCommandHandler implements UseCase<AddSeatToCartCommand, Void> {
+public class AddSeatToCartCommandHandler implements UseCase<AddSeatToCartCommand, Void> {
 
     private final CurrentUser currentUser;
     private final CustomerRepository customers;

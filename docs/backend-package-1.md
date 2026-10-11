@@ -1,5 +1,7 @@
 # Backend Package 1: M8, M9, M10
 
+> Historical handover for the original Package 1 checkpoint. Its in-memory/no-JPA/no-Bearer limitations describe that delivery, not the current MySQL profile. Subsequent fixes `f79445b` and `9a6be03` serialize seat holds/reservations and cart creation/mutations/checkout. Package 2 adds durable persistence; Package 3 adds Bearer/roles. See [current progress](cinema-v1-progress.md) and [MySQL guide](mysql.md).
+
 Implemented on latest main (2403699) using the existing Clean Architecture and venue-dev in-memory adapters.
 
 ## Behavior and contracts

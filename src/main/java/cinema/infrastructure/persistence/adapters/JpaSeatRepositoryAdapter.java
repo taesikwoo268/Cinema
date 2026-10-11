@@ -1,34 +1,39 @@
 package cinema.infrastructure.persistence.adapters;
 
-import java.util.List;
-import java.util.Optional;
-
 import cinema.application.common.interfaces.SeatRepository;
+import cinema.application.common.exceptions.ConflictException;
 import cinema.domain.cinema.Seat;
+import cinema.infrastructure.persistence.entities.*;
+import cinema.infrastructure.persistence.repositories.*;
+import cinema.infrastructure.persistence.mappers.SeatPersistenceMapper;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import org.springframework.context.annotation.Profile;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+import java.util.*;
 
-/**
- * Unwired until persistence mapping and transactional contracts are
- * implemented.
- */
-public final class JpaSeatRepositoryAdapter implements SeatRepository {
-
-    @Override
-    public Optional<Seat> findById(String id) {
-        throw new UnsupportedOperationException("Architecture Contract v0.1: not implemented");
+@Repository
+@Profile("mysql")
+@Transactional
+public class JpaSeatRepositoryAdapter implements SeatRepository {
+    private final SpringDataSeatRepository data;
+    private final SeatPersistenceMapper mapper = new SeatPersistenceMapper();
+    @PersistenceContext private EntityManager em;
+    public JpaSeatRepositoryAdapter(SpringDataSeatRepository data) {
+        this.data = data;
     }
-
-    @Override
-    public List<Seat> findByHallId(String hallId) {
-        throw new UnsupportedOperationException("Architecture Contract v0.1: not implemented");
+    @Override public Optional<Seat> findById(String id) {
+        return data.lockById(id).map(mapper::toDomain);
     }
-
-    @Override
-    public boolean existsByHallIdAndRowAndNumber(String hallId, String row, int number) {
-        throw new UnsupportedOperationException("Architecture Contract v0.1: not implemented");
+    @Override public List<Seat> findByHallId(String hallId) {
+        return data.findByHallIdOrderByRowAscNumberAscIdAsc(hallId).stream().map(mapper::toDomain).toList();
     }
-
-    @Override
-    public void save(Seat seat) {
-        throw new UnsupportedOperationException("Architecture Contract v0.1: not implemented");
+    @Override public boolean existsByHallIdAndRowAndNumber(String id, String row, int number) { return data.existsByHallIdAndRowAndNumber(id, row, number); }
+    @Override public void save(Seat model) {
+        Objects.requireNonNull(model);
+        if (data.existsById(model.getId())) throw new ConflictException("Seat ID already exists");
+        em.persist(mapper.toEntity(model));
+        em.flush();
     }
 }

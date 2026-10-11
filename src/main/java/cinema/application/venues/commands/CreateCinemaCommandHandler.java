@@ -8,7 +8,7 @@ import cinema.domain.common.DomainException;
 import java.util.function.Supplier;
 
 
-public final class CreateCinemaCommandHandler implements UseCase<CreateCinemaCommand, String> {
+public class CreateCinemaCommandHandler implements UseCase<CreateCinemaCommand, String> {
     
     private final CinemaRepository cinemas;
     private final Supplier<String> idGenerator;

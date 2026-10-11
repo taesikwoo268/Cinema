@@ -18,31 +18,31 @@ import cinema.application.common.interfaces.ScreeningRepository;
 public class UseCaseConfiguration {
 
     @Bean
-    @Profile("venue-dev")
+    @Profile({"venue-dev", "mysql"})
     public cinema.application.movies.commands.CreateMovieCommandHandler createMovieCommandHandler(MovieRepository movieRepository) {
         return new cinema.application.movies.commands.CreateMovieCommandHandler(movieRepository, () -> UUID.randomUUID().toString());
     }
 
     @Bean
-    @Profile("venue-dev")
+    @Profile({"venue-dev", "mysql"})
     public cinema.application.movies.commands.DeleteMovieCommandHandler deleteMovieCommandHandler(MovieRepository movieRepository) {
         return new cinema.application.movies.commands.DeleteMovieCommandHandler(movieRepository);
     }
 
     @Bean
-    @Profile("venue-dev")
+    @Profile({"venue-dev", "mysql"})
     public cinema.application.screenings.commands.CreateScreeningCommandHandler createScreeningCommandHandler(ScreeningRepository screeningRepository, MovieRepository movieRepository, HallRepository hallRepository) {
         return new cinema.application.screenings.commands.CreateScreeningCommandHandler(screeningRepository, movieRepository, hallRepository, () -> UUID.randomUUID().toString());
     }
 
     @Bean
-    @Profile("venue-dev")
+    @Profile({"venue-dev", "mysql"})
     public cinema.application.screenings.commands.CancelScreeningCommandHandler cancelScreeningCommandHandler(ScreeningRepository screeningRepository) {
         return new cinema.application.screenings.commands.CancelScreeningCommandHandler(screeningRepository);
     }
 
     @Bean
-    @Profile("venue-dev")
+    @Profile({"venue-dev", "mysql"})
     public cinema.application.carts.commands.AddSeatToCartCommandHandler addSeatToCartCommandHandler(
             cinema.application.common.interfaces.CurrentUser currentUser,
             cinema.application.common.interfaces.CustomerRepository customerRepository,
@@ -64,7 +64,7 @@ public class UseCaseConfiguration {
     }
 
     @Bean
-    @Profile("venue-dev")
+    @Profile({"venue-dev", "mysql"})
     public cinema.application.carts.commands.RemoveSeatFromCartCommandHandler removeSeatFromCartCommandHandler(
             cinema.application.common.interfaces.CurrentUser currentUser,
             cinema.application.common.interfaces.CustomerRepository customerRepository,
@@ -79,7 +79,7 @@ public class UseCaseConfiguration {
     }
 
     @Bean
-    @Profile("venue-dev")
+    @Profile({"venue-dev", "mysql"})
     public cinema.application.carts.commands.ClearCartCommandHandler clearCartCommandHandler(
             cinema.application.common.interfaces.CurrentUser currentUser,
             cinema.application.common.interfaces.CustomerRepository customerRepository,
@@ -94,7 +94,7 @@ public class UseCaseConfiguration {
     }
 
     @Bean
-    @Profile("venue-dev")
+    @Profile({"venue-dev", "mysql"})
     public cinema.application.bookings.commands.CheckoutCartCommandHandler checkoutCartCommandHandler(
             cinema.application.common.interfaces.CurrentUser currentUser,
             cinema.application.common.interfaces.CustomerRepository customerRepository,
@@ -113,7 +113,7 @@ public class UseCaseConfiguration {
     }
 
     @Bean
-    @Profile("venue-dev")
+    @Profile({"venue-dev", "mysql"})
     public cinema.application.bookings.commands.CancelBookingCommandHandler cancelBookingCommandHandler(
             cinema.application.common.interfaces.CurrentUser currentUser,
             cinema.application.common.interfaces.CustomerRepository customerRepository,
@@ -127,7 +127,7 @@ public class UseCaseConfiguration {
     }
 
     @Bean
-    @Profile("venue-dev")
+    @Profile({"venue-dev", "mysql"})
     public cinema.application.payments.commands.PayBookingCommandHandler payBookingCommandHandler(
             cinema.application.common.interfaces.CurrentUser currentUser,
             cinema.application.common.interfaces.CustomerRepository customerRepository,
@@ -147,7 +147,7 @@ public class UseCaseConfiguration {
     }
 
     @Bean
-    @Profile("venue-dev")
+    @Profile({"venue-dev", "mysql"})
     public cinema.application.identity.commands.RegisterCommandHandler registerCommandHandler(
             cinema.application.common.interfaces.IdentityService identityService,
             cinema.application.common.interfaces.CustomerRepository customerRepository) {
@@ -158,6 +158,7 @@ public class UseCaseConfiguration {
     }
 
     @Bean
+    @Profile("!mysql")
     public cinema.application.common.interfaces.IdentityService identityService() {
         return new cinema.infrastructure.identity.IdentityServiceImpl();
     }
@@ -169,38 +170,38 @@ public class UseCaseConfiguration {
     }
 
     @Bean
-    @Profile("venue-dev")
+    @Profile({"venue-dev", "mysql"})
     public cinema.application.movies.queries.GetMoviesQueryHandler getMoviesQueryHandler(MovieRepository movieRepository) {
         return new cinema.application.movies.queries.GetMoviesQueryHandler(movieRepository);
     }
 
     @Bean
-    @Profile("venue-dev")
+    @Profile({"venue-dev", "mysql"})
     public cinema.application.movies.queries.GetMovieQueryHandler getMovieQueryHandler(MovieRepository movieRepository) {
         return new cinema.application.movies.queries.GetMovieQueryHandler(movieRepository);
     }
 
     @Bean
-    @Profile("venue-dev")
+    @Profile({"venue-dev", "mysql"})
     public cinema.application.screenings.queries.GetScreeningsQueryHandler getScreeningsQueryHandler(ScreeningRepository screeningRepository) {
         return new cinema.application.screenings.queries.GetScreeningsQueryHandler(screeningRepository);
     }
 
     @Bean
-    @Profile("venue-dev")
+    @Profile({"venue-dev", "mysql"})
     public cinema.application.screenings.queries.GetScreeningQueryHandler getScreeningQueryHandler(ScreeningRepository screeningRepository) {
         return new cinema.application.screenings.queries.GetScreeningQueryHandler(screeningRepository);
     }
 
     @Bean
-    @Profile("venue-dev")
+    @Profile({"venue-dev", "mysql"})
     public cinema.application.screenings.queries.GetAvailableSeatsQueryHandler getAvailableSeatsQueryHandler(
             ScreeningRepository screenings, SeatRepository seats, SeatReservationRepository reservations, SeatHoldService holds) {
         return new cinema.application.screenings.queries.GetAvailableSeatsQueryHandler(screenings, seats, reservations, holds);
     }
 
     @Bean
-    @Profile("venue-dev")
+    @Profile({"venue-dev", "mysql"})
     public cinema.application.carts.queries.GetMyCartQueryHandler getMyCartQueryHandler(
             cinema.application.common.interfaces.CurrentUser currentUser,
             cinema.application.common.interfaces.CustomerRepository customerRepository,
@@ -213,7 +214,7 @@ public class UseCaseConfiguration {
     }
 
     @Bean
-    @Profile("venue-dev")
+    @Profile({"venue-dev", "mysql"})
     public cinema.application.bookings.queries.GetMyBookingsQueryHandler getMyBookingsQueryHandler(
             cinema.application.common.interfaces.CurrentUser currentUser,
             cinema.application.common.interfaces.CustomerRepository customerRepository,
@@ -225,7 +226,7 @@ public class UseCaseConfiguration {
     }
 
     @Bean
-    @Profile("venue-dev")
+    @Profile({"venue-dev", "mysql"})
     public cinema.application.bookings.queries.GetBookingQueryHandler getBookingQueryHandler(
             cinema.application.common.interfaces.CurrentUser currentUser,
             cinema.application.common.interfaces.CustomerRepository customerRepository,
@@ -238,14 +239,14 @@ public class UseCaseConfiguration {
     }
 
     @Bean
-    @Profile("venue-dev")
+    @Profile({"venue-dev", "mysql"})
     public cinema.application.tickets.queries.GetMyTicketsQueryHandler getMyTicketsQueryHandler(
             CurrentUser currentUser, CustomerRepository customers, BookingRepository bookings, TicketRepository tickets) {
         return new cinema.application.tickets.queries.GetMyTicketsQueryHandler(currentUser, customers, bookings, tickets);
     }
 
     @Bean
-    @Profile("venue-dev")
+    @Profile({"venue-dev", "mysql"})
     public cinema.application.tickets.queries.GetTicketQueryHandler getTicketQueryHandler(
             CurrentUser currentUser, CustomerRepository customers, BookingRepository bookings, TicketRepository tickets) {
         return new cinema.application.tickets.queries.GetTicketQueryHandler(currentUser, customers, bookings, tickets);

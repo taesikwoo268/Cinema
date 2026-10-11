@@ -8,7 +8,7 @@ import cinema.application.common.interfaces.ScreeningRepository;
 import cinema.infrastructure.persistence.inmemory.InMemoryScreeningRepository;
 
 @Configuration
-@Profile("venue-dev")
+@Profile("venue-dev & !mysql")
 public class ScreeningConfiguration {
 
     @Bean

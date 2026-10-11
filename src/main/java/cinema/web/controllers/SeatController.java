@@ -13,7 +13,7 @@ import cinema.web.requests.CreateSeatRequest;
 import cinema.web.responses.CreatedResourceResponse;
 
 @RestController
-@Profile("venue-dev")
+@Profile({"venue-dev", "mysql"})
 @RequestMapping("/seats")
 public final class SeatController {
 

@@ -11,7 +11,7 @@ import cinema.domain.payment.PaymentStatus;
 
 import java.util.function.Supplier;
 
-public final class PayBookingCommandHandler implements UseCase<PayBookingCommand, PaymentResult> {
+public class PayBookingCommandHandler implements UseCase<PayBookingCommand, PaymentResult> {
 
     private final CurrentUser currentUser;
     private final CustomerRepository customers;

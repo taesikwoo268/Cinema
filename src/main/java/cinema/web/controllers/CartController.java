@@ -22,7 +22,7 @@ import cinema.application.common.models.CartView;
 import cinema.web.requests.CartSeatRequest;
 
 @RestController
-@Profile("venue-dev")
+@Profile({"venue-dev", "mysql"})
 @RequestMapping("/carts")
 public final class CartController {
     private final AddSeatToCartCommandHandler addSeatToCartCommand;

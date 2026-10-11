@@ -14,7 +14,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.function.Supplier;
 
-public final class CheckoutCartCommandHandler implements UseCase<CheckoutCartCommand, CheckoutResult> {
+public class CheckoutCartCommandHandler implements UseCase<CheckoutCartCommand, CheckoutResult> {
     private final CurrentUser currentUser;
     private final CustomerRepository customers;
     private final CartRepository carts;
