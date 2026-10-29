@@ -66,11 +66,23 @@ Một ghế vật lý có thể được bán cho nhiều suất chiếu khác n
 Backend được tổ chức theo Clean Architecture với bốn tầng:
 
 ```mermaid
-flowchart LR
+flowchart TB
+    Web["Web<br/>REST Controller · DTO · Security"]
+    Application["Application<br/>Command / Query Handler · Ports"]
+    Domain["Domain<br/>Entity · Value Object · Business Rules"]
+    Infrastructure["Infrastructure<br/>JPA Adapter · Token Service<br/>Transaction · FakePaymentGateway"]
     Web --> Application
     Application --> Domain
     Infrastructure --> Application
     Infrastructure --> Domain
+    classDef web fill:#dbeafe,stroke:#2563eb,color:#172554
+    classDef app fill:#dcfce7,stroke:#16a34a,color:#14532d
+    classDef domain fill:#fef3c7,stroke:#d97706,color:#78350f
+    classDef infra fill:#ede9fe,stroke:#7c3aed,color:#3b0764
+    class Web web
+    class Application app
+    class Domain domain
+    class Infrastructure infra
 ```
 
 Các mũi tên mô tả hướng phụ thuộc mã nguồn.
@@ -114,18 +126,122 @@ pom.xml        Cấu hình build và thư viện
 
 ### 2.3. Ví dụ xử lý một request
 
-```text
-HTTP request
-→ Security filter
-→ Controller
-→ Application handler
-→ Domain và các interface
-→ Infrastructure adapter
-→ MySQL
-→ HTTP response
+```mermaid
+flowchart LR
+    Client["Client"] --> Security["Security filter"]
+    Security --> Controller["Controller"]
+    Controller --> Handler["Application handler"]
+    Handler --> Rules["Domain rules"]
+    Handler --> Adapter["Adapter qua port"]
+    Adapter --> DB[("MySQL")]
 ```
 
+Sơ đồ mô tả luồng gọi xử lý. Kết quả được trả ngược qua handler và controller thành HTTP response; lỗi được ánh xạ sang phản hồi phù hợp.
+
 Trong profile `mysql`, Infrastructure bao các command handler bằng transaction. Application và Domain không phải trực tiếp quản lý kết nối database.
+
+### 2.4. Class diagram — Các lớp nghiệp vụ chính
+
+Sơ đồ rút gọn thể hiện các lớp và quan hệ nghiệp vụ. Các liên kết theo ID được biểu diễn bằng đường liên kết; không phải mọi quan hệ đều là tham chiếu đối tượng Java hoặc khóa ngoại database. Lược bỏ BaseEntity, Money, enum và các lớp hạ tầng để dễ đọc.
+
+```mermaid
+classDiagram
+    direction TB
+    class Cinema {
+        String id
+        String name
+        String address
+    }
+    class Hall {
+        String id
+        String cinemaId
+        String name
+    }
+    class Seat {
+        String id
+        String hallId
+        String row
+        int number
+    }
+    class Movie {
+        String id
+        String title
+        int durationMinutes
+    }
+    class Screening {
+        String id
+        String movieId
+        String hallId
+        Instant startTime
+        Instant endTime
+        Money basePrice
+    }
+    class Customer {
+        String id
+        String userId
+        String displayName
+    }
+    class Cart {
+        String id
+        String customerId
+        List~CartItem~ items
+    }
+    class CartItem {
+        <<ValueObject>>
+        String screeningId
+        String seatId
+        Money unitPrice
+    }
+    class Booking {
+        String id
+        String customerId
+        String screeningId
+        List~BookingItem~ items
+        Money totalAmount
+        BookingStatus status
+    }
+    class BookingItem {
+        <<ValueObject>>
+        String seatId
+        Money price
+    }
+    class Payment {
+        String id
+        String bookingId
+        Money amount
+        PaymentStatus status
+    }
+    class Ticket {
+        String id
+        String bookingId
+        String screeningId
+        String seatId
+        String ticketCode
+    }
+    Cinema "1" -- "0..*" Hall : contains
+    Hall "1" -- "0..*" Seat : contains
+    Hall "1" -- "0..*" Screening : hosts
+    Movie "1" -- "0..*" Screening : shown in
+    Customer "1" -- "0..1" Cart : owns
+    Customer "1" -- "0..*" Booking : places
+    Cart "1" *-- "0..*" CartItem : items
+    Screening "1" -- "0..*" CartItem : selected for
+    Seat "1" -- "0..*" CartItem : selected seat
+    Screening "1" -- "0..*" Booking : booked for
+    Booking "1" *-- "1..*" BookingItem : items
+    Seat "1" -- "0..*" BookingItem : booked seat
+    Booking "1" -- "0..*" Payment : attempts
+    Booking "1" -- "0..*" Ticket : issues
+```
+
+**Cách đọc sơ đồ:**
+
+- Đường liền: association (liên kết giữa các đối tượng).
+- Thoi đặc ở Cart và Booking: composition; các item là thành phần thuộc đối tượng chứa.
+- `1`, `0..1`, `0..*`, `1..*`: số lượng đối tượng có thể liên kết ở mỗi đầu.
+- Không dùng thoi rỗng hoặc tam giác kế thừa khi sơ đồ không biểu diễn quan hệ tương ứng.
+- Booking có thể chưa có payment hoặc ticket; nhiều payment biểu diễn các lần thử, nhưng tối đa một payment SUCCESS theo ràng buộc database.
+- Ticket còn lưu screeningId và seatId; hai đường tham chiếu này được lược bỏ để giảm giao cắt. Một BookingItem có tối đa một ticket theo ràng buộc booking–ghế.
 
 ## 3. Các cơ chế đã triển khai
 
