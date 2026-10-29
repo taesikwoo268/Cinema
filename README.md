@@ -106,3 +106,13 @@ Giới hạn V1: FakePaymentGateway; chưa có hold TTL, refresh/logout/reset pa
 - [Package 1 — hồ sơ bàn giao](docs/backend-package-1.md)
 
 Các tài liệu `docs/m1/` đến `docs/m7/` là hồ sơ từng milestone tại thời điểm thực hiện. Những mô tả như “JPA/Bearer deferred” trong hồ sơ cũ không phải trạng thái hiện tại; xem progress và mysql.md trước khi giao việc mới.
+
+
+Các việc cần tiếp tục
+
+Xây dựng frontend và cấu hình kết nối với backend.
+Bổ sung thời hạn giữ ghế và giải phóng ghế hết hạn.
+Thay FakePaymentGateway bằng cổng thanh toán thật.
+Xử lý trường hợp gateway thành công nhưng transaction database thất bại, để retry không gây thu tiền lặp.
+Bổ sung logout, refresh token, đặt lại mật khẩu và giới hạn tần suất yêu cầu.
+Chuẩn bị HTTPS, quản lý bí mật và giám sát khi triển khai thực tế.
