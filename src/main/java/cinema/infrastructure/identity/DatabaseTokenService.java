@@ -1,12 +1,5 @@
 package cinema.infrastructure.identity;
 
-import cinema.application.common.interfaces.Clock;
-import cinema.application.common.interfaces.TokenVerifier;
-import cinema.application.common.models.AuthenticatedUser;
-import cinema.application.common.models.AuthenticationResult;
-import cinema.infrastructure.persistence.entities.AccessTokenJpaEntity;
-import cinema.infrastructure.persistence.entities.UserJpaEntity;
-import cinema.infrastructure.persistence.repositories.SpringDataAccessTokenRepository;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -16,9 +9,18 @@ import java.util.Base64;
 import java.util.HexFormat;
 import java.util.Optional;
 import java.util.regex.Pattern;
+
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import cinema.application.common.interfaces.Clock;
+import cinema.application.common.interfaces.TokenVerifier;
+import cinema.application.common.models.AuthenticatedUser;
+import cinema.application.common.models.AuthenticationResult;
+import cinema.infrastructure.persistence.entities.AccessTokenJpaEntity;
+import cinema.infrastructure.persistence.entities.UserJpaEntity;
+import cinema.infrastructure.persistence.repositories.SpringDataAccessTokenRepository;
 
 @Service
 @Profile("mysql")
@@ -63,3 +65,5 @@ public class DatabaseTokenService implements TokenVerifier {
         }
     }
 }
+
+

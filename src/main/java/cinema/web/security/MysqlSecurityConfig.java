@@ -1,7 +1,5 @@
 package cinema.web.security;
 
-import cinema.application.common.exceptions.ForbiddenException;
-import cinema.application.common.interfaces.TokenVerifier;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,10 +11,15 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 
+import cinema.application.common.exceptions.ForbiddenException;
+import cinema.application.common.interfaces.TokenVerifier;
+
 @Configuration
 @Profile("mysql")
 public class MysqlSecurityConfig {
-    @Bean SecurityFilterChain mysqlSecurityFilterChain(HttpSecurity http, TokenVerifier verifier,
+
+    @Bean
+    SecurityFilterChain mysqlSecurityFilterChain(HttpSecurity http, TokenVerifier verifier,
             @Qualifier("handlerExceptionResolver") HandlerExceptionResolver errors) throws Exception {
         return http
                 // Header-only Bearer authentication; no browser cookie/session credentials.
