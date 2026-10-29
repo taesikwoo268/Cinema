@@ -108,16 +108,95 @@ Giới hạn V1: FakePaymentGateway; chưa có hold TTL, refresh/logout/reset pa
 Các tài liệu `docs/m1/` đến `docs/m7/` là hồ sơ từng milestone tại thời điểm thực hiện. Những mô tả như “JPA/Bearer deferred” trong hồ sơ cũ không phải trạng thái hiện tại; xem progress và mysql.md trước khi giao việc mới.
 
 
-Các việc cần tiếp tục
+## Giới hạn hiện tại và hướng cải tiến
 
-Xây dựng frontend và cấu hình kết nối với backend.
+Phạm vi đối chiếu: nhánh `main`, commit `7d49cda`. Các hướng cải tiến dưới đây chưa phải chức năng đã triển khai.
 
-Bổ sung thời hạn giữ ghế và giải phóng ghế hết hạn.
+### 1. Thanh toán
 
-Thay FakePaymentGateway bằng cổng thanh toán thật.
+**Hiện trạng**
+- Sử dụng `FakePaymentGateway`, chưa tích hợp thanh toán thật.
+- Khi kết quả thanh toán thành công đã được commit, yêu cầu lặp lại không gọi gateway lần nữa.
+- Nếu gateway thành công nhưng database rollback trước khi commit, lần thử lại vẫn có thể gọi gateway thêm lần nữa.
 
-Xử lý trường hợp gateway thành công nhưng transaction database thất bại, để retry không gây thu tiền lặp.
+**Hướng cải tiến**
+- Tích hợp cổng thanh toán thật và xác minh chữ ký thông báo kết quả.
+- Đối chiếu mã đơn, số tiền và mã giao dịch trước khi xác nhận booking.
+- Sử dụng idempotency key được cổng thanh toán hỗ trợ.
+- Bổ sung trạng thái chờ xác minh và cơ chế đối soát; không mặc định timeout là thanh toán thất bại.
 
-Bổ sung logout, refresh token, đặt lại mật khẩu và giới hạn tần suất yêu cầu.
+### 2. Thời hạn giữ ghế
 
-Chuẩn bị HTTPS, quản lý bí mật và giám sát khi triển khai thực tế.
+**Hiện trạng**
+- Chưa có cơ chế giữ ghế tự hết hạn.
+- Khách bỏ dở thao tác có thể khiến ghế tiếp tục bị giữ nếu không được giải phóng qua luồng hiện có.
+
+**Hướng cải tiến**
+- Bổ sung thời điểm hết hạn và kiểm tra hiệu lực khi checkout, thanh toán.
+- Bổ sung cơ chế giải phóng giữ ghế hết hạn.
+- Quy định thời hạn thanh toán của booking và xử lý khi quá hạn.
+- Giải quyết rõ trường hợp thanh toán thành công sau khi quyền giữ ghế đã hết hạn.
+
+### 3. Xử lý đồng thời và mở rộng
+
+**Hiện trạng**
+- Backend hỗ trợ xử lý nhiều request đồng thời.
+- Có `synchronized`, transaction và khóa database để kiểm soát tranh chấp.
+- Giữ ghế khóa ở cấp suất chiếu, nên các yêu cầu chọn ghế khác nhau trong cùng suất vẫn có thể phải chờ nhau.
+- `synchronized(bookings)` trong xử lý thanh toán có thể khiến các booking khác nhau chờ nhau trong cùng tiến trình.
+- `synchronized` không bảo vệ giữa các instance backend khác nhau.
+
+**Hướng cải tiến**
+- Đo thời gian chờ khóa trước khi tối ưu.
+- Cân nhắc thu hẹp phạm vi khóa theo ghế hoặc booking.
+- Kiểm thử ít nhất hai instance dùng chung MySQL.
+- Kiểm chứng đồng thời các luồng giữ ghế, checkout, hủy booking và thanh toán; không dựa riêng vào khóa trong bộ nhớ.
+
+### 4. Xác thực và bảo mật
+
+**Hiện trạng**
+- Có Bearer token thời hạn một giờ và phân quyền CUSTOMER/ADMIN.
+- Chưa có logout thu hồi token, refresh token, đặt lại mật khẩu hoặc dọn token hết hạn tự động.
+- Chưa có rate limiting.
+
+**Hướng cải tiến**
+- Hoàn thiện vòng đời token và cơ chế thu hồi.
+- Bổ sung quy trình khôi phục tài khoản.
+- Giới hạn tần suất truy cập theo tài khoản/IP và từng loại API.
+- Kiểm thử token hết hạn, bị thu hồi, thay đổi quyền và truy cập dữ liệu không thuộc sở hữu.
+
+### 5. Tích hợp frontend
+
+**Hiện trạng**
+- Chưa triển khai frontend.
+- CORS hoặc proxy cho môi trường phát triển còn cần hoàn thiện.
+
+**Hướng cải tiến**
+- Dùng đặc tả OpenAPI làm hợp đồng tích hợp.
+- Thống nhất địa chỉ API, cách gửi token và định dạng lỗi.
+- Xử lý trên giao diện các tình huống ghế vừa bị người khác giữ, hết hạn giữ ghế và thanh toán chưa rõ kết quả.
+
+### 6. Triển khai và vận hành
+
+**Hiện trạng**
+- Có Dockerfile và Docker Compose phục vụ chạy local.
+- Compose mặc định chỉ mở backend trên `127.0.0.1`.
+- Cấu hình local chưa phải cấu hình production hoàn chỉnh.
+
+**Hướng cải tiến**
+- Bổ sung HTTPS/reverse proxy và quản lý bí mật cho môi trường triển khai.
+- Thiết lập log tập trung, giám sát và cảnh báo.
+- Xây dựng quy trình sao lưu, khôi phục và nâng cấp database.
+- Kiểm tra khả năng khôi phục thực tế, không chỉ kiểm tra việc tạo bản sao lưu.
+
+### 7. Kiểm thử và hiệu năng
+
+**Hiện trạng**
+- Repository có kiểm thử và hồ sơ benchmark.
+- Kết quả benchmark phụ thuộc môi trường, dữ liệu và kịch bản chạy; chưa thể dùng để khẳng định năng lực production.
+
+**Hướng cải tiến**
+- Chạy lại kiểm thử trên mốc commit bàn giao.
+- Đo tải trên môi trường triển khai dự kiến với cả luồng đọc và đặt vé.
+- Theo dõi độ trễ p95/p99, tỷ lệ lỗi, thời gian chờ khóa và mức sử dụng kết nối database.
+- Bổ sung tình huống lỗi gateway, lỗi database, khởi động lại dịch vụ và chạy nhiều instance.
