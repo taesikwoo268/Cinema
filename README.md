@@ -111,8 +111,13 @@ Các tài liệu `docs/m1/` đến `docs/m7/` là hồ sơ từng milestone tạ
 Các việc cần tiếp tục
 
 Xây dựng frontend và cấu hình kết nối với backend.
+
 Bổ sung thời hạn giữ ghế và giải phóng ghế hết hạn.
+
 Thay FakePaymentGateway bằng cổng thanh toán thật.
+
 Xử lý trường hợp gateway thành công nhưng transaction database thất bại, để retry không gây thu tiền lặp.
+
 Bổ sung logout, refresh token, đặt lại mật khẩu và giới hạn tần suất yêu cầu.
+
 Chuẩn bị HTTPS, quản lý bí mật và giám sát khi triển khai thực tế.
