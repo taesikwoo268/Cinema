@@ -108,6 +108,107 @@ Giới hạn V1: FakePaymentGateway; chưa có hold TTL, refresh/logout/reset pa
 Các tài liệu `docs/m1/` đến `docs/m7/` là hồ sơ từng milestone tại thời điểm thực hiện. Những mô tả như “JPA/Bearer deferred” trong hồ sơ cũ không phải trạng thái hiện tại; xem progress và mysql.md trước khi giao việc mới.
 
 
+```markdown
+## Các cơ chế backend đã triển khai
+
+Phạm vi đối chiếu: nhánh `main`, commit `7d49cda`. Nội dung mô tả mã nguồn đã kiểm tra, không phải kết quả chạy lại kiểm thử tại thời điểm đọc.
+
+### 1. Xác thực và bảo mật
+
+| Cơ chế | Triển khai hiện tại |
+|---|---|
+| Băm mật khẩu | Sử dụng **PBKDF2** để băm và kiểm tra mật khẩu. |
+| Xác thực API | Sử dụng **Bearer access token** ngẫu nhiên, có thời hạn **1 giờ**. Token hiện tại không phải JWT. |
+| Lưu trữ token | Database lưu **SHA-256 của token**, không lưu trực tiếp chuỗi token được cấp cho client. |
+| Kiểm tra token | Kiểm tra định dạng, bản băm trong database và thời hạn sử dụng. |
+| Phân quyền | Phân biệt **CUSTOMER** và **ADMIN**; API quản trị yêu cầu quyền ADMIN. |
+| Quyền sở hữu dữ liệu | Kiểm tra người dùng có quyền truy cập hoặc thao tác booking/ticket tương ứng. ADMIN không mặc nhiên bỏ qua kiểm tra ownership. |
+| Nhiều phiên đăng nhập | Mỗi lần đăng nhập thành công có thể tạo token mới; token cũ không tự bị thu hồi. |
+
+Client gửi token qua HTTP header:
+
+    Authorization: Bearer <accessToken>
+
+**Phân biệt:** PBKDF2 dùng cho mật khẩu; SHA-256 dùng để lưu bản băm của token.
+
+### 2. Xử lý đồng thời và kiểm soát tranh chấp
+
+- Máy chủ web hỗ trợ xử lý nhiều HTTP request đồng thời.
+- Checkout sử dụng `synchronized(cart)` để bảo vệ thao tác trên cùng giỏ hàng trong cùng tiến trình.
+- Thanh toán sử dụng `synchronized(bookings)` trong vùng xử lý quan trọng.
+- Trong profile `mysql`, giữ ghế sử dụng khóa `PESSIMISTIC_WRITE` trên bản ghi suất chiếu trước khi kiểm tra và cập nhật.
+- Database có các ràng buộc duy nhất nhằm ngăn dữ liệu ghế/vé trùng theo các khóa đã định nghĩa.
+- Lỗi vi phạm ràng buộc hoặc tranh chấp khóa được chuyển thành lỗi xung đột nghiệp vụ.
+
+**Giới hạn:**
+- `synchronized` chỉ có hiệu lực trong một tiến trình Java.
+- Khóa ở cấp suất chiếu có thể khiến các yêu cầu chọn ghế khác nhau của cùng suất phải chờ nhau.
+- Cần kiểm thử riêng khi triển khai nhiều instance backend dùng chung database.
+
+### 3. Transaction và lưu trữ dữ liệu
+
+- Sử dụng **Spring Data JPA và MySQL** để lưu dữ liệu.
+- Trong profile `mysql`, các command handler được bao bởi transaction tại tầng Infrastructure.
+- Transaction sử dụng mức cô lập `READ_COMMITTED`.
+- Các cập nhật database trong phạm vi transaction được commit hoặc rollback cùng nhau.
+- **Flyway V1–V3** quản lý thay đổi cấu trúc dữ liệu.
+- Hibernate sử dụng `ddl-auto=validate` để kiểm tra schema.
+
+> Transaction database không bao phủ giao dịch của cổng thanh toán bên ngoài.
+
+### 4. Kiểm tra nghiệp vụ checkout
+
+- Kiểm tra người dùng đã đăng nhập và có hồ sơ customer.
+- Kiểm tra giỏ hàng tồn tại và không rỗng.
+- Kiểm tra các ghế trong giỏ vẫn được giữ bởi customer hiện tại.
+- Nhóm các mục trong giỏ theo suất chiếu.
+- Tạo **một booking cho mỗi suất chiếu**, với trạng thái `PENDING`.
+- Lưu giá của từng ghế vào booking và tính tổng tiền.
+- Xóa nội dung giỏ sau khi tạo booking trong luồng checkout.
+
+### 5. Thanh toán và phát vé
+
+- Hiện sử dụng **FakePaymentGateway** để mô phỏng thanh toán.
+- Kiểm tra quyền sở hữu và trạng thái booking trước khi thanh toán.
+- Kiểm tra ghế đã được đặt trước khi gọi gateway.
+- Khi thành công, lưu payment, xác nhận booking, ghi nhận ghế đã đặt và phát vé.
+- Nếu payment `SUCCESS` đã được lưu và commit, yêu cầu lặp sử dụng kết quả đã có, không gọi gateway lại.
+- ID vé được tạo ổn định từ booking và ghế; kiểm tra vé tồn tại trước khi lưu để hỗ trợ xử lý lặp.
+
+**Giới hạn:** nếu gateway thành công nhưng database rollback trước khi commit, lần thử lại vẫn có thể gọi gateway thêm lần nữa. Cần bổ sung idempotency tại cổng thanh toán và cơ chế đối soát trước khi tích hợp thanh toán thật.
+
+### 6. Kiểm thử
+
+- Có kiểm thử nghiệp vụ, API, persistence và ranh giới kiến trúc.
+- Có kiểm thử đồng thời sử dụng `ExecutorService` và `CountDownLatch`.
+- Test checkout bao gồm:
+  - Hai yêu cầu cùng checkout một giỏ: chỉ một yêu cầu thành công.
+  - Hai giỏ khác nhau có thể tiếp tục xử lý đồng thời.
+- Có hồ sơ kiểm thử và benchmark trong repository.
+
+> Việc có mã kiểm thử không đồng nghĩa các kiểm thử vừa được chạy hoặc mọi tình huống triển khai đều đã được xác nhận.
+
+### 7. Đóng gói và chạy ứng dụng
+
+- Có **Dockerfile** nhiều giai đoạn; ứng dụng chạy bằng tài khoản không phải root.
+- Có **Docker Compose** chạy backend và MySQL 8.4.
+- Dữ liệu MySQL được lưu trong volume.
+- Có health check và cơ chế chờ database sẵn sàng.
+- Có đặc tả **OpenAPI** phục vụ tra cứu và tích hợp API.
+- Cấu hình Compose hiện phục vụ môi trường local, chưa phải cấu hình production hoàn chỉnh.
+
+### 8. Các chức năng chưa hoàn thiện
+
+- Tự động hết hạn và giải phóng giữ ghế.
+- Logout thu hồi token, refresh token và đặt lại mật khẩu.
+- Dọn token hết hạn tự động.
+- Rate limiting.
+- Tích hợp cổng thanh toán thật và đối soát giao dịch.
+- Frontend và cấu hình tích hợp CORS/dev proxy.
+- Kiểm chứng đầy đủ khi chạy nhiều instance.
+- Cấu hình vận hành production: HTTPS, quản lý bí mật, giám sát và sao lưu/khôi phục.
+```
+
 ## Giới hạn hiện tại và hướng cải tiến
 
 Phạm vi đối chiếu: nhánh `main`, commit `7d49cda`. Các hướng cải tiến dưới đây chưa phải chức năng đã triển khai.
